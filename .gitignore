@@ -9,7 +9,7 @@ git push
 database.py
 
 # Datasets
-Dataset.csv
+# Dataset.csv
 Dataset/
 *.csv
 *.xlsx
