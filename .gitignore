@@ -1,6 +1,9 @@
 # Python cache
-__pycache__/
-*.pyc
+_echo "__pycache__/" >> .gitignore
+git add .gitignore
+git commit -m "ignore __pycache__"
+git push
+
 
 # Local database configuration
 database.py
