@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Edu2Job - Login/Register</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/static/favicon.png"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      /* Fixed background image */
+      background: url("/static/bgimg.png") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .glass-card {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.1);
+      border-radius: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      color: #fff;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 1rem;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      transition: all 0.3s;
+    }
+
+    /* White placeholders for both login & register */
+    .input-field::placeholder { color: #fff; opacity: 1; }
+
+    .input-field:focus {
+      outline: none;
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.5);
+    }
+
+    .gradient-btn {
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: 1rem;
+      background: linear-gradient(90deg, #4f46e5, #ec4899);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .gradient-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+    .toggle-link {
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    #message {
+      text-align:center;
+      margin-top:1rem;
+      font-weight:500;
+      font-size:0.95rem;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glass-card">
+    <h1 class="text-5xl font-extrabold text-center mb-8 drop-shadow-lg">Edu2Job</h1>
+    <h4 class="text-2xl font-extrabold text-center mb-6 drop-shadow-lg">Predict Your Job Role</h4>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-5">
+      <input type="email" id="loginEmail" placeholder="Email" class="input-field" required/>
+      <input type="password" id="loginPassword" placeholder="Password" class="input-field" required/>
+      <button type="submit" class="gradient-btn">Login</button>
+      <p class="text-center mt-2">New user? <span id="showRegister" class="toggle-link">Register here</span></p>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" class="space-y-5 hidden">
+      <input type="text" id="regName" placeholder="Full Name" class="input-field" required/>
+      <input type="email" id="regEmail" placeholder="Email" class="input-field" required/>
+      <input type="password" id="regPassword" placeholder="Password" class="input-field" required/>
+      <input type="password" id="regConfirmPassword" placeholder="Confirm Password" class="input-field" required/>
+      <button type="submit" class="gradient-btn">Register</button>
+      <p class="text-center mt-2">Already have an account? <span id="showLogin" class="toggle-link">Login here</span></p>
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+<script>
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const showRegister = document.getElementById("showRegister");
+const showLogin = document.getElementById("showLogin");
+const messageDiv = document.getElementById("message");
+
+// Toggle forms
+showRegister.onclick = () => {
+  loginForm.classList.add("hidden");
+  registerForm.classList.remove("hidden");
+  messageDiv.textContent = "";
+};
+showLogin.onclick = () => {
+  registerForm.classList.add("hidden");
+  loginForm.classList.remove("hidden");
+  messageDiv.textContent = "";
+};
+
+// Helper: POST JSON
+async function postJson(url, data) {
+  const res = await fetch(url, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(data)
+  });
+  return {ok: res.ok, data: await res.json()};
+}
+
+// Login
+loginForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  messageDiv.textContent = "";
+
+  const {ok,data} = await postJson("/api/login", {
+    email: document.getElementById("loginEmail").value.trim(),
+    password: document.getElementById("loginPassword").value
+  });
+
+  if(ok){
+    messageDiv.textContent = "✅ Login successful, redirecting...";
+    setTimeout(()=>window.location.href="/dashboard",1000);
+  } else {
+    messageDiv.textContent = data.error || "Login failed";
+  }
+});
+
+// Register
+registerForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  messageDiv.textContent = "";
+
+  const password = document.getElementById("regPassword").value;
+  const confirmPassword = document.getElementById("regConfirmPassword").value;
+
+  if(password !== confirmPassword){
+    messageDiv.textContent = "❌ Passwords do not match!";
+    return;
+  }
+
+  const {ok,data} = await postJson("/api/register", {
+    name: document.getElementById("regName").value.trim(),
+    email: document.getElementById("regEmail").value.trim(),
+    password: password
+  });
+
+  if(ok){
+    messageDiv.textContent = "✅ Registered successfully, please login!";
+    registerForm.reset();
+    registerForm.classList.add("hidden");
+    loginForm.classList.remove("hidden");
+  } else {
+    messageDiv.textContent = data.error || "Registration failed";
+  }
+});
+</script>
+
+</body>
+</html>
