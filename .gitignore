@@ -1,2 +1,12 @@
-# Ignore the database configuration file
+# Python
+__pycache__/
+*.pyc
+
+# Local database config
 database.py
+
+# Datasets
+Dataset.csv
+Dataset/
+*.csv
+*.xlsx
