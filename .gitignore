@@ -22,3 +22,9 @@ venv/
 .env/
 .venv/
 env/
+
+sql.sql
+# 1. Add the file to .gitignore
+echo "jobrole_model.pkl" >> .gitignore
+echo "label_encoder.pkl" >> .gitignore
+echo "feature_encoders.pkl" >> .gitignore
