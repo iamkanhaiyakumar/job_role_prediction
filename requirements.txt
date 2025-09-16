@@ -1,0 +1,19 @@
+# ---- Web Framework ----
+Flask==2.3.3
+
+# ---- Database ----
+mysql-connector-python==8.1.0     # MySQL driver
+
+# ---- Authentication ----
+bcrypt==4.1.2                     # password hashing
+
+# ---- Machine Learning / Data ----
+numpy==1.26.4
+scikit-learn==1.4.2
+joblib==1.4.2
+
+# ---- Deployment (production server) ----
+gunicorn==21.2.0                  # WSGI server for production
+
+# ---- (Optional but recommended) ----
+python-dotenv==1.0.1              # load env variables from .env
