@@ -1,8 +1,8 @@
-# Python
+# Python cache
 __pycache__/
 *.pyc
 
-# Local database config
+# Local database configuration
 database.py
 
 # Datasets
@@ -10,3 +10,15 @@ Dataset.csv
 Dataset/
 *.csv
 *.xlsx
+
+# Model / pickle files
+jobrole_model.pkl
+label_encoder.pkl
+feature_encoders.pkl
+*.pkl        # ignore any other .pkl files as well
+
+# Virtual environment
+venv/
+.env/
+.venv/
+env/
