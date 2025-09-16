@@ -10,9 +10,9 @@ database.py
 
 # Datasets
 # Dataset.csv
-Dataset/
-*.csv
-*.xlsx
+# Dataset/
+# *.csv
+# *.xlsx
 
 # Model / pickle files
 jobrole_model.pkl
@@ -31,3 +31,6 @@ sql.sql
 echo "jobrole_model.pkl" >> .gitignore
 echo "label_encoder.pkl" >> .gitignore
 echo "feature_encoders.pkl" >> .gitignore
+
+
+
