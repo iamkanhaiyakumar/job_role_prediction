@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,19 +8,94 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @keyframes slideDown {
-      from {
-        transform: translateY(-20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      from { transform: translateY(-20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
     }
+    .toast { animation: slideDown 0.4s ease-out; }
 
-    .toast {
-      animation: slideDown 0.4s ease-out;
+    /* ---------- Chatbot Styles ---------- */
+    #chatbot-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4f46e5;
+      color: #fff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
     }
+    #chatbot-toggle:hover { transform: scale(1.1); }
+
+    #chatbot-box {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 320px;
+      max-height: 420px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 50;
+    }
+    #chatbot-header {
+      background: #4f46e5;
+      color: #fff;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+ /* Force readable dark text inside the chatbot */
+#chatbot-messages,
+#chatbot-messages div,
+#chatbot-messages strong {
+  color: #111 !important;       /* dark grey/black text */
+}
+
+#chatbot-text {
+  color: #111 !important;       /* user typing area text */
+  background: #f9f9f9;          /* light background for contrast */
+}
+
+    #chatbot-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    #chatbot-input input {
+      flex: 1;
+      border: none;
+      padding: 0.6rem;
+      outline: none;
+    }
+    #chatbot-input button {
+      background: #4f46e5;
+      color: #fff;
+      padding: 0 1rem;
+      font-weight: 600;
+    }
+    .bot-msg, .user-msg {
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 8px;
+  max-width: 90%;
+  line-height: 1.4;
+}
+.user-msg { background: #e0e7ff; color: #111; align-self: flex-end; }
+.bot-msg  { background: #f1f5f9; color: #111; }
+
   </style>
 </head>
 
@@ -244,6 +318,21 @@
       </section>
     </main>
   </div>
+   <div id="chatbot-toggle">💬</div>
+
+  <div id="chatbot-box" class="flex">
+    <div id="chatbot-header">
+      Edu2Job Bot
+      <span id="chatbot-close" class="cursor-pointer">✖</span>
+    </div>
+    <div id="chatbot-messages">
+      <div><strong>Bot:</strong> Hi! How can I help you today?</div>
+    </div>
+    <form id="chatbot-input">
+      <input type="text" id="chatbot-text" placeholder="Type a message..." />
+      <button type="submit">Send</button>
+    </form>
+  </div>
 
   <script>
     function switchTab(id) {
@@ -315,6 +404,44 @@
       }
     });
 
+    // === Simple Frontend Bot Logic ===
+   const toggleBtn = document.getElementById("chatbot-toggle");
+  const chatBox   = document.getElementById("chatbot-box");
+  const closeBtn  = document.getElementById("chatbot-close");
+  const chatForm  = document.getElementById("chatbot-input");
+  const chatText  = document.getElementById("chatbot-text");
+  const chatMsgs  = document.getElementById("chatbot-messages");
+
+  function openChat() {
+    chatBox.style.display = "flex";
+  }
+
+  function closeChat() {
+    chatBox.style.display = "none";
+  }
+
+  toggleBtn.onclick = () => openChat();
+  closeBtn.onclick  = () => closeChat();
+
+  // Close instantly when mouse leaves the chat box
+  chatBox.addEventListener("mouseleave", closeChat);
+
+  // Chat send
+  chatForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const msg = chatText.value.trim();
+    if (!msg) return;
+
+    chatMsgs.innerHTML += `<div><strong>You:</strong> ${msg}</div>`;
+    chatText.value = "";
+
+    setTimeout(() => {
+      chatMsgs.innerHTML += `<div><strong>Bot:</strong> You said "${msg}".</div>`;
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    }, 500);
+
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  });
     
 
 

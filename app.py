@@ -1,16 +1,19 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-
 import bcrypt
 import joblib
 import numpy as np
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+import anthropic   # ✅ added for Claude chatbot
 
-# ✅ import database helpers
+# ✅ database helpers
 from database import get_db, init_db
+
+load_dotenv()
+
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = "supersecret"
-
-
 
 init_db()
 
@@ -61,7 +64,7 @@ def profile():
     uid = session["user_id"]
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
-    
+
     if request.method == "GET":
         cursor.execute("SELECT * FROM profiles WHERE user_id=%s", (uid,))
         row = cursor.fetchone()
@@ -154,12 +157,25 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+# ---------------- Claude Chatbot API ----------------
+@app.route("/chat", methods=["POST"])
+def chat():
+    """Chat endpoint for Claude AI"""
+    user_message = request.json.get("message", "")
+    client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    response = client.messages.create(
+        model="claude-3-sonnet-20240229",
+        max_tokens=200,
+        messages=[{"role": "user", "content": user_message}]
+    )
+    text = response.content[0].text if response.content else "No response."
+    return jsonify({"reply": text})
+
 # ---------------- Prediction History ----------------
 @app.route("/api/history")
 def history():
     if "user_id" not in session:
         return jsonify([])
-
     conn = get_db()
     cleanup = conn.cursor()
     cleanup.execute(
@@ -168,7 +184,6 @@ def history():
     )
     conn.commit()
     cleanup.close()
-
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
         SELECT degree, major, cgpa, experience, skills, predicted_role, created_at

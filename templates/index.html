@@ -5,23 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Edu2Job - Login/Register</title>
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="/static/favicon.png"/>
-
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body {
       font-family: 'Poppins', sans-serif;
       min-height: 100vh;
-      /* Fixed background image */
       background: url("/static/bgimg.png") no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
     }
-
     .glass-card {
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -34,7 +30,6 @@
       max-width: 400px;
       color: #fff;
     }
-
     .input-field {
       width: 100%;
       padding: 1rem;
@@ -44,16 +39,12 @@
       color: #fff;
       transition: all 0.3s;
     }
-
-    /* White placeholders for both login & register */
     .input-field::placeholder { color: #fff; opacity: 1; }
-
     .input-field:focus {
       outline: none;
       background: rgba(255,255,255,0.25);
       box-shadow: 0 0 0 3px rgba(139,92,246,0.5);
     }
-
     .gradient-btn {
       width: 100%;
       padding: 0.85rem;
@@ -65,7 +56,6 @@
       transition: all 0.2s;
     }
     .gradient-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-
     .toggle-link {
       color: #fff;
       text-decoration: underline;
@@ -83,6 +73,7 @@
 </head>
 <body>
 
+  <!-- ===== Auth Card ===== -->
   <div class="glass-card">
     <h1 class="text-5xl font-extrabold text-center mb-8 drop-shadow-lg">Edu2Job</h1>
     <h4 class="text-2xl font-extrabold text-center mb-6 drop-shadow-lg">Predict Your Job Role</h4>
@@ -107,6 +98,30 @@
 
     <div id="message"></div>
   </div>
+
+  <!-- === Chatbot Widget === -->
+  <div id="chatWidget"
+       class="fixed bottom-5 right-5 w-72 max-h-[70vh] bg-white/90 rounded-2xl shadow-2xl border border-gray-300 flex flex-col text-gray-800 hidden">
+    <div class="flex justify-between items-center bg-gradient-to-r from-indigo-500 to-pink-500 text-white px-4 py-2 rounded-t-2xl">
+      <span class="font-semibold">Ask to Bot</span>
+      <button id="closeChat" class="text-white font-bold">×</button>
+    </div>
+
+    <div id="chatBody" class="flex-1 overflow-y-auto p-3 space-y-2 text-sm"></div>
+
+    <form id="chatForm" class="flex border-t border-gray-300">
+      <input id="chatInput" type="text"
+             placeholder="Type your question…"
+             class="flex-1 p-2 outline-none text-gray-800 bg-transparent">
+      <button class="px-3 text-indigo-600 font-semibold">Send</button>
+    </form>
+  </div>
+
+  <!-- Floating open button -->
+  <button id="openChat"
+          class="fixed bottom-5 right-5 bg-gradient-to-r from-indigo-500 to-pink-500 text-white p-4 rounded-full shadow-lg hover:scale-110 transition">
+    💬
+  </button>
 
 <script>
 const loginForm = document.getElementById("loginForm");
@@ -183,6 +198,64 @@ registerForm.addEventListener("submit", async e => {
     messageDiv.textContent = data.error || "Registration failed";
   }
 });
+
+/* ==== Chatbot logic ==== */
+const openBtn  = document.getElementById("openChat");
+const closeBtn = document.getElementById("closeChat");
+const widget   = document.getElementById("chatWidget");
+const chatBody = document.getElementById("chatBody");
+const chatForm = document.getElementById("chatForm");
+const chatInput= document.getElementById("chatInput");
+
+// --- show/hide ---
+function openWidget(){
+  widget.classList.remove("hidden");
+  openBtn.classList.add("hidden");
+  chatInput.focus();
+}
+
+function closeWidget(){
+  widget.classList.add("hidden");
+  openBtn.classList.remove("hidden");
+}
+
+openBtn.onclick  = openWidget;
+closeBtn.onclick = closeWidget;
+
+// ✅ Close the widget immediately when mouse leaves it
+widget.addEventListener("mouseleave", closeWidget);
+
+// ✅ Also close if it loses focus and nothing inside is active
+widget.addEventListener("focusout", e => {
+  // if the newly focused element is not inside the widget
+  if (!widget.contains(e.relatedTarget)) {
+    closeWidget();
+  }
+});
+
+// Chat form
+chatForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = chatInput.value.trim();
+  if(!msg) return;
+  appendMsg("You", msg);
+  chatInput.value = "";
+
+  const res = await fetch("/chat", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({message: msg})
+  });
+  const data = await res.json();
+  appendMsg("Claude", data.reply || "No response.");
+});
+
+function appendMsg(sender, text){
+  const div = document.createElement("div");
+  div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
 </script>
 
 </body>
