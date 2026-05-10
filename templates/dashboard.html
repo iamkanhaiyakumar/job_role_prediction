@@ -18,11 +18,12 @@
 <nav class="top-nav">
   <div class="nav-left">
     <a href="/" class="nav-logo">Edu2<span>Job</span></a>
-    <span class="nav-badge">Dashboard</span>
+    <span class="nav-badge">✦ Dashboard</span>
   </div>
   <div class="nav-right">
+    <span id="navUserName" style="font-size:0.85rem;color:var(--muted);font-weight:500"></span>
     <img src="/static/user.png" alt="Profile" class="avatar" onclick="switchTab('profile')">
-    <a href="/logout" class="logout-btn">Logout</a>
+    <a href="/logout" class="logout-btn">⬡ Logout</a>
   </div>
 </nav>
 
@@ -35,6 +36,7 @@
     <div class="sidebar-divider"></div>
     <button class="side-btn" data-tab="profile"><span class="ico">👤</span><span>Profile</span></button>
     <div class="sidebar-spacer"></div>
+    <a href="/" class="side-btn"><span class="ico">🌐</span><span>Website</span></a>
     <a href="/logout" class="side-btn" style="color:#ef4444"><span class="ico">🚪</span><span>Logout</span></a>
   </aside>
 
@@ -45,17 +47,38 @@
     <section id="home" class="tab-content active">
       <div class="section-head">
         <h2>Welcome to <span class="hl">Edu2Job</span> 👋</h2>
-        <p>Your AI-powered career prediction dashboard</p>
+        <p>Your AI-powered career prediction dashboard — get started in seconds</p>
       </div>
       <div class="quick-stats">
-        <div class="g-card stat-card"><div class="stat-num">95%+</div><div class="stat-label">Model Accuracy</div></div>
-        <div class="g-card stat-card"><div class="stat-num">50+</div><div class="stat-label">Job Categories</div></div>
-        <div class="g-card stat-card"><div class="stat-num" id="predCount">0</div><div class="stat-label">Your Predictions</div></div>
+        <div class="g-card stat-card">
+          <div class="stat-num">95%+</div>
+          <div class="stat-label">Model Accuracy</div>
+        </div>
+        <div class="g-card stat-card">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Job Categories</div>
+        </div>
+        <div class="g-card stat-card">
+          <div class="stat-num" id="predCount">0</div>
+          <div class="stat-label">Your Predictions</div>
+        </div>
       </div>
       <div class="home-grid">
-        <div class="g-card home-card"><div class="hc-icon">🎯</div><h3>Smart Prediction</h3><p>Use advanced ML models to get job role predictions tailored to your profile.</p></div>
-        <div class="g-card home-card"><div class="hc-icon">📊</div><h3>Track History</h3><p>View past predictions, monitor trends, and visualize skills demand.</p></div>
-        <div class="g-card home-card"><div class="hc-icon">🛡️</div><h3>Secure & Private</h3><p>Your data is protected with modern security and stored safely.</p></div>
+        <div class="g-card home-card">
+          <div class="hc-icon">🎯</div>
+          <h3>Smart Prediction</h3>
+          <p>Use advanced ML models to get job role predictions tailored to your unique profile and skills.</p>
+        </div>
+        <div class="g-card home-card">
+          <div class="hc-icon">📊</div>
+          <h3>Track History</h3>
+          <p>View past predictions, monitor career trends, and visualize skills demand over time.</p>
+        </div>
+        <div class="g-card home-card">
+          <div class="hc-icon">🛡️</div>
+          <h3>Secure & Private</h3>
+          <p>Your data is protected with modern encryption and stored safely in our secure database.</p>
+        </div>
       </div>
       <button class="cta-btn" onclick="switchTab('predict')">🔮 Start Prediction</button>
     </section>
@@ -68,23 +91,87 @@
       </div>
       <div class="g-card">
         <form id="predictForm" class="form-grid">
-          <div class="form-group"><label>Degree</label><input name="degree" placeholder="e.g. B.Tech" required></div>
-          <div class="form-group"><label>Major</label><input name="major" placeholder="e.g. Computer Science" required></div>
-          <div class="form-group"><label>CGPA</label><input name="cgpa" type="number" step="0.01" placeholder="e.g. 8.5" required></div>
-          <div class="form-group"><label>Experience (years)</label><input name="experience" type="number" placeholder="e.g. 2"></div>
-          <div class="form-group"><label>Employed</label><input name="employed" placeholder="Yes / No"></div>
-          <div class="form-group"><label>Industry Preference</label><input name="industry_preference" placeholder="e.g. IT, Finance"></div>
-          <div class="form-group full-width"><label>Skills (comma-separated)</label><input name="skills" placeholder="e.g. python, machine learning, sql"></div>
-          <div class="form-group full-width"><label>Certifications (comma-separated)</label><input name="certifications" placeholder="e.g. AWS, Google ML"></div>
-          <div class="full-width"><button type="submit" class="cta-btn" style="width:100%;justify-content:center">🔮 Predict Job Role</button></div>
+          <div class="form-group">
+            <label>Degree</label>
+            <select name="degree" required>
+              <option value="">Select Degree</option>
+              <option value="B.Tech">B.Tech</option>
+              <option value="M.Tech">M.Tech</option>
+              <option value="BCA">BCA</option>
+              <option value="MCA">MCA</option>
+              <option value="B.Sc">B.Sc</option>
+              <option value="M.Sc">M.Sc</option>
+              <option value="MBA">MBA</option>
+              <option value="PhD">PhD</option>
+              <option value="BBA">BBA</option>
+              <option value="B.Com">B.Com</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Major</label>
+            <select name="major" required>
+              <option value="">Select Major</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Mechanical">Mechanical</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Artificial Intelligence">Artificial Intelligence</option>
+              <option value="Business">Business</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Civil">Civil</option>
+              <option value="Electrical">Electrical</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>CGPA</label>
+            <input name="cgpa" type="number" step="0.01" min="0" max="10" placeholder="e.g. 8.5" required>
+          </div>
+          <div class="form-group">
+            <label>Experience (years)</label>
+            <input name="experience" type="number" min="0" max="30" placeholder="e.g. 2">
+          </div>
+          <div class="form-group">
+            <label>Currently Employed</label>
+            <select name="employed">
+              <option value="">Select</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Industry Preference</label>
+            <select name="industry_preference">
+              <option value="">Select Industry</option>
+              <option value="IT">IT / Software</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Finance">Finance</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Education">Education</option>
+              <option value="Consulting">Consulting</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Engineering">Engineering</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>Skills (comma-separated)</label>
+            <input name="skills" placeholder="e.g. python, machine learning, sql, react, data analysis">
+          </div>
+          <div class="form-group full-width">
+            <label>Certifications (comma-separated)</label>
+            <input name="certifications" placeholder="e.g. AWS, Google ML, Azure, IBM Data Science">
+          </div>
+          <div class="full-width">
+            <button type="submit" class="cta-btn" id="predictBtn" style="width:100%;justify-content:center">🔮 Predict Job Role</button>
+          </div>
         </form>
       </div>
       <div class="pred-result" id="predResult">
-        <div style="font-size:2rem;margin-bottom:0.5rem">🎯</div>
+        <div style="font-size:2.2rem;margin-bottom:0.5rem">🎯</div>
         <div class="pred-role" id="predRole"></div>
         <div class="pred-conf" id="predConf"></div>
       </div>
-      <div class="chart-box"><canvas id="predictionChart"></canvas></div>
+      <div class="chart-box" id="predChartWrap" style="display:none"><canvas id="predictionChart"></canvas></div>
     </section>
 
     <!-- HISTORY TAB -->
@@ -98,6 +185,10 @@
           <thead><tr><th>Date</th><th>Degree</th><th>Major</th><th>CGPA</th><th>Exp</th><th>Skills</th><th>Predicted Role</th></tr></thead>
           <tbody id="historyTable"></tbody>
         </table>
+      </div>
+      <div id="noHistory" style="display:none;text-align:center;padding:3rem;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:1rem;opacity:0.5">📭</div>
+        <p>No predictions yet. Head to the <a href="#" onclick="switchTab('predict');return false" style="color:var(--cyan);font-weight:600">Predict tab</a> to get started!</p>
       </div>
       <div class="charts-row">
         <div class="g-card chart-box"><canvas id="roleChart"></canvas></div>
@@ -115,7 +206,10 @@
       <div id="profileDisplay" class="g-card">
         <div class="profile-header">
           <img src="/static/user.png" alt="Avatar" class="profile-avatar">
-          <div class="profile-info"><h3 id="displayName">—</h3><span class="role-tag">Student / Professional</span></div>
+          <div class="profile-info">
+            <h3 id="displayName">—</h3>
+            <span class="role-tag">Student / Professional</span>
+          </div>
         </div>
         <div class="profile-grid">
           <div class="profile-item"><div class="pi-label">Email</div><div class="pi-value" id="displayEmail">—</div></div>
@@ -129,11 +223,12 @@
         </div>
         <div class="profile-actions">
           <button class="btn-edit" id="editProfileBtn">✏️ Edit Profile</button>
-          <button class="btn-cancel" onclick="switchTab('home')">← Back</button>
+          <button class="btn-cancel" onclick="switchTab('home')">← Back to Home</button>
         </div>
       </div>
       <!-- Edit Form -->
       <div class="g-card" id="profileFormWrap" style="display:none">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.2rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">✏️ Edit Your Profile</h3>
         <form id="profileForm" class="form-grid">
           <div class="form-group"><label>Full Name</label><input name="name" placeholder="Full Name" required></div>
           <div class="form-group"><label>Email</label><input name="email" type="email" placeholder="Email" required></div>
@@ -144,9 +239,9 @@
           <div class="form-group"><label>Experience</label><input name="experience" type="number" placeholder="Years"></div>
           <div class="form-group"><label>Passout Year</label><input name="passout_year" type="number" placeholder="Year"></div>
           <div class="form-group full-width"><label>Skills</label><input name="skills" placeholder="comma-separated"></div>
-          <div class="full-width" style="display:flex;gap:0.8rem">
+          <div class="full-width" style="display:flex;gap:0.8rem;margin-top:0.5rem">
             <button type="submit" class="btn-save">💾 Save Profile</button>
-            <button type="button" class="btn-cancel" id="cancelEdit">Cancel</button>
+            <button type="button" class="btn-cancel" id="cancelEdit">✕ Cancel</button>
           </div>
         </form>
       </div>
@@ -157,27 +252,31 @@
 <!-- Chatbot -->
 <button class="chat-toggle" id="chatToggle">💬</button>
 <div class="chat-box" id="chatBox">
-  <div class="chat-head"><span>Edu2Job AI Bot</span><button id="chatClose">✕</button></div>
-  <div class="chat-msgs" id="chatMsgs"><div class="bot-msg"><strong>Bot:</strong> Hi! How can I help you today?</div></div>
-  <form class="chat-input" id="chatForm"><input type="text" id="chatText" placeholder="Type a message..."><button type="submit">Send</button></form>
+  <div class="chat-head"><span>🤖 Edu2Job AI Bot</span><button id="chatClose">✕</button></div>
+  <div class="chat-msgs" id="chatMsgs"><div class="bot-msg"><strong>Bot:</strong> Hi! I'm your AI career assistant. Ask me about job roles, skills, or career advice!</div></div>
+  <form class="chat-input" id="chatForm"><input type="text" id="chatText" placeholder="Ask me anything..."><button type="submit">Send</button></form>
 </div>
 
 <script>
-// Tab switching
+// ===== Tab switching =====
 function switchTab(id){
   document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.side-btn[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===id)});
   if(id==='profile')loadProfile();
-  if(id==='predict'){predictForm.reset();predResult.classList.remove('show');if(window.predChart)window.predChart.destroy()}
+  if(id==='predict'){predictForm.reset();predResult.classList.remove('show');document.getElementById('predChartWrap').style.display='none';if(window.predChart)window.predChart.destroy()}
   if(id==='history')loadHistory();
 }
 document.querySelectorAll('.side-btn[data-tab]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
 
-// Toast
-function showToast(msg,type='success'){const t=document.getElementById('toast');t.className='toast '+type;t.textContent=msg;setTimeout(()=>t.className='toast',3000)}
+// ===== Toast =====
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.className='toast '+type;t.textContent=msg;
+  setTimeout(()=>t.className='toast',3500);
+}
 
-// Profile
+// ===== Profile =====
 const profileForm=document.getElementById('profileForm');
 const profileDisplay=document.getElementById('profileDisplay');
 const profileFormWrap=document.getElementById('profileFormWrap');
@@ -195,62 +294,129 @@ async function loadProfile(){
   document.getElementById('displayCGPA').textContent=d.cgpa||'—';
   document.getElementById('displayExp').textContent=d.experience||'—';
   document.getElementById('displayPassout').textContent=d.passout_year||'—';
+  // Update navbar name
+  if(d.name)document.getElementById('navUserName').textContent=d.name;
   const sk=document.getElementById('displaySkills');
-  if(d.skills){sk.innerHTML=d.skills.split(',').map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('')}
-  else{sk.innerHTML='<span class="skill-tag">—</span>'}
+  if(d.skills){
+    sk.innerHTML=d.skills.split(',').map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('');
+  }else{
+    sk.innerHTML='<span class="skill-tag">—</span>';
+  }
   for(let k in d){if(profileForm.elements[k])profileForm.elements[k].value=d[k]||''}
 }
 
-document.getElementById('editProfileBtn').addEventListener('click',()=>{profileDisplay.style.display='none';profileFormWrap.style.display='block'});
-document.getElementById('cancelEdit').addEventListener('click',()=>{profileFormWrap.style.display='none';profileDisplay.style.display='block'});
+document.getElementById('editProfileBtn').addEventListener('click',()=>{
+  profileDisplay.style.display='none';profileFormWrap.style.display='block';
+});
+document.getElementById('cancelEdit').addEventListener('click',()=>{
+  profileFormWrap.style.display='none';profileDisplay.style.display='block';
+});
 
 profileForm.addEventListener('submit',async e=>{
   e.preventDefault();
   const data=Object.fromEntries(new FormData(profileForm).entries());
   const res=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-  showToast(res.ok?'Profile saved! ✅':'Save failed ❌',res.ok?'success':'error');
+  showToast(res.ok?'Profile saved successfully! ✅':'Failed to save profile ❌',res.ok?'success':'error');
   if(res.ok){profileFormWrap.style.display='none';profileDisplay.style.display='block';loadProfile()}
 });
 
-// Prediction
+// ===== Prediction =====
 const predictForm=document.getElementById('predictForm');
 let roleChart,skillChart;
 
 predictForm.addEventListener('submit',async e=>{
   e.preventDefault();
+  const btn=document.getElementById('predictBtn');
+  btn.textContent='🔄 Predicting...';btn.disabled=true;
   const data=Object.fromEntries(new FormData(predictForm).entries());
-  const res=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-  const result=await res.json();
-  if(res.ok){
-    document.getElementById('predRole').textContent=result.prediction;
-    const topConf=result.graph_data.find(g=>g.role===result.prediction);
-    document.getElementById('predConf').textContent='Confidence: '+(topConf?(topConf.confidence*100).toFixed(1)+'%':'High');
-    predResult.classList.add('show');
-    showToast('Prediction successful! ✅');
-    if(window.predChart)window.predChart.destroy();
-    const labels=result.graph_data.map(i=>i.role);
-    const values=result.graph_data.map(i=>i.confidence*100);
-    const colors=labels.map(l=>l===result.prediction?'rgba(99,102,241,0.8)':'rgba(168,85,247,0.4)');
-    window.predChart=new Chart(document.getElementById('predictionChart'),{type:'bar',data:{labels,datasets:[{label:'Confidence %',data:values,backgroundColor:colors,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a0a0c0'}}},scales:{x:{ticks:{color:'#a0a0c0',maxRotation:45},grid:{color:'rgba(255,255,255,0.05)'}},y:{beginAtZero:true,max:100,ticks:{color:'#a0a0c0'},grid:{color:'rgba(255,255,255,0.05)'}}}}});
-    loadHistory();
-  }else{showToast('Error: '+(result.error||'Failed'),'error')}
+  try{
+    const res=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const result=await res.json();
+    if(res.ok){
+      document.getElementById('predRole').textContent=result.prediction;
+      const topConf=result.graph_data.find(g=>g.role===result.prediction);
+      document.getElementById('predConf').textContent='Confidence: '+(topConf?(topConf.confidence*100).toFixed(1)+'%':'High');
+      predResult.classList.add('show');
+      showToast('Prediction successful! 🎯');
+      // Chart
+      document.getElementById('predChartWrap').style.display='block';
+      if(window.predChart)window.predChart.destroy();
+      const top10=result.graph_data.sort((a,b)=>b.confidence-a.confidence).slice(0,10);
+      const labels=top10.map(i=>i.role);
+      const values=top10.map(i=>i.confidence*100);
+      const colors=labels.map(l=>l===result.prediction?'rgba(99,102,241,0.85)':'rgba(168,85,247,0.4)');
+      window.predChart=new Chart(document.getElementById('predictionChart'),{
+        type:'bar',
+        data:{labels,datasets:[{label:'Confidence %',data:values,backgroundColor:colors,borderRadius:8,borderSkipped:false}]},
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{labels:{color:'#a0a0c0',font:{family:'Inter'}}}},
+          scales:{
+            x:{ticks:{color:'#a0a0c0',maxRotation:45,font:{family:'Inter',size:11}},grid:{color:'rgba(255,255,255,0.04)'}},
+            y:{beginAtZero:true,max:100,ticks:{color:'#a0a0c0',font:{family:'Inter'}},grid:{color:'rgba(255,255,255,0.04)'}}
+          }
+        }
+      });
+      loadHistory();
+    }else{showToast('Error: '+(result.error||'Failed'),'error')}
+  }catch(err){showToast('Network error. Try again.','error')}
+  btn.textContent='🔮 Predict Job Role';btn.disabled=false;
 });
 
-// History
+// ===== History =====
 async function loadHistory(){
   const res=await fetch('/api/history');if(!res.ok)return;
   const rows=await res.json();
   document.getElementById('predCount').textContent=rows.length;
   const tb=document.getElementById('historyTable');
-  tb.innerHTML=rows.map(r=>`<tr><td>${r.created_at||''}</td><td>${r.degree||''}</td><td>${r.major||''}</td><td>${r.cgpa||''}</td><td>${r.experience||''}</td><td>${r.skills||''}</td><td><span class="role-badge">${r.predicted_role||''}</span></td></tr>`).join('');
+  const noHist=document.getElementById('noHistory');
+  if(rows.length===0){
+    tb.innerHTML='';noHist.style.display='block';
+    return;
+  }
+  noHist.style.display='none';
+  tb.innerHTML=rows.map(r=>`<tr>
+    <td>${r.created_at?new Date(r.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—'}</td>
+    <td>${r.degree||'—'}</td>
+    <td>${r.major||'—'}</td>
+    <td>${r.cgpa||'—'}</td>
+    <td>${r.experience||'0'}y</td>
+    <td>${(r.skills||'').split(',').slice(0,3).join(', ')}${(r.skills||'').split(',').length>3?'...':''}</td>
+    <td><span class="role-badge">${r.predicted_role||'—'}</span></td>
+  </tr>`).join('');
+
+  // Role distribution chart
   if(roleChart)roleChart.destroy();if(skillChart)skillChart.destroy();
   const rc={};rows.forEach(r=>{if(r.predicted_role)rc[r.predicted_role]=(rc[r.predicted_role]||0)+1});
-  roleChart=new Chart(document.getElementById('roleChart'),{type:'bar',data:{labels:Object.keys(rc),datasets:[{label:'Predictions',data:Object.values(rc),backgroundColor:Object.keys(rc).map((_,i)=>`hsla(${220+i*30},70%,60%,0.7)`),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a0a0c0'}}},scales:{x:{ticks:{color:'#a0a0c0'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#a0a0c0'},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  roleChart=new Chart(document.getElementById('roleChart'),{
+    type:'bar',
+    data:{
+      labels:Object.keys(rc),
+      datasets:[{label:'Predictions',data:Object.values(rc),backgroundColor:Object.keys(rc).map((_,i)=>`hsla(${220+i*30},70%,60%,0.7)`),borderRadius:8}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'Role Distribution',color:'#a0a0c0',font:{family:'Inter',size:14,weight:600}},legend:{labels:{color:'#a0a0c0',font:{family:'Inter'}}}},
+      scales:{x:{ticks:{color:'#a0a0c0',font:{family:'Inter'}},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#a0a0c0',font:{family:'Inter'}},grid:{color:'rgba(255,255,255,0.04)'}}}
+    }
+  });
+
+  // Skills chart
   const sk={};rows.forEach(r=>{if(r.skills)r.skills.split(',').forEach(s=>{s=s.trim().toLowerCase();if(s)sk[s]=(sk[s]||0)+1})});
-  skillChart=new Chart(document.getElementById('skillChart'),{type:'doughnut',data:{labels:Object.keys(sk),datasets:[{data:Object.values(sk),backgroundColor:Object.keys(sk).map((_,i)=>`hsla(${250+i*25},65%,55%,0.8)`)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a0a0c0',font:{size:11}}}}}});
+  skillChart=new Chart(document.getElementById('skillChart'),{
+    type:'doughnut',
+    data:{
+      labels:Object.keys(sk).slice(0,8),
+      datasets:[{data:Object.values(sk).slice(0,8),backgroundColor:Object.keys(sk).slice(0,8).map((_,i)=>`hsla(${250+i*30},65%,55%,0.8)`)}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'Top Skills Used',color:'#a0a0c0',font:{family:'Inter',size:14,weight:600}},legend:{labels:{color:'#a0a0c0',font:{family:'Inter',size:11}}}}
+    }
+  });
 }
 
-// Chatbot
+// ===== Chatbot =====
 const chatToggle=document.getElementById('chatToggle');
 const chatBox=document.getElementById('chatBox');
 const chatClose=document.getElementById('chatClose');
@@ -260,20 +426,25 @@ const chatMsgs=document.getElementById('chatMsgs');
 let autoClose;
 chatToggle.onclick=()=>{chatBox.classList.toggle('open');if(chatBox.classList.contains('open')){chatText.focus();resetAC()}};
 chatClose.onclick=()=>{chatBox.classList.remove('open');clearTimeout(autoClose)};
-function resetAC(){clearTimeout(autoClose);autoClose=setTimeout(()=>chatBox.classList.remove('open'),20000)}
+function resetAC(){clearTimeout(autoClose);autoClose=setTimeout(()=>chatBox.classList.remove('open'),30000)}
 chatText.addEventListener('input',resetAC);chatBox.addEventListener('mousemove',resetAC);
 
 chatForm.addEventListener('submit',e=>{
   e.preventDefault();const msg=chatText.value.trim();if(!msg)return;
-  chatMsgs.innerHTML+=`<div class="user-msg"><strong>You:</strong> ${msg}</div>`;chatText.value='';chatMsgs.scrollTop=chatMsgs.scrollHeight;resetAC();
-  const typing=document.createElement('div');typing.className='bot-msg';typing.innerHTML='<strong>Bot:</strong> Typing...';chatMsgs.appendChild(typing);chatMsgs.scrollTop=chatMsgs.scrollHeight;
+  chatMsgs.innerHTML+=`<div class="user-msg"><strong>You:</strong> ${msg}</div>`;
+  chatText.value='';chatMsgs.scrollTop=chatMsgs.scrollHeight;resetAC();
+  const typing=document.createElement('div');typing.className='bot-msg';
+  typing.innerHTML='<strong>Bot:</strong> <span style="opacity:0.6">Typing...</span>';
+  chatMsgs.appendChild(typing);chatMsgs.scrollTop=chatMsgs.scrollHeight;
   fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})})
-  .then(r=>r.json()).then(d=>{typing.innerHTML=`<strong>Bot:</strong> ${d.reply||'No response.'}`;chatMsgs.scrollTop=chatMsgs.scrollHeight})
-  .catch(()=>{typing.innerHTML='<strong>Bot:</strong> ⚠️ Error connecting.'});
+  .then(r=>r.json()).then(d=>{typing.innerHTML=`<strong>Bot:</strong> ${d.reply||'No response.'}`; chatMsgs.scrollTop=chatMsgs.scrollHeight})
+  .catch(()=>{typing.innerHTML='<strong>Bot:</strong> ⚠️ Error connecting to AI.'});
 });
 
-// Init
+// ===== Init =====
 switchTab('home');loadHistory();
+// Load user name on init
+fetch('/api/profile').then(r=>r.json()).then(d=>{if(d.name)document.getElementById('navUserName').textContent=d.name}).catch(()=>{});
 </script>
 </body>
 </html>
