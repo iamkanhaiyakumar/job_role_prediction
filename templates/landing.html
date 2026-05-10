@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edu2Job — AI-Powered Job Role Prediction System</title>
+  <meta name="description" content="Predict your ideal career path using AI & Machine Learning. Edu2Job analyzes your skills, education, and interests to recommend the perfect job roles.">
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- Particles Background -->
+<div class="particles" id="particles"></div>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="#" class="nav-logo">Edu2<span>Job</span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#demo">Demo</a>
+      <a href="#tech">Tech Stack</a>
+      <a href="#about">About</a>
+      <a href="#developer">Developer</a>
+      <a href="/dashboard" class="nav-cta">Launch App →</a>
+    </div>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose">✕</button>
+  <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#how-it-works" onclick="closeMobile()">How It Works</a>
+  <a href="#demo" onclick="closeMobile()">Demo</a>
+  <a href="#tech" onclick="closeMobile()">Tech Stack</a>
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#developer" onclick="closeMobile()">Developer</a>
+  <a href="/dashboard" class="btn btn-primary">Launch App →</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        AI-Powered Career Prediction
+      </div>
+      <h1>
+        Predict Your<br>
+        <span class="gradient-text">Dream Career</span><br>
+        With AI
+      </h1>
+      <p>Our advanced Machine Learning system analyzes your skills, education, and interests to predict the most suitable job roles — empowering smarter career decisions.</p>
+      <div class="hero-buttons">
+        <a href="#demo" class="btn btn-primary">Try Live Demo ✦</a>
+        <a href="#how-it-works" class="btn btn-outline">How It Works →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <h3>95%+</h3>
+          <p>Accuracy</p>
+        </div>
+        <div class="hero-stat">
+          <h3>50+</h3>
+          <p>Job Roles</p>
+        </div>
+        <div class="hero-stat">
+          <h3>10K+</h3>
+          <p>Data Points</p>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-dashboard">
+        <div class="dashboard-header">
+          <span class="dashboard-dot" style="background:#ef4444"></span>
+          <span class="dashboard-dot" style="background:#f59e0b"></span>
+          <span class="dashboard-dot" style="background:#22c55e"></span>
+          <span style="margin-left:auto;font-size:0.75rem;color:var(--text-secondary)">Prediction Dashboard</span>
+        </div>
+        <div class="dashboard-bars">
+          <div class="bar-row"><span class="bar-label">Python</span><div class="bar-track"><div class="bar-fill blue"></div></div></div>
+          <div class="bar-row"><span class="bar-label">ML/AI</span><div class="bar-track"><div class="bar-fill purple"></div></div></div>
+          <div class="bar-row"><span class="bar-label">Web Dev</span><div class="bar-track"><div class="bar-fill pink"></div></div></div>
+          <div class="bar-row"><span class="bar-label">Data Sci</span><div class="bar-track"><div class="bar-fill cyan"></div></div></div>
+          <div class="bar-row"><span class="bar-label">Analytics</span><div class="bar-track"><div class="bar-fill green"></div></div></div>
+        </div>
+        <div class="dashboard-result">
+          <div class="role">🎯 ML Engineer</div>
+          <div class="confidence">Confidence: 94.2%</div>
+        </div>
+      </div>
+      <div class="floating-card card-1">⚡ Real-time Analysis</div>
+      <div class="floating-card card-2">🧠 AI Powered</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="section" id="features">
+  <div class="container text-center">
+    <span class="section-label">Features</span>
+    <h2 class="section-title">Intelligent Career Prediction</h2>
+    <p class="section-subtitle">Powered by advanced Machine Learning algorithms to deliver accurate, personalized career recommendations.</p>
+    <div class="features-grid">
+      <div class="glass feature-card fade-in">
+        <div class="feature-icon">🔍</div>
+        <h3>Skill Analysis</h3>
+        <p>Deep analysis of your technical and soft skills using multi-label encoding to understand your complete skill profile.</p>
+      </div>
+      <div class="glass feature-card fade-in fade-in-delay-1">
+        <div class="feature-icon">🤖</div>
+        <h3>AI Job Prediction</h3>
+        <p>Random Forest Classifier trained on 10,000+ data points predicts the most suitable job roles with high accuracy.</p>
+      </div>
+      <div class="glass feature-card fade-in fade-in-delay-2">
+        <div class="feature-icon">🎯</div>
+        <h3>Career Recommendations</h3>
+        <p>Get personalized career path suggestions based on your education background, experience, and industry preferences.</p>
+      </div>
+      <div class="glass feature-card fade-in fade-in-delay-3">
+        <div class="feature-icon">📄</div>
+        <h3>Resume Insights</h3>
+        <p>Understand how your qualifications align with different roles and get actionable insights to improve your profile.</p>
+      </div>
+      <div class="glass feature-card fade-in fade-in-delay-4">
+        <div class="feature-icon">📊</div>
+        <h3>Smart Dashboard</h3>
+        <p>Interactive dashboard with visual analytics, prediction history, and confidence scores for all predicted roles.</p>
+      </div>
+      <div class="glass feature-card fade-in fade-in-delay-5">
+        <div class="feature-icon">⚡</div>
+        <h3>Fast Predictions</h3>
+        <p>Get instant job role predictions in seconds. Our optimized ML pipeline ensures lightning-fast response times.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section" id="how-it-works" style="background:var(--bg-secondary)">
+  <div class="container text-center">
+    <span class="section-label">Process</span>
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-subtitle">From input to prediction — our streamlined AI pipeline delivers results in seconds.</p>
+    <div class="steps-grid">
+      <div class="step-card fade-in">
+        <div class="step-number">1</div>
+        <h3>Enter Your Skills</h3>
+        <p>Input your degree, major, skills, certifications, CGPA and experience level.</p>
+      </div>
+      <div class="step-card fade-in fade-in-delay-1">
+        <div class="step-number">2</div>
+        <h3>ML Model Processing</h3>
+        <p>Our Random Forest model encodes and analyzes your data through multiple feature layers.</p>
+      </div>
+      <div class="step-card fade-in fade-in-delay-2">
+        <div class="step-number">3</div>
+        <h3>Role Prediction</h3>
+        <p>The AI generates predictions with confidence scores for multiple matching job roles.</p>
+      </div>
+      <div class="step-card fade-in fade-in-delay-3">
+        <div class="step-number">4</div>
+        <h3>Career Suggestions</h3>
+        <p>Receive detailed career path recommendations and insights for your predicted roles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LIVE DEMO ===== -->
+<section class="section" id="demo">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-label">Try It Out</span>
+      <h2 class="section-title">Live Prediction Demo</h2>
+      <p class="section-subtitle">Experience the AI prediction engine. Enter your details and see your predicted job role instantly.</p>
+    </div>
+    <div class="demo-wrapper">
+      <div class="glass demo-form">
+        <h3>📋 Enter Your Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="demo-degree">Degree</label>
+            <select id="demo-degree">
+              <option value="">Select Degree</option>
+              <option value="B.Tech">B.Tech</option>
+              <option value="M.Tech">M.Tech</option>
+              <option value="BCA">BCA</option>
+              <option value="MCA">MCA</option>
+              <option value="B.Sc">B.Sc</option>
+              <option value="M.Sc">M.Sc</option>
+              <option value="MBA">MBA</option>
+              <option value="PhD">PhD</option>
+              <option value="BBA">BBA</option>
+              <option value="B.Com">B.Com</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="demo-major">Major</label>
+            <select id="demo-major">
+              <option value="">Select Major</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Mechanical">Mechanical</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Artificial Intelligence">Artificial Intelligence</option>
+              <option value="Business">Business</option>
+              <option value="Mathematics">Mathematics</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="demo-cgpa">CGPA</label>
+            <input type="number" id="demo-cgpa" placeholder="e.g. 8.5" min="0" max="10" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="demo-exp">Experience (years)</label>
+            <input type="number" id="demo-exp" placeholder="e.g. 2" min="0" max="30">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="demo-skills">Skills (comma-separated)</label>
+          <input type="text" id="demo-skills" placeholder="e.g. python, machine learning, sql">
+        </div>
+        <div class="form-group">
+          <label for="demo-industry">Industry Preference</label>
+          <select id="demo-industry">
+            <option value="">Select Industry</option>
+            <option value="IT">IT / Software</option>
+            <option value="Data Science">Data Science</option>
+            <option value="Finance">Finance</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Education">Education</option>
+            <option value="Consulting">Consulting</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem" id="predictBtn">
+          🔮 Predict My Job Role
+        </button>
+      </div>
+      <div class="glass demo-result" id="demoResult">
+        <div class="result-placeholder">
+          <div class="icon">🔮</div>
+          <p>Enter your details and click predict<br>to see AI-powered job role predictions</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TECH STACK ===== -->
+<section class="section" id="tech" style="background:var(--bg-secondary)">
+  <div class="container text-center">
+    <span class="section-label">Technology</span>
+    <h2 class="section-title">Tech Stack</h2>
+    <p class="section-subtitle">Built with industry-leading technologies for robust, scalable, and accurate predictions.</p>
+    <div class="tech-grid">
+      <div class="glass tech-card fade-in">
+        <div class="tech-icon">🐍</div>
+        <h4>Python</h4>
+        <p>Core Language</p>
+      </div>
+      <div class="glass tech-card fade-in fade-in-delay-1">
+        <div class="tech-icon">🧠</div>
+        <h4>Scikit-learn</h4>
+        <p>ML Framework</p>
+      </div>
+      <div class="glass tech-card fade-in fade-in-delay-2">
+        <div class="tech-icon">🌐</div>
+        <h4>Flask</h4>
+        <p>Web Backend</p>
+      </div>
+      <div class="glass tech-card fade-in fade-in-delay-3">
+        <div class="tech-icon">📊</div>
+        <h4>Pandas</h4>
+        <p>Data Processing</p>
+      </div>
+      <div class="glass tech-card fade-in fade-in-delay-4">
+        <div class="tech-icon">🎨</div>
+        <h4>HTML/CSS/JS</h4>
+        <p>Frontend</p>
+      </div>
+      <div class="glass tech-card fade-in fade-in-delay-5">
+        <div class="tech-icon">🗄️</div>
+        <h4>MySQL</h4>
+        <p>Database</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="about-content">
+      <div class="about-text">
+        <span class="section-label">About Project</span>
+        <h2 class="section-title">Edu2Job Prediction System</h2>
+        <h3>Bridging Education and Employment with AI</h3>
+        <p>Edu2Job is an intelligent career prediction system that leverages Machine Learning to bridge the gap between education and employment. By analyzing a student's academic background, technical skills, certifications, and industry preferences, our system predicts the most suitable job roles.</p>
+        <p>The project uses a Random Forest Classifier trained on a comprehensive dataset of 10,000+ career profiles. With multi-label encoding for skills and certifications, and label encoding for categorical features, the model achieves high accuracy in predicting across 50+ job role categories.</p>
+        <p>Built with Flask for the backend, MySQL for data persistence, and a modern glassmorphic UI — Edu2Job combines the power of data science with elegant design to deliver a premium career guidance experience.</p>
+      </div>
+      <div>
+        <div class="about-highlights">
+          <div class="highlight-item fade-in">
+            <div class="num">10K+</div>
+            <div class="label">Training Samples</div>
+          </div>
+          <div class="highlight-item fade-in fade-in-delay-1">
+            <div class="num">50+</div>
+            <div class="label">Job Categories</div>
+          </div>
+          <div class="highlight-item fade-in fade-in-delay-2">
+            <div class="num">95%+</div>
+            <div class="label">Model Accuracy</div>
+          </div>
+          <div class="highlight-item fade-in fade-in-delay-3">
+            <div class="num">RF</div>
+            <div class="label">Random Forest</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DEVELOPER ===== -->
+<section class="section" id="developer" style="background:var(--bg-secondary)">
+  <div class="container text-center">
+    <span class="section-label">Creator</span>
+    <h2 class="section-title">Meet the Developer</h2>
+    <div class="glass dev-card fade-in">
+      <div class="dev-avatar">KK</div>
+      <h3>Kanhaiya Kumar</h3>
+      <p class="dev-role">AI/ML Developer & Full Stack Engineer</p>
+      <p>Passionate about building intelligent systems that solve real-world problems. Specialized in Machine Learning, Data Science, and Full-Stack Web Development. Created Edu2Job to help students make data-driven career decisions.</p>
+      <div class="dev-links">
+        <a href="https://github.com/iamkanhaiyakumar" target="_blank" title="GitHub">🔗</a>
+        <a href="https://linkedin.com/in/iamkanhaiyakumar" target="_blank" title="LinkedIn">💼</a>
+        <a href="mailto:kanhaiya@example.com" title="Email">✉️</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="nav-logo">Edu2<span>Job</span></span>
+        <p>AI-powered career prediction system that helps students discover their ideal job roles using Machine Learning.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#demo">Live Demo</a>
+        <a href="#tech">Tech Stack</a>
+      </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <a href="#about">About</a>
+        <a href="#developer">Developer</a>
+        <a href="https://github.com/iamkanhaiyakumar" target="_blank">GitHub</a>
+        <a href="/dashboard">Dashboard</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="https://github.com/iamkanhaiyakumar" target="_blank">GitHub</a>
+        <a href="https://linkedin.com/in/iamkanhaiyakumar" target="_blank">LinkedIn</a>
+        <a href="mailto:kanhaiya@example.com">Email</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Edu2Job — Job Role Prediction System. Developed with ❤️ by Kanhaiya Kumar</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>

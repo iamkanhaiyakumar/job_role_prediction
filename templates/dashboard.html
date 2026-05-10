@@ -1,536 +1,279 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Edu2Job Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edu2Job — Dashboard</title>
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    @keyframes slideDown {
-      from { transform: translateY(-20px); opacity: 0; }
-      to   { transform: translateY(0);    opacity: 1; }
-    }
-    .toast { animation: slideDown 0.4s ease-out; }
-
-    /* ---------- Chatbot Styles ---------- */
-    #chatbot-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #4f46e5;
-      color: #fff;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.8rem;
-      cursor: pointer;
-      z-index: 50;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: transform 0.2s;
-    }
-    #chatbot-toggle:hover { transform: scale(1.1); }
-
-    #chatbot-box {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 320px;
-      max-height: 420px;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(12px);
-      border-radius: 1rem;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 50;
-    }
-    #chatbot-header {
-      background: #4f46e5;
-      color: #fff;
-      padding: 0.75rem 1rem;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
- /* Force readable dark text inside the chatbot */
-#chatbot-messages,
-#chatbot-messages div,
-#chatbot-messages strong {
-  color: #111 !important;       /* dark grey/black text */
-}
-
-#chatbot-text {
-  color: #111 !important;       /* user typing area text */
-  background: #f9f9f9;          /* light background for contrast */
-}
-
-    #chatbot-input {
-      display: flex;
-      border-top: 1px solid #ccc;
-    }
-    #chatbot-input input {
-      flex: 1;
-      border: none;
-      padding: 0.6rem;
-      outline: none;
-    }
-    #chatbot-input button {
-      background: #4f46e5;
-      color: #fff;
-      padding: 0 1rem;
-      font-weight: 600;
-    }
-    .bot-msg, .user-msg {
-  padding: 6px 10px;
-  margin: 4px 0;
-  border-radius: 8px;
-  max-width: 90%;
-  line-height: 1.4;
-}
-.user-msg { background: #e0e7ff; color: #111; align-self: flex-end; }
-.bot-msg  { background: #f1f5f9; color: #111; }
-
-  </style>
 </head>
+<body>
 
-<body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white flex flex-col">
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
-  <!-- Top Navbar -->
-  <header class="w-full bg-white/10 backdrop-blur-md shadow-md sticky top-0 z-20">
-    <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-      <div class="flex items-center space-x-3">
-        <img src="/static/logo.png" alt="Edu2Job Logo" class="h-10 w-10 rounded-full shadow-md cursor-pointer"
-          onclick="switchTab('home')" />
-        <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">Edu2Job Dashboard</h1>
-      </div>
-
-      <!-- Right: Profile Icon + Logout -->
-      <div class="flex items-center space-x-4">
-        <button onclick="switchTab('profile')" class="relative">
-          <img src="/static/user.png"
-            class="h-10 w-10 rounded-full shadow-md hover:ring-4 hover:ring-purple-800 transition cursor-pointer"
-            alt="Profile" />
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Layout -->
-  <div class="flex flex-1 max-w-7xl mx-auto w-full px-4 py-6 space-x-6">
-
-    <!-- Sidebar -->
-    <aside class="w-48 md:w-56 bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-4 flex flex-col justify-between">
-
-      <div class="flex flex-col space-y-4">
-        <button type="button" onclick="switchTab('home')" 
-          class="w-full flex items-center justify-start space-x-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-xl transition">
-          <img src="/static/home.png" alt="Home" class="h-10 w-10 rounded-full shadow-md hover:ring-2 hover:ring-purple-400 transition cursor-pointer"/>
-          <span>Home</span>
-        </button>
-
-        <button type="button" onclick="switchTab('predict')" 
-          class="w-full flex items-center justify-start space-x-3 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-xl transition">
-          <img src="/static/predict.png" alt="Predict" class="h-10 w-10 rounded-full shadow-md hover:ring-2 hover:ring-purple-400 transition cursor-pointer"/>
-          <span>New Prediction</span>
-        </button>
-
-        <button type="button" onclick="switchTab('history')" 
-          class="w-full flex items-center justify-start space-x-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl transition">
-          <img src="/static/history.png" alt="History" class="h-10 w-10 rounded-full shadow-md hover:ring-2 hover:ring-purple-400 transition cursor-pointer"/>
-          <span>Prediction History</span>
-        </button>
-      </div>
-
-      <!-- Bottom Profile & Logout -->
-      <div class="pt-4 flex flex-col space-y-2">
-        <button type="button" onclick="switchTab('profile')"
-          class="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl transition">
-          <img src="/static/user.png"
-            class="h-8 w-8 rounded-full shadow-md hover:ring-2 hover:ring-purple-400 transition cursor-pointer"
-            alt="Profile" />
-          <span>Profile</span>
-        </button>
-
-        <a href="/logout"
-          class="w-full flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl transition">
-          <span>Logout</span>
-        </a>
-      </div>
-
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 bg-white/20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 overflow-y-auto">
-
-      <!-- Home -->
-      <section id="home" class="tab-content">
-        <div class="text-center space-y-6">
-          <h2 class="text-4xl font-extrabold mb-2">Welcome to <span class="text-yellow-300">Edu2Job</span></h2>
-          <p class="max-w-2xl mx-auto text-lg text-white/90">
-            Edu2Job helps students and professionals predict suitable job roles based on their
-            educational background, skills, certifications, and preferences.
-          </p>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div class="p-6 bg-white/10 rounded-2xl shadow-lg hover:bg-white/20 transition">
-              <div class="text-5xl mb-4">🎯</div>
-              <h3 class="text-xl font-bold">Smart Prediction</h3>
-              <p class="mt-2 text-white/80">
-                Use advanced AI models to get job role predictions tailored to your profile.
-              </p>
-            </div>
-            <div class="p-6 bg-white/10 rounded-2xl shadow-lg hover:bg-white/20 transition">
-              <div class="text-5xl mb-4">📊</div>
-              <h3 class="text-xl font-bold">Track History</h3>
-              <p class="mt-2 text-white/80">
-                View past predictions, monitor trends, and visualize skills demand.
-              </p>
-            </div>
-            <div class="p-6 bg-white/10 rounded-2xl shadow-lg hover:bg-white/20 transition">
-              <div class="text-5xl mb-4">🛡️</div>
-              <h3 class="text-xl font-bold">Secure & Private</h3>
-              <p class="mt-2 text-white/80">
-                Your data is protected with modern security and stored safely in our database.
-              </p>
-            </div>
-          </div>
-
-          <button onclick="switchTab('predict')"
-            class="mt-8 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold transition">
-            Start Prediction
-          </button>
-        </div>
-      </section>
-
-      <!-- Profile -->
-      <section id="profile" class="tab-content hidden">
-        <h2 class="text-2xl font-bold mb-4">Profile Information</h2>
-
-        <!-- Toast -->
-        <div id="toast" class="hidden mb-4 px-4 py-3 rounded-xl text-white font-semibold toast"></div>
-
-        <!-- Professional Display -->
-        <div id="profileDisplay" class="space-y-3">
-          <div class="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6 bg-white/20 backdrop-blur-md p-6 rounded-2xl shadow-lg">
-  <!-- Profile Image -->
-  <img src="/static/user.png" class="h-28 w-28 md:h-28 md:w-28 rounded-full shadow-2xl border-4 border-purple-500" alt="Profile" />
-
-  <!-- Info Panel -->
-  <div class="flex-1 space-y-3">
-    <h2 class="text-2xl md:text-3xl font-bold text-yellow-300">Profile Information</h2>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-white/90">
-      <p><span class="font-semibold">Name:</span> <span id="displayName">-</span></p>
-      <p><span class="font-semibold">College:</span> <span id="displayCollege">-</span></p>
-      <p><span class="font-semibold">Email:</span> <span id="displayEmail">-</span></p>
-      <p><span class="font-semibold">Degree:</span> <span id="displayDegree">-</span></p>
-      <p><span class="font-semibold">Major:</span> <span id="displayMajor">-</span></p>
-      <p><span class="font-semibold">CGPA:</span> <span id="displayCGPA">-</span></p>
-      <p><span class="font-semibold">Experience:</span> <span id="displayExp">-</span> years</p>
-      <p><span class="font-semibold">Passout Year:</span> <span id="displayPassout">-</span></p>
-    </div>
-
-    <!-- Skills Badges -->
-    <div>
-      <span class="font-bold text-red-500">Skills:</span>
-      <div id="displaySkills" class="mt-1 flex flex-wrap gap-2">
-        <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm">-</span>
-      </div>
-    </div>
+<!-- Top Nav -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="/" class="nav-logo">Edu2<span>Job</span></a>
+    <span class="nav-badge">Dashboard</span>
   </div>
+  <div class="nav-right">
+    <img src="/static/user.png" alt="Profile" class="avatar" onclick="switchTab('profile')">
+    <a href="/logout" class="logout-btn">Logout</a>
+  </div>
+</nav>
+
+<div class="dash-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <button class="side-btn active" data-tab="home"><span class="ico">🏠</span><span>Home</span></button>
+    <button class="side-btn" data-tab="predict"><span class="ico">🔮</span><span>Predict</span></button>
+    <button class="side-btn" data-tab="history"><span class="ico">📊</span><span>History</span></button>
+    <div class="sidebar-divider"></div>
+    <button class="side-btn" data-tab="profile"><span class="ico">👤</span><span>Profile</span></button>
+    <div class="sidebar-spacer"></div>
+    <a href="/logout" class="side-btn" style="color:#ef4444"><span class="ico">🚪</span><span>Logout</span></a>
+  </aside>
+
+  <!-- Main -->
+  <main class="dash-main">
+
+    <!-- HOME TAB -->
+    <section id="home" class="tab-content active">
+      <div class="section-head">
+        <h2>Welcome to <span class="hl">Edu2Job</span> 👋</h2>
+        <p>Your AI-powered career prediction dashboard</p>
+      </div>
+      <div class="quick-stats">
+        <div class="g-card stat-card"><div class="stat-num">95%+</div><div class="stat-label">Model Accuracy</div></div>
+        <div class="g-card stat-card"><div class="stat-num">50+</div><div class="stat-label">Job Categories</div></div>
+        <div class="g-card stat-card"><div class="stat-num" id="predCount">0</div><div class="stat-label">Your Predictions</div></div>
+      </div>
+      <div class="home-grid">
+        <div class="g-card home-card"><div class="hc-icon">🎯</div><h3>Smart Prediction</h3><p>Use advanced ML models to get job role predictions tailored to your profile.</p></div>
+        <div class="g-card home-card"><div class="hc-icon">📊</div><h3>Track History</h3><p>View past predictions, monitor trends, and visualize skills demand.</p></div>
+        <div class="g-card home-card"><div class="hc-icon">🛡️</div><h3>Secure & Private</h3><p>Your data is protected with modern security and stored safely.</p></div>
+      </div>
+      <button class="cta-btn" onclick="switchTab('predict')">🔮 Start Prediction</button>
+    </section>
+
+    <!-- PREDICT TAB -->
+    <section id="predict" class="tab-content">
+      <div class="section-head">
+        <h2>New <span class="hl">Prediction</span></h2>
+        <p>Enter your details and let our AI predict your ideal job role</p>
+      </div>
+      <div class="g-card">
+        <form id="predictForm" class="form-grid">
+          <div class="form-group"><label>Degree</label><input name="degree" placeholder="e.g. B.Tech" required></div>
+          <div class="form-group"><label>Major</label><input name="major" placeholder="e.g. Computer Science" required></div>
+          <div class="form-group"><label>CGPA</label><input name="cgpa" type="number" step="0.01" placeholder="e.g. 8.5" required></div>
+          <div class="form-group"><label>Experience (years)</label><input name="experience" type="number" placeholder="e.g. 2"></div>
+          <div class="form-group"><label>Employed</label><input name="employed" placeholder="Yes / No"></div>
+          <div class="form-group"><label>Industry Preference</label><input name="industry_preference" placeholder="e.g. IT, Finance"></div>
+          <div class="form-group full-width"><label>Skills (comma-separated)</label><input name="skills" placeholder="e.g. python, machine learning, sql"></div>
+          <div class="form-group full-width"><label>Certifications (comma-separated)</label><input name="certifications" placeholder="e.g. AWS, Google ML"></div>
+          <div class="full-width"><button type="submit" class="cta-btn" style="width:100%;justify-content:center">🔮 Predict Job Role</button></div>
+        </form>
+      </div>
+      <div class="pred-result" id="predResult">
+        <div style="font-size:2rem;margin-bottom:0.5rem">🎯</div>
+        <div class="pred-role" id="predRole"></div>
+        <div class="pred-conf" id="predConf"></div>
+      </div>
+      <div class="chart-box"><canvas id="predictionChart"></canvas></div>
+    </section>
+
+    <!-- HISTORY TAB -->
+    <section id="history" class="tab-content">
+      <div class="section-head">
+        <h2>Prediction <span class="hl">History</span></h2>
+        <p>Your predictions from the last 15 days</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Degree</th><th>Major</th><th>CGPA</th><th>Exp</th><th>Skills</th><th>Predicted Role</th></tr></thead>
+          <tbody id="historyTable"></tbody>
+        </table>
+      </div>
+      <div class="charts-row">
+        <div class="g-card chart-box"><canvas id="roleChart"></canvas></div>
+        <div class="g-card chart-box"><canvas id="skillChart"></canvas></div>
+      </div>
+    </section>
+
+    <!-- PROFILE TAB -->
+    <section id="profile" class="tab-content">
+      <div class="section-head">
+        <h2>Your <span class="hl">Profile</span></h2>
+        <p>Manage your personal and academic information</p>
+      </div>
+      <!-- Display -->
+      <div id="profileDisplay" class="g-card">
+        <div class="profile-header">
+          <img src="/static/user.png" alt="Avatar" class="profile-avatar">
+          <div class="profile-info"><h3 id="displayName">—</h3><span class="role-tag">Student / Professional</span></div>
+        </div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="pi-label">Email</div><div class="pi-value" id="displayEmail">—</div></div>
+          <div class="profile-item"><div class="pi-label">College</div><div class="pi-value" id="displayCollege">—</div></div>
+          <div class="profile-item"><div class="pi-label">Degree</div><div class="pi-value" id="displayDegree">—</div></div>
+          <div class="profile-item"><div class="pi-label">Major</div><div class="pi-value" id="displayMajor">—</div></div>
+          <div class="profile-item"><div class="pi-label">CGPA</div><div class="pi-value" id="displayCGPA">—</div></div>
+          <div class="profile-item"><div class="pi-label">Experience</div><div class="pi-value"><span id="displayExp">—</span> years</div></div>
+          <div class="profile-item"><div class="pi-label">Passout Year</div><div class="pi-value" id="displayPassout">—</div></div>
+          <div class="profile-item"><div class="pi-label">Skills</div><div class="skills-tags" id="displaySkills"><span class="skill-tag">—</span></div></div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-edit" id="editProfileBtn">✏️ Edit Profile</button>
+          <button class="btn-cancel" onclick="switchTab('home')">← Back</button>
+        </div>
+      </div>
+      <!-- Edit Form -->
+      <div class="g-card" id="profileFormWrap" style="display:none">
+        <form id="profileForm" class="form-grid">
+          <div class="form-group"><label>Full Name</label><input name="name" placeholder="Full Name" required></div>
+          <div class="form-group"><label>Email</label><input name="email" type="email" placeholder="Email" required></div>
+          <div class="form-group"><label>College</label><input name="college_name" placeholder="College Name"></div>
+          <div class="form-group"><label>Degree</label><input name="degree" placeholder="Degree"></div>
+          <div class="form-group"><label>Major</label><input name="major" placeholder="Major"></div>
+          <div class="form-group"><label>CGPA</label><input name="cgpa" type="number" step="0.01" placeholder="CGPA"></div>
+          <div class="form-group"><label>Experience</label><input name="experience" type="number" placeholder="Years"></div>
+          <div class="form-group"><label>Passout Year</label><input name="passout_year" type="number" placeholder="Year"></div>
+          <div class="form-group full-width"><label>Skills</label><input name="skills" placeholder="comma-separated"></div>
+          <div class="full-width" style="display:flex;gap:0.8rem">
+            <button type="submit" class="btn-save">💾 Save Profile</button>
+            <button type="button" class="btn-cancel" id="cancelEdit">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
 </div>
 
-          <div class="flex space-x-3">
-            <button id="editProfileBtn" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-xl font-semibold">Edit</button>
-            <button id="backProfileBtn" class="bg-gray-500 hover:bg-red-600 px-4 py-2 rounded-xl font-semibold" onclick="switchTab('home')">Back</button>
-          </div>
-        </div>
+<!-- Chatbot -->
+<button class="chat-toggle" id="chatToggle">💬</button>
+<div class="chat-box" id="chatBox">
+  <div class="chat-head"><span>Edu2Job AI Bot</span><button id="chatClose">✕</button></div>
+  <div class="chat-msgs" id="chatMsgs"><div class="bot-msg"><strong>Bot:</strong> Hi! How can I help you today?</div></div>
+  <form class="chat-input" id="chatForm"><input type="text" id="chatText" placeholder="Type a message..."><button type="submit">Send</button></form>
+</div>
 
-        <!-- Profile Form -->
-        <form id="profileForm" class="space-y-4 hidden">
-          <input name="name" placeholder="Full Name" required class="input" />
-          <input name="college_name" placeholder="College Name" required class="input" />
-          <input name="email" type="email" placeholder="Email" required class="input" />
-          <input name="degree" placeholder="Degree" required class="input" />
-          <input name="major" placeholder="Major" required class="input" />
-          <input name="cgpa" type="number" step="0.01" placeholder="CGPA" required class="input" />
-          <input name="experience" type="number" placeholder="Years of Experience" class="input" />
-          <input name="skills" placeholder="Skills (comma-separated)" class="input" />
-          <input name="passout_year" type="number" placeholder="Passout Year" class="input" />
-          <button type="submit" class="btn-green">Save Profile</button>
-          <button type="button" id="cancelEdit" class="btn-red">Cancel</button>
-        </form>
-      </section>
-      <!-- Prediction -->
-      <section id="predict" class="tab-content hidden">
-        <h2 class="text-2xl font-bold mb-4">Make a Prediction</h2>
-        <form id="predictForm" class="space-y-4">
-          <input name="degree" placeholder="Degree" required class="input" />
-          <input name="major" placeholder="Major" required class="input" />
-          <input name="cgpa" type="number" step="0.01" placeholder="CGPA" required class="input" />
-          <input name="employed" placeholder="Employed (Yes/No)" class="input" />
-          <input name="experience" type="number" placeholder="Years of Experience" class="input" />
-          <input name="skills" placeholder="Skills (comma-separated)" class="input" />
-          <input name="certifications" placeholder="Certifications (comma-separated)" class="input" />
-          <input name="industry_preference" placeholder="Industry Preference" class="input" />
-          <button type="submit" class="btn-blue">Predict Job Role</button>
-        </form>
-        <div id="predictionResult" class="mt-4 font-bold text-white/90"></div>
-        <div class="w-full h-64 bg-white/10 p-4 rounded-xl mt-4">
-          <canvas id="predictionChart"></canvas>
-        </div>
-      </section>
+<script>
+// Tab switching
+function switchTab(id){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.side-btn[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===id)});
+  if(id==='profile')loadProfile();
+  if(id==='predict'){predictForm.reset();predResult.classList.remove('show');if(window.predChart)window.predChart.destroy()}
+  if(id==='history')loadHistory();
+}
+document.querySelectorAll('.side-btn[data-tab]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
 
-      <!-- History -->
-      <section id="history" class="tab-content hidden">
-        <h2 class="text-2xl font-bold mb-4">Prediction History (last 15 days)</h2>
-        <div class="overflow-x-auto max-h-96 rounded-xl border border-white/20">
-          <table class="w-full text-left bg-white/10 rounded-xl">
-            <thead class="bg-white/20">
-              <tr>
-                <th class="px-4 py-2">Date</th>
-                <th class="px-4 py-2">Degree</th>
-                <th class="px-4 py-2">Major</th>
-                <th class="px-4 py-2">CGPA</th>
-                <th class="px-4 py-2">Experience</th>
-                <th class="px-4 py-2">Skills</th>
-                <th class="px-4 py-2">Predicted Role</th>
-              </tr>
-            </thead>
-            <tbody id="historyTable"></tbody>
-          </table>
-        </div>
+// Toast
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.className='toast '+type;t.textContent=msg;setTimeout(()=>t.className='toast',3000)}
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div class="w-full h-64 bg-white/10 p-4 rounded-xl">
-            <canvas id="roleChart"></canvas>
-          </div>
-          <div class="w-full h-64 bg-white/10 p-4 rounded-xl">
-            <canvas id="skillChart"></canvas>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-   <div id="chatbot-toggle">💬</div>
+// Profile
+const profileForm=document.getElementById('profileForm');
+const profileDisplay=document.getElementById('profileDisplay');
+const profileFormWrap=document.getElementById('profileFormWrap');
+const predResult=document.getElementById('predResult');
 
-  <div id="chatbot-box" class="flex">
-    <div id="chatbot-header">
-      Edu2Job Bot
-      <span id="chatbot-close" class="cursor-pointer">✖</span>
-    </div>
-    <div id="chatbot-messages">
-      <div><strong>Bot:</strong> Hi! How can I help you today?</div>
-    </div>
-    <form id="chatbot-input">
-      <input type="text" id="chatbot-text" placeholder="Type a message..." />
-      <button type="submit">Send</button>
-    </form>
-  </div>
+async function loadProfile(){
+  const res=await fetch('/api/profile');
+  if(!res.ok)return;
+  const d=await res.json();
+  document.getElementById('displayName').textContent=d.name||'—';
+  document.getElementById('displayEmail').textContent=d.email||'—';
+  document.getElementById('displayCollege').textContent=d.college_name||'—';
+  document.getElementById('displayDegree').textContent=d.degree||'—';
+  document.getElementById('displayMajor').textContent=d.major||'—';
+  document.getElementById('displayCGPA').textContent=d.cgpa||'—';
+  document.getElementById('displayExp').textContent=d.experience||'—';
+  document.getElementById('displayPassout').textContent=d.passout_year||'—';
+  const sk=document.getElementById('displaySkills');
+  if(d.skills){sk.innerHTML=d.skills.split(',').map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('')}
+  else{sk.innerHTML='<span class="skill-tag">—</span>'}
+  for(let k in d){if(profileForm.elements[k])profileForm.elements[k].value=d[k]||''}
+}
 
-  <script>
-    function switchTab(id) {
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-      if (id === "profile") loadProfile(); 
-      if (id === "predict") { predictForm.reset(); document.getElementById("predictionResult").textContent = ""; 
-      if (window.predChart) window.predChart.destroy(); } 
-      if (id === "history") loadHistory(); }
+document.getElementById('editProfileBtn').addEventListener('click',()=>{profileDisplay.style.display='none';profileFormWrap.style.display='block'});
+document.getElementById('cancelEdit').addEventListener('click',()=>{profileFormWrap.style.display='none';profileDisplay.style.display='block'});
 
-    function showToast(msg, color = "bg-green-500") {
-      const t = document.getElementById("toast");
-      t.className = `mb-4 px-4 py-3 rounded-xl text-white font-semibold toast ${color}`;
-      t.textContent = msg;
-      t.style.display = "block";
-      setTimeout(() => t.style.display = "none", 3000);
-    }
-    // Profile functions
-   async function loadProfile() {
-      const res = await fetch("/api/profile");
-      if (res.ok) {
-        const data = await res.json();
-        document.getElementById("displayName").textContent = data.name || "-";
-        document.getElementById("displayCollege").textContent = data.college_name || "-";
-        document.getElementById("displayEmail").textContent = data.email || "-";
-        document.getElementById("displayDegree").textContent = data.degree || "-";
-        document.getElementById("displayMajor").textContent = data.major || "-";
-        document.getElementById("displayCGPA").textContent = data.cgpa || "-";
-        document.getElementById("displayExp").textContent = data.experience || "-";
-        document.getElementById("displaySkills").textContent = data.skills || "-";
-        document.getElementById("displayPassout").textContent = data.passout_year || "-";
+profileForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const data=Object.fromEntries(new FormData(profileForm).entries());
+  const res=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  showToast(res.ok?'Profile saved! ✅':'Save failed ❌',res.ok?'success':'error');
+  if(res.ok){profileFormWrap.style.display='none';profileDisplay.style.display='block';loadProfile()}
+});
 
-        for (let key in data) {
-          if (profileForm.elements[key]) profileForm.elements[key].value = data[key] || "";
-        }
-      }
-    }
+// Prediction
+const predictForm=document.getElementById('predictForm');
+let roleChart,skillChart;
 
-    const profileForm = document.getElementById("profileForm");
-    document.getElementById("editProfileBtn").addEventListener("click", () => {
-      document.getElementById("profileDisplay").classList.add("hidden");
-      profileForm.classList.remove("hidden");
-    });
+predictForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const data=Object.fromEntries(new FormData(predictForm).entries());
+  const res=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const result=await res.json();
+  if(res.ok){
+    document.getElementById('predRole').textContent=result.prediction;
+    const topConf=result.graph_data.find(g=>g.role===result.prediction);
+    document.getElementById('predConf').textContent='Confidence: '+(topConf?(topConf.confidence*100).toFixed(1)+'%':'High');
+    predResult.classList.add('show');
+    showToast('Prediction successful! ✅');
+    if(window.predChart)window.predChart.destroy();
+    const labels=result.graph_data.map(i=>i.role);
+    const values=result.graph_data.map(i=>i.confidence*100);
+    const colors=labels.map(l=>l===result.prediction?'rgba(99,102,241,0.8)':'rgba(168,85,247,0.4)');
+    window.predChart=new Chart(document.getElementById('predictionChart'),{type:'bar',data:{labels,datasets:[{label:'Confidence %',data:values,backgroundColor:colors,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a0a0c0'}}},scales:{x:{ticks:{color:'#a0a0c0',maxRotation:45},grid:{color:'rgba(255,255,255,0.05)'}},y:{beginAtZero:true,max:100,ticks:{color:'#a0a0c0'},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    loadHistory();
+  }else{showToast('Error: '+(result.error||'Failed'),'error')}
+});
 
-    document.getElementById("backProfileBtn").addEventListener("click", () => {
-      profileForm.classList.add("hidden");
-      document.getElementById("profileDisplay").classList.remove("hidden");
-    });
+// History
+async function loadHistory(){
+  const res=await fetch('/api/history');if(!res.ok)return;
+  const rows=await res.json();
+  document.getElementById('predCount').textContent=rows.length;
+  const tb=document.getElementById('historyTable');
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.created_at||''}</td><td>${r.degree||''}</td><td>${r.major||''}</td><td>${r.cgpa||''}</td><td>${r.experience||''}</td><td>${r.skills||''}</td><td><span class="role-badge">${r.predicted_role||''}</span></td></tr>`).join('');
+  if(roleChart)roleChart.destroy();if(skillChart)skillChart.destroy();
+  const rc={};rows.forEach(r=>{if(r.predicted_role)rc[r.predicted_role]=(rc[r.predicted_role]||0)+1});
+  roleChart=new Chart(document.getElementById('roleChart'),{type:'bar',data:{labels:Object.keys(rc),datasets:[{label:'Predictions',data:Object.values(rc),backgroundColor:Object.keys(rc).map((_,i)=>`hsla(${220+i*30},70%,60%,0.7)`),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a0a0c0'}}},scales:{x:{ticks:{color:'#a0a0c0'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#a0a0c0'},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  const sk={};rows.forEach(r=>{if(r.skills)r.skills.split(',').forEach(s=>{s=s.trim().toLowerCase();if(s)sk[s]=(sk[s]||0)+1})});
+  skillChart=new Chart(document.getElementById('skillChart'),{type:'doughnut',data:{labels:Object.keys(sk),datasets:[{data:Object.values(sk),backgroundColor:Object.keys(sk).map((_,i)=>`hsla(${250+i*25},65%,55%,0.8)`)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a0a0c0',font:{size:11}}}}}});
+}
 
-    document.getElementById("cancelEdit").addEventListener("click", () => {
-      profileForm.classList.add("hidden");
-      document.getElementById("profileDisplay").classList.remove("hidden");
-    });
+// Chatbot
+const chatToggle=document.getElementById('chatToggle');
+const chatBox=document.getElementById('chatBox');
+const chatClose=document.getElementById('chatClose');
+const chatForm=document.getElementById('chatForm');
+const chatText=document.getElementById('chatText');
+const chatMsgs=document.getElementById('chatMsgs');
+let autoClose;
+chatToggle.onclick=()=>{chatBox.classList.toggle('open');if(chatBox.classList.contains('open')){chatText.focus();resetAC()}};
+chatClose.onclick=()=>{chatBox.classList.remove('open');clearTimeout(autoClose)};
+function resetAC(){clearTimeout(autoClose);autoClose=setTimeout(()=>chatBox.classList.remove('open'),20000)}
+chatText.addEventListener('input',resetAC);chatBox.addEventListener('mousemove',resetAC);
 
-    profileForm.addEventListener("submit", async e => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(profileForm).entries());
-      const res = await fetch("/api/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      showToast(res.ok ? "Profile Saved 🍻" : "Profile Save Failed ❌",
-        res.ok ? "bg-green-500" : "bg-red-500");
-      if (res.ok) {
-        profileForm.classList.add("hidden");
-        document.getElementById("profileDisplay").classList.remove("hidden");
-        loadProfile();
-      }
-    });
+chatForm.addEventListener('submit',e=>{
+  e.preventDefault();const msg=chatText.value.trim();if(!msg)return;
+  chatMsgs.innerHTML+=`<div class="user-msg"><strong>You:</strong> ${msg}</div>`;chatText.value='';chatMsgs.scrollTop=chatMsgs.scrollHeight;resetAC();
+  const typing=document.createElement('div');typing.className='bot-msg';typing.innerHTML='<strong>Bot:</strong> Typing...';chatMsgs.appendChild(typing);chatMsgs.scrollTop=chatMsgs.scrollHeight;
+  fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})})
+  .then(r=>r.json()).then(d=>{typing.innerHTML=`<strong>Bot:</strong> ${d.reply||'No response.'}`;chatMsgs.scrollTop=chatMsgs.scrollHeight})
+  .catch(()=>{typing.innerHTML='<strong>Bot:</strong> ⚠️ Error connecting.'});
+});
 
-    // === Simple Frontend Bot Logic ===
-   const toggleBtn = document.getElementById("chatbot-toggle");
-  const chatBox   = document.getElementById("chatbot-box");
-  const closeBtn  = document.getElementById("chatbot-close");
-  const chatForm  = document.getElementById("chatbot-input");
-  const chatText  = document.getElementById("chatbot-text");
-  const chatMsgs  = document.getElementById("chatbot-messages");
-
-  function openChat() {
-    chatBox.style.display = "flex";
-  }
-
-  function closeChat() {
-    chatBox.style.display = "none";
-  }
-
-  toggleBtn.onclick = () => openChat();
-  closeBtn.onclick  = () => closeChat();
-
-  // Close instantly when mouse leaves the chat box
-  chatBox.addEventListener("mouseleave", closeChat);
-
-  // Chat send
-  chatForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const msg = chatText.value.trim();
-    if (!msg) return;
-
-    chatMsgs.innerHTML += `<div><strong>You:</strong> ${msg}</div>`;
-    chatText.value = "";
-
-    setTimeout(() => {
-      chatMsgs.innerHTML += `<div><strong>Bot:</strong> You said "${msg}".</div>`;
-      chatMsgs.scrollTop = chatMsgs.scrollHeight;
-    }, 500);
-
-    chatMsgs.scrollTop = chatMsgs.scrollHeight;
-  });
-    
-
-
-    // Prediction & History functions remain same as your previous code
-    const predictForm = document.getElementById("predictForm");
-
-    let roleChart, skillChart;
-    predictForm.addEventListener("submit", async e => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(predictForm).entries());
-      const res = await fetch("/api/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
-      if (res.ok) {
-        document.getElementById("predictionResult").textContent = `Predicted Job Role: ${result.prediction}`;
-        showToast("Prediction Successful ✅");
-        loadHistory();
-        if (window.predChart) window.predChart.destroy();
-        const labels = result.graph_data.map(item => item.role);
-        const values = result.graph_data.map(item => item.confidence * 100);
-        const colors = labels.map(l => l === result.prediction ? "rgba(255,206,86,0.7)" : "rgba(75,192,192,0.6)");
-        const ctx = document.getElementById("predictionChart").getContext("2d");
-        window.predChart = new Chart(ctx, {
-          type: "bar",
-          data: { labels, datasets: [{ label: "Confidence (%)", data: values, backgroundColor: colors }] },
-          options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
-        });
-      } else showToast(`Error: ${result.error}`, "bg-red-500");
-    });
-
-    async function loadHistory() {
-      const res = await fetch("/api/history");
-      if (!res.ok) return;
-      const rows = await res.json();
-      const table = document.getElementById("historyTable");
-      table.innerHTML = rows.map((r, i) => `
-    <tr class="${i % 2 === 0 ? 'bg-white/5' : 'bg-white/15'}">
-      <td class="px-4 py-2">${r.created_at || ""}</td>
-      <td class="px-4 py-2">${r.degree || ""}</td>
-      <td class="px-4 py-2">${r.major || ""}</td>
-      <td class="px-4 py-2">${r.cgpa || ""}</td>
-      <td class="px-4 py-2">${r.experience || ""}</td>
-      <td class="px-4 py-2">${r.skills || ""}</td>
-      <td class="px-4 py-2 font-bold">${r.predicted_role || ""}</td>
-    </tr>`).join("");
-
-      if (roleChart) roleChart.destroy();
-      if (skillChart) skillChart.destroy();
-
-      const roleCount = {};
-      rows.forEach(r => { if (r.predicted_role) roleCount[r.predicted_role] = (roleCount[r.predicted_role] || 0) + 1; });
-      roleChart = new Chart(document.getElementById("roleChart"), {
-        type: "bar",
-        data: { labels: Object.keys(roleCount), datasets: [{ label: "Roles", data: Object.values(roleCount), backgroundColor: Object.keys(roleCount).map(() => `hsl(${Math.random() * 360},70%,50%)`) }] },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
-
-      const skills = {};
-      rows.forEach(r => { if (r.skills) r.skills.split(",").forEach(s => { s = s.trim().toLowerCase(); if (s) skills[s] = (skills[s] || 0) + 1; }); });
-      skillChart = new Chart(document.getElementById("skillChart"), {
-        type: "doughnut",
-        data: { labels: Object.keys(skills), datasets: [{ data: Object.values(skills), backgroundColor: Object.keys(skills).map(() => `hsl(${Math.random() * 360},70%,50%)`) }] },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
-    }
-
-    // Initialize
-    switchTab('home');
-
-    // Tailwind styling utilities
-    document.querySelectorAll('.side-btn').forEach(btn => {
-      btn.className = "w-full px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-left font-semibold transition hover:scale-105 flex items-center space-x-2";
-    });
-    document.querySelectorAll('.input').forEach(i => {
-      i.className = "w-full px-4 py-3 rounded-xl text-black focus:ring-2 focus:ring-purple-400 outline-none";
-    });
-    document.querySelectorAll('.btn-green').forEach(b => {
-      b.className = "w-full bg-green-500 hover:bg-green-600 py-3 rounded-xl font-bold transition";
-    });
-    document.querySelectorAll('.btn-blue').forEach(b => {
-      b.className = "w-full bg-blue-500 hover:bg-blue-600 py-3 rounded-xl font-bold transition";
-    });
-    document.querySelectorAll('.btn-red').forEach(b => {
-      b.className = "w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-bold transition";
-    });
-  </script>
+// Init
+switchTab('home');loadHistory();
+</script>
 </body>
-
 </html>

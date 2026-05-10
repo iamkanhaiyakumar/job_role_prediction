@@ -1,4 +1,4 @@
-Degree,Major,CGPA,Employed,Experience,Skills,Certifications,IndustryPreference,Job Role Simplified,Job Role
+﻿Degree,Major,CGPA,Employed,Experience,Skills,Certifications,IndustryPreference,Job Role Simplified,Job Role
 MBA,Economics,8.16,yes,9,"R, Econometrics, Data Analysis, Python, Statistics",AWS Certified,IT,Financial Analyst,Data Analyst
 MBA,Economics,6.66,no,7,"Data Analysis, R, Econometrics, Python, Statistics",PMP,IT,Financial Analyst,Data Analyst
 MBA,Finance,6.95,no,9,"Financial Modeling, Excel, Risk Analysis",Six Sigma,Manufacturing,Investment Analyst,Data Analyst
@@ -9522,7 +9522,3 @@ M.Tech,ECE,8.95,yes,2,"TypeScript, SQL, Next.js, Cypress, Express.js, TailwindCS
 B.Tech,ECE,6.45,yes,6,"CSS, Node.js, TailwindCSS, GraphQL, SQL, Jest",Full Stack Web Development Certificate,IT,Frontend Developer,Electrical Engineer
 B.Tech,ECE,9.26,no,5,"Git, Cypress, JavaScript, Jest, Node.js, Docker",Backend Developer Nanodegree,IT,Full Stack Developer,Electrical Engineer
 B.Tech,ECE,6.35,yes,2,"React, CSS, Kubernetes, MongoDB, TailwindCSS, Node.js, Cypress, Next.js",Node.js Certification,IT,Full Stack Developer,Electrical Engineer
-M.Tech,ECE,6.91,no,3,"JavaScript, Redux, CSS, HTML, Git",Frontend Developer Nanodegree,IT,Frontend Developer,Electrical Engineer
-B.Tech,ECE,6.96,no,0,"JavaScript, Redux, CSS, HTML, Git",Frontend Developer Nanodegree,IT,Frontend Developer,Electrical Engineer
-B.Tech,ECE,7.72,no,1,"JavaScript, Redux, CSS, HTML, Git",Frontend Developer Nanodegree,IT,Frontend Developer,Electrical Engineer
-M.Tech,ECE,8.39,no,2,"JavaScript, Redux, CSS, HTML, Git",Frontend Developer Nanodegree,IT,Frontend Developer,Electrical Engineer
