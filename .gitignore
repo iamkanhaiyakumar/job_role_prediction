@@ -33,4 +33,5 @@ echo "label_encoder.pkl" >> .gitignore
 echo "feature_encoders.pkl" >> .gitignore
 
 
+.env
 
