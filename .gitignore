@@ -1,0 +1,39 @@
+# .gitignore — Edu2Job
+
+# Environment variables (NEVER commit secrets)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Backup files
+*.bak
+
+# Large data files
+Data.csv
+Dataset.csv
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log

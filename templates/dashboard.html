@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edu2Job — Dashboard</title>
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/dashboard.css?v=4.9">
+  <script src="/static/js/chart.min.js?v=4.9"></script>
+</head>
+<body>
+
+<!-- Global Toast Notification System -->
+<div class="toast" id="toast">
+  <span id="toastMsg"></span>
+  <button class="toast-close" onclick="hideToast()">✕</button>
+</div>
+
+<!-- ===== TOP NAV ===== -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="/" class="nav-logo">Edu2<span>Job</span></a>
+    <span class="nav-badge">✦ Dashboard</span>
+  </div>
+  <div class="nav-right">
+    <span id="navUserName" class="nav-username"></span>
+    <div class="nav-initials-circle" id="navInitialsCircle" onclick="switchTab('profile')" title="View Profile">?</div>
+    <a href="/logout" class="logout-btn">Logout</a>
+  </div>
+</nav>
+
+<div class="dash-layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <button class="side-btn active" data-tab="home"><span class="ico">🏠</span><span class="label">Home</span></button>
+    <button class="side-btn" data-tab="predict"><span class="ico">🔮</span><span class="label">Predict</span></button>
+    <button class="side-btn" data-tab="history"><span class="ico">📊</span><span class="label">History</span></button>
+    
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-divider"></div>
+
+    <button class="side-btn" data-tab="profile"><span class="ico">👤</span><span class="label">Profile</span></button>
+    <button class="side-btn" data-tab="about"><span class="ico">ℹ️</span><span class="label">About &amp; FAQ</span></button>
+    <a href="/logout" class="side-btn danger"><span class="ico">🚪</span><span class="label">Logout</span></a>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="dash-main">
+
+    <!-- ============ HOME TAB ============ -->
+    <section id="home" class="tab-content active">
+
+      <!-- Time-based greeting banner -->
+      <div class="welcome-banner">
+        <div class="wb-left">
+          <div class="wb-greeting" id="wbGreeting">Welcome! 👋</div>
+          <div class="wb-subtitle" id="wbSubtitle">Your AI-powered career prediction dashboard</div>
+          <div class="wb-actions">
+            <button class="wb-btn-primary" onclick="switchTab('predict')">🔮 Make Prediction →</button>
+            <button class="wb-btn-outline" onclick="switchTab('history')">📊 View History →</button>
+          </div>
+        </div>
+        <div class="wb-right">
+          <div class="wb-decoration">
+            <div class="wb-ring ring-1"></div>
+            <div class="wb-ring ring-2"></div>
+            <div class="wb-ring ring-3"></div>
+            <div class="wb-icon">🎯</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animated count-up stats -->
+      <div class="stats-row">
+        <div class="stat-card g-card">
+          <div class="stat-icon-wrap">🎯</div>
+          <div class="stat-num" data-target="99" data-suffix="%+">0</div>
+          <div class="stat-label">Model Accuracy</div>
+        </div>
+        <div class="stat-card g-card">
+          <div class="stat-icon-wrap">💼</div>
+          <div class="stat-num" data-target="15" data-suffix=" Roles">0</div>
+          <div class="stat-label">Supported Roles</div>
+        </div>
+        <div class="stat-card g-card">
+          <div class="stat-icon-wrap">📈</div>
+          <div class="stat-num" id="predCount">0</div>
+          <div class="stat-label">Your Predictions</div>
+        </div>
+      </div>
+
+      <!-- Empty profile CTA -->
+      <div class="g-card empty-profile-cta" id="emptyProfileCta" style="display:none">
+        <div class="epc-icon">👤</div>
+        <h3>Complete Your Profile</h3>
+        <p>Add your education &amp; skills to get more accurate predictions</p>
+        <button class="cta-btn" onclick="switchTab('profile')">✏️ Set Up Profile</button>
+      </div>
+
+      <!-- Last Prediction Card -->
+      <div class="g-card last-pred-card" id="lastPredCard" style="display:none">
+        <div class="lpc-label">Last Prediction</div>
+        <div class="lpc-role" id="lastPredRole"></div>
+        <div class="lpc-date" id="lastPredDate"></div>
+        <button class="lpc-action" onclick="switchTab('predict')">Run New →</button>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="g-card" id="activityFeedCard" style="display:none">
+        <div class="card-header-row">
+          <h3 class="card-title">Recent Activity</h3>
+          <a href="#" onclick="switchTab('history');return false" class="see-all-link">See All →</a>
+        </div>
+        <div class="activity-feed" id="activityFeed"></div>
+      </div>
+
+      <!-- Feature cards -->
+      <div class="home-grid">
+        <div class="g-card home-card">
+          <div class="hc-icon">🎯</div>
+          <h3>Smart Prediction</h3>
+          <p>Advanced ML models predict job roles tailored to your unique profile and skills.</p>
+        </div>
+        <div class="g-card home-card">
+          <div class="hc-icon">📊</div>
+          <h3>Track Growth</h3>
+          <p>All predictions saved permanently. Monitor career trends over time.</p>
+        </div>
+        <div class="g-card home-card" style="cursor:pointer" onclick="switchTab('about')">
+          <div class="hc-icon">⚙️</div>
+          <h3>AI Architecture</h3>
+          <p>Explore our 180-tree model, 151 feature space, and 5-factor hybrid scoring.</p>
+        </div>
+      </div>
+
+      <!-- Footer for Home Tab -->
+      <footer class="dash-footer">
+        <div class="df-top">
+          <div class="df-brand">
+            <div class="df-logo">Edu2<span>Job</span></div>
+            <p class="df-tagline">AI-Powered Career Role Prediction &amp; Educational Navigation System.</p>
+            <div class="df-status-pill">
+              <span class="live-pulse"></span>
+              <span>AI Engine Active (v2.0-calibrated)</span>
+            </div>
+          </div>
+
+          <div class="df-links-col">
+            <h4>Navigation</h4>
+            <a href="#" onclick="switchTab('home');return false">🏠 Dashboard Home</a>
+            <a href="#" onclick="switchTab('predict');return false">🔮 Career Prediction</a>
+            <a href="#" onclick="switchTab('history');return false">📊 Prediction History</a>
+            <a href="#" onclick="switchTab('profile');return false">👤 Student Profile</a>
+            <a href="#" onclick="switchTab('about');return false">ℹ️ About &amp; FAQ</a>
+          </div>
+
+          <div class="df-links-col">
+            <h4>AI Transparency</h4>
+            <a href="#" onclick="switchTab('about');return false">📐 151-Dim Pipeline</a>
+            <a href="#" onclick="switchTab('about');return false">🌲 180 Ensemble Trees</a>
+            <a href="#" onclick="switchTab('about');return false">⚖️ 5-Factor Formula</a>
+            <a href="#" onclick="switchTab('about');return false">💼 15 Canonical Roles</a>
+          </div>
+
+          <div class="df-links-col">
+            <h4>Assistance</h4>
+            <a href="#" onclick="document.getElementById('chatToggle').click();return false">💬 CareerBot Chat</a>
+            <a href="#" onclick="switchTab('predict');return false">📄 Resume PDF Parser</a>
+            <a href="/logout">🚪 Sign Out</a>
+          </div>
+        </div>
+
+        <div class="df-bottom">
+          <div class="df-copy">© 2026 Edu2Job. Engineered with Scikit-Learn, Flask &amp; Mistral AI. All rights reserved.</div>
+          <div class="df-disclaimer">Career Fit Scores reflect recommendation alignment and do not constitute employment guarantees.</div>
+        </div>
+      </footer>
+
+    </section>
+
+    <!-- ============ PREDICT TAB ============ -->
+    <section id="predict" class="tab-content">
+      <div class="section-head">
+        <h2>New <span class="hl">Prediction</span></h2>
+        <p>Enter your details and let AI predict your ideal job role</p>
+      </div>
+
+      <div class="g-card predict-card">
+        <!-- Resume Upload Dropzone Card -->
+        <div class="resume-upload-banner">
+          <div class="rub-left">
+            <div class="rub-icon">📄</div>
+            <div class="rub-info">
+              <h4>Instant Profile Auto-Fill from Resume</h4>
+              <p>Upload your PDF resume to auto-extract degree, CGPA, experience, and 200+ tech skills</p>
+            </div>
+          </div>
+          <div class="rub-right">
+            <input type="file" id="resumeFileInput" accept=".pdf" style="display:none" onchange="handleResumeUpload(event)">
+            <button type="button" class="btn-resume-upload" id="btnResumeUpload" onclick="document.getElementById('resumeFileInput').click()">
+              <span class="btn-resume-text">⚡ Upload Resume PDF</span>
+              <span class="btn-resume-loading" style="display:none"><span class="spinner"></span> Parsing PDF...</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="predict-toolbar">
+          <span class="pt-or">OR ENTER MANUALLY</span>
+          <button class="auto-fill-btn" onclick="autoFillFromProfile()">⚡ Use Profile Data</button>
+        </div>
+
+        <form id="predictForm">
+
+          <!-- Section A: Academic -->
+          <div class="form-section">
+            <div class="form-section-label">🎓 Academic Background</div>
+            <div class="form-grid">
+              <div class="fl-group">
+                <select name="degree" id="fl-degree" required>
+                  <option value="" disabled selected></option>
+                  <option>B.Tech</option><option>M.Tech</option><option>BCA</option>
+                  <option>MCA</option><option>B.Sc</option><option>M.Sc</option>
+                  <option>MBA</option><option>PhD</option><option>BBA</option><option>B.Com</option>
+                </select>
+                <label for="fl-degree">Degree *</label>
+              </div>
+              <div class="fl-group">
+                <select name="major" id="fl-major" required>
+                  <option value="" disabled selected></option>
+                  <option>Computer Science</option><option>Information Technology</option>
+                  <option>Electronics</option><option>Mechanical</option>
+                  <option>Data Science</option><option>Artificial Intelligence</option>
+                  <option>Business</option><option>Mathematics</option>
+                  <option>Civil</option><option>Electrical</option>
+                </select>
+                <label for="fl-major">Major *</label>
+              </div>
+              <div class="fl-group">
+                <input type="number" name="cgpa" id="fl-cgpa" step="0.01" min="0" max="10" placeholder=" " required>
+                <label for="fl-cgpa">CGPA (out of 10) *</label>
+              </div>
+              <div class="fl-group">
+                <input type="number" name="experience" id="fl-exp" min="0" max="30" placeholder=" ">
+                <label for="fl-exp">Experience (years)</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section B: Professional -->
+          <div class="form-section">
+            <div class="form-section-label">💼 Professional Details</div>
+            <div class="form-grid">
+              <div class="fl-group">
+                <select name="employed" id="fl-employed">
+                  <option value="" disabled selected></option>
+                  <option value="Yes">Currently Employed</option>
+                  <option value="No">Not Employed</option>
+                </select>
+                <label for="fl-employed">Employment Status</label>
+              </div>
+              <div class="fl-group">
+                <select name="industry_preference" id="fl-industry">
+                  <option value="" disabled selected></option>
+                  <option value="IT">IT / Software</option>
+                  <option value="Data Science">Data Science</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Education">Education</option>
+                  <option value="Consulting">Consulting</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Engineering">Engineering</option>
+                </select>
+                <label for="fl-industry">Industry Preference</label>
+              </div>
+              <div class="fl-group full-width">
+                <input type="text" name="skills" id="fl-skills" placeholder=" ">
+                <label for="fl-skills">Skills (comma-separated, e.g. python, ml, sql)</label>
+              </div>
+              <div class="fl-group full-width">
+                <input type="text" name="certifications" id="fl-certs" placeholder=" ">
+                <label for="fl-certs">Certifications (e.g. AWS, Google ML, Azure)</label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="predict-submit-btn" id="predictBtn">
+            <span class="btn-text">🔮 Predict My Job Role</span>
+            <span class="btn-loading" style="display:none"><span class="spinner"></span>Analyzing your profile...</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Result Section -->
+      <div id="resultWrapper" style="display:none">
+        <!-- Top 3 Roles Card -->
+        <div class="g-card top-roles-card">
+          <h3 class="card-title" style="margin-bottom:1.2rem">🏆 Top Predicted Roles</h3>
+          <div class="top-roles-grid" id="topRolesGrid"></div>
+        </div>
+
+        <!-- Skill Gap Analysis Card -->
+        <div class="g-card skill-gap-card" id="skillGapCard">
+          <div class="sgc-header">
+            <div>
+              <h3 class="card-title">🎯 AI Skill Gap Analysis</h3>
+              <p class="sgc-sub">Role Readiness for <strong id="sgTargetRole" style="color:var(--cyan)">—</strong></p>
+            </div>
+            <div class="sgc-boost-badge" id="sgBoostBadge">+35% Match Potential</div>
+          </div>
+
+          <!-- Readiness Progress Bar -->
+          <div class="readiness-meter-wrap">
+            <div class="rm-label-row">
+              <span class="rm-title">Career Readiness Score</span>
+              <span class="rm-val" id="rmVal">75%</span>
+            </div>
+            <div class="rm-bar-bg"><div class="rm-bar-fill" id="rmFill" style="width:75%"></div></div>
+          </div>
+
+          <div class="sg-columns">
+            <div class="sg-col matched-col">
+              <div class="sg-col-title">✅ Skills You Already Have</div>
+              <div class="sg-pills" id="sgMatchedPills"></div>
+            </div>
+            <div class="sg-col missing-col">
+              <div class="sg-col-title">⚠️ High-Priority Missing Skills to Learn</div>
+              <div class="sg-pills" id="sgMissingPills"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curated Learning Roadmap Card -->
+        <div class="g-card roadmap-card" id="roadmapCard">
+          <h3 class="card-title" style="margin-bottom:0.3rem">🗺️ Step-by-Step Learning Roadmap</h3>
+          <p class="sgc-sub" style="margin-bottom:1.4rem">Curated phase-by-phase action plan with free official &amp; community tutorials</p>
+          <div class="roadmap-timeline" id="roadmapTimeline"></div>
+        </div>
+
+        <!-- AI Mock Interview Questions Card -->
+        <div class="g-card interview-card" id="interviewCard">
+          <h3 class="card-title" style="margin-bottom:0.3rem">💡 Top 5 Technical Interview Questions</h3>
+          <p class="sgc-sub" style="margin-bottom:1.2rem">Frequently asked interview questions for this role with model answers</p>
+          <div class="interview-accordion" id="interviewAccordion"></div>
+        </div>
+
+        <!-- All Role Confidences Bar Chart -->
+        <div class="g-card chart-card">
+          <h3 class="card-title">📊 All Role Confidences</h3>
+          <div style="height:280px;margin-top:1rem;position:relative;width:100%"><canvas id="predictionChart"></canvas></div>
+          <div class="predict-again-wrap">
+            <button class="btn-predict-again" onclick="resetPredictForm(true)">🔮 Predict Again</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HISTORY TAB ============ -->
+    <section id="history" class="tab-content">
+      <div class="section-head">
+        <h2>Prediction <span class="hl">History</span></h2>
+        <p>Your complete prediction history — all records saved permanently</p>
+      </div>
+
+      <div class="history-notice" id="historyNotice" style="display:flex;align-items:center;justify-content:space-between;transition:opacity 0.3s ease;">
+        <span>✅ History is <strong>saved permanently</strong> — no data will ever be auto-deleted.</span>
+        <button onclick="dismissHistoryNotice()" style="background:none;border:none;color:inherit;cursor:pointer;font-size:1.05rem;opacity:0.75;padding:0 0.4rem;line-height:1;" title="Dismiss">✕</button>
+      </div>
+
+      <!-- Search + Sort toolbar -->
+      <div class="history-toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="historySearch" placeholder="Search by job role..." oninput="filterHistory()">
+        </div>
+        <div class="sort-btns">
+          <button class="sort-btn active" id="sortLatest" onclick="sortHistory('latest')">Latest</button>
+          <button class="sort-btn" id="sortOldest" onclick="sortHistory('oldest')">Oldest</button>
+        </div>
+      </div>
+
+      <!-- Timeline cards container -->
+      <div class="timeline-container" id="timelineContainer"></div>
+
+      <!-- Empty state: No search matches -->
+      <div id="noSearchMatch" class="empty-state-box" style="display:none">
+        <div class="empty-state-icon">🔍</div>
+        <div class="empty-state-title">No matching predictions</div>
+        <div class="empty-state-desc">Try changing your search keywords.</div>
+      </div>
+
+      <!-- Empty state: No predictions yet -->
+      <div id="noHistory" class="empty-state-box" style="display:none">
+        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-title">No predictions yet</div>
+        <div class="empty-state-desc">Make your first career prediction to see your results here.</div>
+        <button class="cta-btn" onclick="switchTab('predict')">Make Prediction →</button>
+      </div>
+
+      <div class="charts-row" id="historyChartsRow">
+        <div class="g-card">
+          <h3 class="card-title" style="margin-bottom:1rem">📊 Role Distribution</h3>
+          <div style="height:250px;position:relative;width:100%" id="roleChartWrap">
+            <canvas id="roleChart"></canvas>
+            <div id="noRoleChartMsg" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--muted);font-size:0.85rem;text-align:center;">
+              📊 Make a prediction to see role distribution.
+            </div>
+          </div>
+        </div>
+        <div class="g-card">
+          <h3 class="card-title" style="margin-bottom:1rem">🎯 Top Skills Frequency</h3>
+          <div style="height:250px;position:relative;width:100%" id="skillChartWrap">
+            <canvas id="skillChart"></canvas>
+            <div id="noSkillChartMsg" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--muted);font-size:0.85rem;text-align:center;padding:1rem;">
+              ⚡ Add skills to your predictions to see skill frequency insights.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROFILE TAB — INLINE EDITING ============ -->
+    <section id="profile" class="tab-content">
+      <div class="section-head">
+        <h2>Your <span class="hl">Profile</span></h2>
+        <p>Click any field directly to edit and update your information</p>
+      </div>
+
+      <div id="profileDisplay" class="g-card">
+
+        <!-- Avatar & User Info Header -->
+        <div class="profile-header-new">
+          <div class="profile-initials-circle" id="profileInitialsCircle">?</div>
+          <div class="ph-info">
+            <h3 id="displayName">—</h3>
+            <span class="role-tag">Student / Professional</span>
+            <div id="displayEmail" class="ph-email">—</div>
+          </div>
+        </div>
+
+        <!-- Profile Completion Meter -->
+        <div class="completion-meter">
+          <div class="cm-top">
+            <span class="cm-label">Profile Completion</span>
+            <span class="cm-pct" id="cmPct">0%</span>
+          </div>
+          <div class="cm-bar-bg"><div class="cm-bar-fill" id="cmFill" style="width:0%"></div></div>
+          <div class="cm-hint" id="cmHint">Loading profile details...</div>
+        </div>
+
+        <!-- Latest AI Career Match Highlight Card -->
+        <div class="profile-latest-pred-card" id="profileLatestPredCard">
+          <div class="plp-header">
+            <span class="plp-badge">✦ Latest AI Career Match</span>
+            <span class="plp-date" id="plpDate">Loading...</span>
+          </div>
+          <div class="plp-body">
+            <div class="plp-role-info">
+              <div class="plp-icon" id="plpIcon">🎯</div>
+              <div>
+                <h4 class="plp-role-title" id="plpRole">—</h4>
+                <div class="plp-role-cat" id="plpCategory">—</div>
+              </div>
+            </div>
+            <div class="plp-score-box">
+              <div class="plp-score-val" id="plpScore">—</div>
+              <div class="plp-score-label">Fit Score</div>
+            </div>
+          </div>
+          <div class="plp-footer">
+            <span class="plp-meta" id="plpMeta">Explore matching technical skills and tailored roadmaps.</span>
+            <button class="plp-action-btn" id="plpActionBtn" onclick="switchTab('predict')">🔮 Make Prediction →</button>
+          </div>
+        </div>
+
+        <!-- Inline Click-to-Edit Grid -->
+        <div class="profile-grid-new">
+          <div class="pg-item" onclick="activateInlineEdit(this, 'name', 'text', 'Full Name')">
+            <div class="pg-label"><span>Full Name</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_name">—</div>
+          </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'email', 'email', 'Email Address')">
+            <div class="pg-label"><span>Email Address</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_email">—</div>
+          </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'college_name', 'text', 'College / University')">
+            <div class="pg-label"><span>College / University</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_college_name">—</div>
+          </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'degree', 'text', 'Degree (e.g. B.Tech)')">
+            <div class="pg-label"><span>Degree</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_degree">—</div>
+          </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'major', 'text', 'Major / Branch')">
+            <div class="pg-label"><span>Major / Branch</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_major">—</div>
+          </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'cgpa', 'number', 'CGPA (0 - 10)')">
+            <div class="pg-label"><span>CGPA</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_cgpa">—</div>
+          </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'experience', 'number', 'Experience (Years)')">
+            <div class="pg-label"><span>Experience (Years)</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_experience">—</div>
+          </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'passout_year', 'number', 'Passout Year')">
+            <div class="pg-label"><span>Passout Year</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_passout_year">—</div>
+          </div>
+          <div class="pg-item full-span" onclick="activateInlineEdit(this, 'skills', 'text', 'Skills (comma-separated)')">
+            <div class="pg-label"><span>Skills</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_skills">—</div>
+          </div>
+        </div>
+
+        <!-- Floating / Sticky Save Changes Bar (shows only when changes made) -->
+        <div class="profile-save-bar" id="profileSaveBar">
+          <span class="psb-text">⚡ You have unsaved profile changes!</span>
+          <div class="psb-actions">
+            <button class="btn-cancel-inline" onclick="cancelInlineEdits()">✕ Reset</button>
+            <button class="btn-save-inline" onclick="saveInlineEdits()">💾 Save Changes</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ ABOUT & FAQ TAB ============ -->
+    <section id="about" class="tab-content">
+      
+      <!-- Hero Header -->
+      <div class="about-hero g-card">
+        <div class="about-hero-badge">✦ Smart Career Guidance</div>
+        <h2>About <span class="hl">Edu2Job</span></h2>
+        <p class="about-hero-sub">
+          Edu2Job bridges the gap between college education and industry careers. Using transparent machine learning, we analyze your skills, degree, and background to predict your ideal career path with actionable roadmaps and skill gap insights.
+        </p>
+      </div>
+
+      <!-- 3 Key Value Pillars -->
+      <div class="about-grid">
+        <div class="about-card g-card">
+          <div class="ac-icon">🎯</div>
+          <h3>Smart Role Matching</h3>
+          <p>Instantly map your background to 15 top tech &amp; engineering career tracks with high-confidence predictions.</p>
+        </div>
+        <div class="about-card g-card">
+          <div class="ac-icon">⚡</div>
+          <h3>Skill Gap Analysis</h3>
+          <p>See exactly which core technologies you already know and which high-demand skills you need to learn next.</p>
+        </div>
+        <div class="about-card g-card">
+          <div class="ac-icon">🚀</div>
+          <h3>Actionable Roadmaps</h3>
+          <p>Get curated learning milestones, free study resources, salary insights, and top interview questions for your dream role.</p>
+        </div>
+      </div>
+
+      <!-- How It Works Pipeline (4 Simple Steps) -->
+      <div class="g-card pipeline-card">
+        <div class="section-head-sm">
+          <div class="sh-badge">⚙️ How It Works</div>
+          <h3>How Edu2Job Powers Your Career Journey</h3>
+          <p>From your raw skills to a personalized career roadmap in seconds</p>
+        </div>
+
+        <div class="pipeline-flow" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="pipeline-step">
+            <div class="p-step-num">Step 1</div>
+            <div class="p-step-icon">📄</div>
+            <h4>Input or Resume</h4>
+            <p>Enter your profile details or simply upload your PDF resume to auto-fill skills, CGPA, and degree in one click.</p>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="p-step-num">Step 2</div>
+            <div class="p-step-icon">🧠</div>
+            <h4>AI Skill Analysis</h4>
+            <p>Our 180-tree Random Forest model (calibrated <em>T = 0.1656</em>) evaluates your profile across 151 technical attributes and certifications.</p>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="p-step-num">Step 3</div>
+            <div class="p-step-icon">⚖️</div>
+            <h4>Hybrid Fit Scoring</h4>
+            <p>Combines AI probability with practical skill overlap (40%), academics (15%), and experience for realistic match scores.</p>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="p-step-num">Step 4</div>
+            <div class="p-step-icon">🎯</div>
+            <h4>Roadmaps &amp; Prep</h4>
+            <p>Unlock tailored study paths, interview prep questions, salary ranges, and 24/7 guidance from CareerBot.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verified Model Performance (4 Key Stats) -->
+      <div class="g-card metrics-card">
+        <div class="section-head-sm">
+          <div class="sh-badge">📊 Verified AI Performance</div>
+          <h3>Engineered for Precision &amp; Reliability</h3>
+          <p>Audited benchmarks from our calibrated machine learning engine</p>
+        </div>
+
+        <div class="metrics-grid" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="metric-item">
+            <div class="m-val hl-text">99.78%</div>
+            <div class="m-label">Test Accuracy</div>
+            <div class="m-sub">Verified test benchmark</div>
+          </div>
+          <div class="metric-item">
+            <div class="m-val">180</div>
+            <div class="m-label">Decision Trees</div>
+            <div class="m-sub">Trained ensemble model</div>
+          </div>
+          <div class="metric-item">
+            <div class="m-val">151</div>
+            <div class="m-label">Evaluated Features</div>
+            <div class="m-sub">Skills, certs &amp; academics</div>
+          </div>
+          <div class="metric-item">
+            <div class="m-val">15</div>
+            <div class="m-label">Career Roles</div>
+            <div class="m-sub">Recognized job tracks</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Match Score Breakdown -->
+      <div class="g-card formula-card">
+        <div class="section-head-sm">
+          <div class="sh-badge">🧮 How Match Score is Calculated</div>
+          <h3>Transparent 5-Factor Career Fit</h3>
+          <p>We combine multiple factors so your prediction is balanced and trustworthy</p>
+        </div>
+
+        <div class="formula-bars">
+          <div class="formula-row">
+            <div class="fr-meta">
+              <span class="fr-name">⚡ Direct Skill Alignment</span>
+              <span class="fr-pct">40% Weight</span>
+            </div>
+            <div class="fr-track"><div class="fr-fill" style="width: 40%"></div></div>
+            <div class="fr-desc">How closely your current technical skills match the core requirements of the job role.</div>
+          </div>
+
+          <div class="formula-row">
+            <div class="fr-meta">
+              <span class="fr-name">🤖 AI Model Confidence</span>
+              <span class="fr-pct">35% Weight</span>
+            </div>
+            <div class="fr-track"><div class="fr-fill" style="width: 35%"></div></div>
+            <div class="fr-desc">Calibrated prediction likelihood from our trained 180-tree Random Forest model.</div>
+          </div>
+
+          <div class="formula-row">
+            <div class="fr-meta">
+              <span class="fr-name">🎓 Academic Background &amp; CGPA</span>
+              <span class="fr-pct">15% Weight</span>
+            </div>
+            <div class="fr-track"><div class="fr-fill" style="width: 15%"></div></div>
+            <div class="fr-desc">Relevance of your degree program, academic major, and overall performance.</div>
+          </div>
+
+          <div class="formula-row">
+            <div class="fr-meta">
+              <span class="fr-name">💼 Work / Internship Experience</span>
+              <span class="fr-pct">5% Weight</span>
+            </div>
+            <div class="fr-track"><div class="fr-fill" style="width: 5%"></div></div>
+            <div class="fr-desc">Years of industry exposure compared against entry or mid-level expectations.</div>
+          </div>
+
+          <div class="formula-row">
+            <div class="fr-meta">
+              <span class="fr-name">🌐 Industry Preference &amp; Certifications</span>
+              <span class="fr-pct">5% Weight</span>
+            </div>
+            <div class="fr-track"><div class="fr-fill" style="width: 5%"></div></div>
+            <div class="fr-desc">Your preferred career domain and verified professional certifications.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terminology Notice -->
+      <div class="g-card terminology-card">
+        <div class="tc-icon">ℹ️</div>
+        <div class="tc-content">
+          <h4>Clear &amp; Honest Guidance</h4>
+          <p>
+            Your <strong>Career Match Score</strong> indicates how well your skills align with industry expectations for guidance and skill discovery. It serves as an educational roadmap to help you prepare — not a guarantee of a job offer.
+          </p>
+        </div>
+      </div>
+
+      <!-- Supported Roles Directory -->
+      <div class="g-card roles-directory-card">
+        <div class="section-head-sm">
+          <div class="sh-badge">💼 Supported Careers</div>
+          <h3>15 Industry Job Tracks</h3>
+          <p>Career paths currently evaluated and recommended by the platform</p>
+        </div>
+
+        <div class="roles-grid-modern">
+          <div class="role-pill-item"><span class="rp-icon">🤖</span><span class="rp-title">Data Scientist</span><span class="rp-cat">AI &amp; Data</span></div>
+          <div class="role-pill-item"><span class="rp-icon">🧠</span><span class="rp-title">Machine Learning Engineer</span><span class="rp-cat">AI &amp; Data</span></div>
+          <div class="role-pill-item"><span class="rp-icon">📊</span><span class="rp-title">Data Analyst</span><span class="rp-cat">Analytics</span></div>
+          <div class="role-pill-item"><span class="rp-icon">💻</span><span class="rp-title">Software Engineer</span><span class="rp-cat">Engineering</span></div>
+          <div class="role-pill-item"><span class="rp-icon">🌐</span><span class="rp-title">Full Stack Developer</span><span class="rp-cat">Engineering</span></div>
+          <div class="role-pill-item"><span class="rp-icon">🎨</span><span class="rp-title">Frontend Developer</span><span class="rp-cat">Engineering</span></div>
+          <div class="role-pill-item"><span class="rp-icon">⚙️</span><span class="rp-title">Backend Developer</span><span class="rp-cat">Engineering</span></div>
+          <div class="role-pill-item"><span class="rp-icon">♾️</span><span class="rp-title">DevOps Engineer</span><span class="rp-cat">Cloud &amp; Ops</span></div>
+          <div class="role-pill-item"><span class="rp-icon">☁️</span><span class="rp-title">Cloud Architect</span><span class="rp-cat">Cloud &amp; Ops</span></div>
+          <div class="role-pill-item"><span class="rp-icon">📈</span><span class="rp-title">Business Analyst</span><span class="rp-cat">Strategy</span></div>
+          <div class="role-pill-item"><span class="rp-icon">💵</span><span class="rp-title">Financial Analyst</span><span class="rp-cat">Finance</span></div>
+          <div class="role-pill-item"><span class="rp-icon">📋</span><span class="rp-title">Project Manager</span><span class="rp-cat">Management</span></div>
+          <div class="role-pill-item"><span class="rp-icon">⚡</span><span class="rp-title">Electrical Engineer</span><span class="rp-cat">Core Eng</span></div>
+          <div class="role-pill-item"><span class="rp-icon">🔧</span><span class="rp-title">Mechanical Engineer</span><span class="rp-cat">Core Eng</span></div>
+          <div class="role-pill-item"><span class="rp-icon">🏗️</span><span class="rp-title">Civil Engineer</span><span class="rp-cat">Core Eng</span></div>
+        </div>
+      </div>
+
+      <!-- FAQ Accordion -->
+      <div class="g-card faq-card">
+        <div class="section-head-sm">
+          <div class="sh-badge">❓ Common Questions</div>
+          <h3>Frequently Asked Questions</h3>
+          <p>Quick answers to help you get the most out of Edu2Job</p>
+        </div>
+
+        <div class="faq-accordion">
+          
+          <div class="faq-item">
+            <button class="faq-header" onclick="toggleFaqAccordion(this)">
+              <span class="faq-q">How does Edu2Job pick the best career role for me?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              <p>Edu2Job matches your degree, CGPA, experience, and technical skills against real industry patterns using a trained 180-tree Random Forest model. We blend the AI probability with your direct skill match so you get realistic, reliable recommendations.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" onclick="toggleFaqAccordion(this)">
+              <span class="faq-q">Can I just upload my PDF resume instead of typing?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              <p>Yes! Simply click "📄 Upload PDF Resume" on the Predict tab. Our parser automatically detects your degree, major, CGPA, years of experience, skills, and certifications, instantly filling the form for you.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" onclick="toggleFaqAccordion(this)">
+              <span class="faq-q">What if I have missing skills for my dream role?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              <p>When you run a prediction, we generate a Skill Gap Matrix highlighting the exact skills you're missing. You'll also receive curated 3-phase study roadmaps with free tutorials and top interview prep questions to help you bridge that gap.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" onclick="toggleFaqAccordion(this)">
+              <span class="faq-q">What does the Career Match Percentage mean?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              <p>It represents how closely your current background aligns with the job profile. 85%+ is an Excellent Match, 70-84% is a Strong Match, 50-69% is a Good Match, and below 50% shows areas where upskilling will make the biggest impact.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" onclick="toggleFaqAccordion(this)">
+              <span class="faq-q">Is my profile data private and permanently saved?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              <p>Yes. Your account data, uploaded details, and prediction history are securely stored in your personal database account. Your history is never automatically deleted, allowing you to track your growth over time.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" onclick="toggleFaqAccordion(this)">
+              <span class="faq-q">How can CareerBot assist me?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              <p>CareerBot is your 24/7 AI career mentor powered by Mistral AI. You can click the chat bubble anytime to ask for interview tips, career transitions, resume feedback, or explanations of specific technologies.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tech Stack Badges -->
+      <div class="g-card tech-stack-card">
+        <div class="section-head-sm">
+          <div class="sh-badge">💻 Built With</div>
+          <h3>Modern Technologies &amp; Standards</h3>
+        </div>
+        <div class="tech-tags">
+          <span class="tech-badge">🐍 Python 3</span>
+          <span class="tech-badge">🌶️ Flask Framework</span>
+          <span class="tech-badge">🤖 Scikit-Learn</span>
+          <span class="tech-badge">🌲 Random Forest (180 Trees)</span>
+          <span class="tech-badge">🔮 Mistral AI</span>
+          <span class="tech-badge">🐬 MySQL</span>
+          <span class="tech-badge">📊 Chart.js</span>
+          <span class="tech-badge">🎨 Glassmorphism UI</span>
+        </div>
+      </div>
+
+      <!-- Footer for About & FAQ Tab -->
+      <footer class="dash-footer">
+        <div class="df-top">
+          <div class="df-brand">
+            <div class="df-logo">Edu2<span>Job</span></div>
+            <p class="df-tagline">AI-Powered Career Role Prediction &amp; Educational Navigation System.</p>
+            <div class="df-status-pill">
+              <span class="live-pulse"></span>
+              <span>AI Engine Active (v2.0-calibrated)</span>
+            </div>
+          </div>
+
+          <div class="df-links-col">
+            <h4>Navigation</h4>
+            <a href="#" onclick="switchTab('home');return false">🏠 Dashboard Home</a>
+            <a href="#" onclick="switchTab('predict');return false">🔮 Career Prediction</a>
+            <a href="#" onclick="switchTab('history');return false">📊 Prediction History</a>
+            <a href="#" onclick="switchTab('profile');return false">👤 Student Profile</a>
+            <a href="#" onclick="switchTab('about');return false">ℹ️ About &amp; FAQ</a>
+          </div>
+
+          <div class="df-links-col">
+            <h4>AI Transparency</h4>
+            <a href="#" onclick="switchTab('about');return false">📐 151-Dim Pipeline</a>
+            <a href="#" onclick="switchTab('about');return false">🌲 180 Ensemble Trees</a>
+            <a href="#" onclick="switchTab('about');return false">⚖️ 5-Factor Formula</a>
+            <a href="#" onclick="switchTab('about');return false">💼 15 Canonical Roles</a>
+          </div>
+
+          <div class="df-links-col">
+            <h4>Assistance</h4>
+            <a href="#" onclick="document.getElementById('chatToggle').click();return false">💬 CareerBot Chat</a>
+            <a href="#" onclick="switchTab('predict');return false">📄 Resume PDF Parser</a>
+            <a href="/logout">🚪 Sign Out</a>
+          </div>
+        </div>
+
+        <div class="df-bottom">
+          <div class="df-copy">© 2026 Edu2Job. Engineered with Scikit-Learn, Flask &amp; Mistral AI. All rights reserved.</div>
+          <div class="df-disclaimer">Career Fit Scores reflect recommendation alignment and do not constitute employment guarantees.</div>
+        </div>
+      </footer>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- Mobile bottom navigation -->
+<nav class="mobile-bottom-nav">
+  <button class="mbn-btn active" data-tab="home" onclick="switchTab('home')"><span>🏠</span><span>Home</span></button>
+  <button class="mbn-btn" data-tab="predict" onclick="switchTab('predict')"><span>🔮</span><span>Predict</span></button>
+  <button class="mbn-btn" data-tab="history" onclick="switchTab('history')"><span>📊</span><span>History</span></button>
+  <button class="mbn-btn" data-tab="profile" onclick="switchTab('profile')"><span>👤</span><span>Profile</span></button>
+</nav>
+
+<!-- Chatbot -->
+<button class="chat-toggle" id="chatToggle">💬</button>
+<div class="chat-box" id="chatBox">
+  <div class="chat-head">
+    <div class="chat-bot-avatar">AI</div>
+    <div>
+      <div style="font-weight:700;font-size:0.88rem">CareerBot</div>
+      <div style="font-size:0.7rem;opacity:0.65">Powered by Mistral AI</div>
+    </div>
+    <button id="chatClose" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.1rem">✕</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="bot-msg">
+      <div class="chat-msg-avatar">AI</div>
+      <div class="chat-msg-body">
+        <div class="chat-msg-text">Hi! I'm your AI career assistant. Ask me about job roles, skills, or career advice! 👋</div>
+        <div class="chat-msg-time">just now</div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-chips" id="chatChips">
+    <button class="chip" onclick="sendChip('What skills do I need to become a Data Scientist?')">📊 Skills for Data Scientist</button>
+    <button class="chip" onclick="sendChip('Best job roles for Computer Science graduates?')">💻 Roles for CS grads</button>
+    <button class="chip" onclick="sendChip('How do I become a Machine Learning Engineer?')">🤖 Become ML Engineer</button>
+    <button class="chip" onclick="sendChip('Give me interview tips for software developer roles')">🎯 Interview tips</button>
+  </div>
+  <form class="chat-input" id="chatForm">
+    <input type="text" id="chatText" placeholder="Ask me anything...">
+    <button type="submit">➤</button>
+  </form>
+</div>
+
+<!-- Confetti Canvas -->
+<canvas id="confettiCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none"></canvas>
+
+<script>
+// ===== REUSABLE TOAST SYSTEM =====
+let toastTimer;
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  const m = document.getElementById('toastMsg');
+  clearTimeout(toastTimer);
+  t.className = `toast show ${type}`;
+  m.textContent = msg;
+  toastTimer = setTimeout(hideToast, 4000);
+}
+function hideToast() {
+  const t = document.getElementById('toast');
+  t.className = 'toast';
+}
+
+// ===== TAB SWITCH (smooth) =====
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  requestAnimationFrame(() => document.getElementById(id).classList.add('active'));
+  document.querySelectorAll('.side-btn[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+  document.querySelectorAll('.mbn-btn[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+  if (id === 'profile') loadProfile();
+  if (id === 'history') {
+    loadHistory().then(() => {
+      setTimeout(renderHistoryCharts, 80);
+    });
+  }
+  if (id === 'predict') resetPredictForm(false);
+}
+document.querySelectorAll('.side-btn[data-tab]').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+function resetPredictForm(scrollToTop=false) {
+  document.getElementById('predictForm').reset();
+  document.getElementById('resultWrapper').style.display = 'none';
+  if (window.predChart) { window.predChart.destroy(); window.predChart = null; }
+  document.querySelectorAll('#predictForm .fl-group').forEach(g => g.classList.remove('has-value'));
+  if(scrollToTop) {
+    document.getElementById('predict').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
+// ===== FLOATING LABELS =====
+function initFloatingLabels() {
+  document.querySelectorAll('.fl-group input, .fl-group select').forEach(el => {
+    const check = () => {
+      const g = el.closest('.fl-group');
+      g.classList.toggle('has-value', el.value !== '' && el.value !== null);
+    };
+    el.addEventListener('input', check);
+    el.addEventListener('change', check);
+    el.addEventListener('focus', () => el.closest('.fl-group').classList.add('focused'));
+    el.addEventListener('blur',  () => el.closest('.fl-group').classList.remove('focused'));
+    check();
+  });
+}
+
+// ===== TIME GREETING =====
+function setTimeGreeting(name) {
+  const h = new Date().getHours();
+  const [greet, emoji] =
+    h < 12 ? ['Good Morning',   '☀️'] :
+    h < 17 ? ['Good Afternoon', '🌤️'] :
+    h < 21 ? ['Good Evening',   '🌙'] :
+             ['Good Night',     '⭐'];
+  const first = name ? name.split(' ')[0] : '';
+  document.getElementById('wbGreeting').textContent = `${greet}${first ? ', ' + first : ''}! ${emoji}`;
+  document.getElementById('wbSubtitle').textContent = first
+    ? `Welcome back! Ready to explore your next career opportunity?`
+    : `Your AI-powered career prediction dashboard — start below.`;
+}
+
+// ===== COUNT-UP ANIMATION =====
+function countUp(el, target, suffix) {
+  let n = 0;
+  const step = Math.max(1, Math.ceil(target / 60));
+  const t = setInterval(() => {
+    n = Math.min(n + step, target);
+    el.textContent = n + (suffix || '');
+    if (n >= target) clearInterval(t);
+  }, 20);
+}
+
+// ===== INITIALS =====
+function getInitials(name) {
+  return (name || '').split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+}
+
+// ===== PROFILE & INLINE EDITING =====
+let cachedProfile = {};
+let pendingEdits = {};
+
+function renderSkillsTags(skillsStr) {
+  if (!skillsStr || !String(skillsStr).trim()) {
+    return '<span class="skill-tag muted-tag">No skills added</span>';
+  }
+  const list = String(skillsStr).includes(',')
+    ? String(skillsStr).split(',')
+    : [String(skillsStr)];
+  const tags = list.map(s => s.trim()).filter(Boolean);
+  if (!tags.length) return '<span class="skill-tag muted-tag">No skills added</span>';
+  return tags.map(s => `<span class="skill-tag">⚡ ${s}</span>`).join('');
+}
+
+async function loadProfile() {
+  const res = await fetch('/api/profile');
+  if (!res.ok) return;
+  const d = await res.json();
+  cachedProfile = { ...d };
+  pendingEdits = {};
+  document.getElementById('profileSaveBar').classList.remove('show');
+
+  const isEmpty = !d.name && !d.degree && !d.skills;
+  const initials = getInitials(d.name || '');
+  ['profileInitialsCircle','navInitialsCircle'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = initials || '?';
+  });
+
+  document.getElementById('displayName').textContent  = d.name || '—';
+  document.getElementById('displayEmail').textContent = d.email || '—';
+  if (d.name) document.getElementById('navUserName').textContent = d.name;
+
+  // Render values in grid
+  const fields = ['name','email','college_name','degree','major','cgpa','experience','passout_year','skills'];
+  fields.forEach(f => {
+    const el = document.getElementById('val_' + f);
+    if (!el) return;
+    if (f === 'skills') {
+      el.innerHTML = renderSkillsTags(d.skills);
+    } else {
+      el.textContent = (d[f] !== null && d[f] !== undefined && String(d[f]).trim() !== '') ? d[f] : '—';
+    }
+  });
+
+  updateCompletionMeter(d);
+  renderProfileLatestPrediction();
+  setTimeGreeting(d.name || '');
+  document.getElementById('emptyProfileCta').style.display = isEmpty ? 'flex' : 'none';
+}
+
+async function renderProfileLatestPrediction() {
+  const card = document.getElementById('profileLatestPredCard');
+  if (!card) return;
+
+  if (!allRows || !allRows.length) {
+    try {
+      const res = await fetch('/api/history');
+      if (res.ok) allRows = await res.json();
+    } catch (e) {}
+  }
+
+  const roleEl = document.getElementById('plpRole');
+  const catEl  = document.getElementById('plpCategory');
+  const scoreEl= document.getElementById('plpScore');
+  const dateEl = document.getElementById('plpDate');
+  const iconEl = document.getElementById('plpIcon');
+  const metaEl = document.getElementById('plpMeta');
+  const btnEl  = document.getElementById('plpActionBtn');
+
+  if (allRows && allRows.length > 0) {
+    const latest = allRows[0];
+    const role = latest.predicted_role || 'Target Role';
+    const conf = latest.confidence ? (latest.confidence <= 1 ? (latest.confidence * 100).toFixed(1) : Number(latest.confidence).toFixed(1)) : '0.0';
+
+    roleEl.textContent = role;
+    catEl.textContent  = getRoleCategory(role) || 'Technology & Engineering';
+    scoreEl.textContent = conf + '%';
+
+    const nConf = parseFloat(conf);
+    scoreEl.style.color = nConf >= 85 ? '#22c55e' : nConf >= 70 ? '#22d3ee' : nConf >= 50 ? '#f59e0b' : '#a0a0c0';
+
+    const icons = {
+      'Data': '🤖', 'Machine': '🧠', 'Software': '💻', 'Frontend': '🎨', 'Backend': '⚙️',
+      'Full': '🌐', 'DevOps': '♾️', 'Cloud': '☁️', 'Business': '📈', 'Financial': '💵',
+      'Project': '📋', 'Electrical': '⚡', 'Mechanical': '🔧', 'Civil': '🏗️'
+    };
+    let icon = '🎯';
+    for (let k in icons) { if (role.includes(k)) { icon = icons[k]; break; } }
+    iconEl.textContent = icon;
+
+    dateEl.textContent = latest.created_at ? 'Evaluated: ' + latest.created_at.slice(0, 16).replace('T', ' ') : 'Latest Assessment';
+    metaEl.textContent = 'Based on your profile skills & academic background.';
+    btnEl.textContent  = '🔮 Re-Evaluate Career →';
+    btnEl.onclick      = () => switchTab('predict');
+  } else {
+    roleEl.textContent = 'No Assessment Yet';
+    catEl.textContent  = 'Make your first career prediction to see your match';
+    scoreEl.textContent = '—';
+    scoreEl.style.color = '#a0a0c0';
+    dateEl.textContent = 'Not Evaluated';
+    iconEl.textContent = '🔮';
+    metaEl.textContent = 'Ready to discover your ideal career role and skill roadmaps?';
+    btnEl.textContent  = '🔮 Make Prediction →';
+    btnEl.onclick      = () => switchTab('predict');
+  }
+}
+
+function updateCompletionMeter(d) {
+  const fields = ['name','email','college_name','degree','major','cgpa','experience','passout_year','skills'];
+  const filled = fields.filter(f => d[f] && String(d[f]).trim() !== '' && String(d[f]) !== '0');
+  const pct = Math.round((filled.length / fields.length) * 100);
+  document.getElementById('cmPct').textContent = pct + '%';
+  setTimeout(() => document.getElementById('cmFill').style.width = pct + '%', 100);
+  const missing = fields.filter(f => !d[f] || String(d[f]).trim() === '' || String(d[f]) === '0');
+  const labels = {college_name:'College', passout_year:'Passout Year', cgpa:'CGPA', experience:'Experience', skills:'Skills'};
+  document.getElementById('cmHint').textContent = missing.length > 0
+    ? `Add ${labels[missing[0]] || missing[0]} to improve prediction accuracy`
+    : 'Profile 100% complete! Great job! 🎉';
+}
+
+// Inline editing activation
+function activateInlineEdit(itemEl, fieldKey, type, placeholder) {
+  if (itemEl.classList.contains('editing')) return;
+  itemEl.classList.add('editing');
+  const valEl = itemEl.querySelector('.pg-value');
+  const currentVal = pendingEdits[fieldKey] !== undefined ? pendingEdits[fieldKey] : (cachedProfile[fieldKey] || '');
+
+  valEl.innerHTML = `<input type="${type}" class="inline-input" value="${currentVal}" placeholder="${placeholder}">`;
+  const input = valEl.querySelector('input');
+  input.focus();
+
+  const finishEdit = () => {
+    const newVal = input.value.trim();
+    if (newVal !== (cachedProfile[fieldKey] || '')) {
+      pendingEdits[fieldKey] = newVal;
+      document.getElementById('profileSaveBar').classList.add('show');
+    }
+    itemEl.classList.remove('editing');
+    if (fieldKey === 'skills') {
+      const skillsVal = pendingEdits[fieldKey] !== undefined ? pendingEdits[fieldKey] : (cachedProfile.skills || '');
+      valEl.innerHTML = renderSkillsTags(skillsVal);
+    } else {
+      valEl.textContent = (pendingEdits[fieldKey] !== undefined ? pendingEdits[fieldKey] : cachedProfile[fieldKey]) || '—';
+    }
+  };
+
+  input.addEventListener('blur', finishEdit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Escape') { input.value = cachedProfile[fieldKey] || ''; input.blur(); }
+  });
+}
+
+function cancelInlineEdits() {
+  pendingEdits = {};
+  document.getElementById('profileSaveBar').classList.remove('show');
+  loadProfile();
+  showToast('Profile edits cancelled', 'info');
+}
+
+async function saveInlineEdits() {
+  const updatedData = { ...cachedProfile, ...pendingEdits };
+  const res = await fetch('/api/profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updatedData)
+  });
+
+  if (res.ok) {
+    showToast('Profile updated successfully! ✅', 'success');
+    cachedProfile = updatedData;
+    pendingEdits = {};
+    document.getElementById('profileSaveBar').classList.remove('show');
+    loadProfile();
+  } else {
+    showToast('Failed to update profile. Try again.', 'error');
+  }
+}
+
+// ===== AUTO-FILL FROM PROFILE =====
+function autoFillFromProfile() {
+  if (!cachedProfile || !cachedProfile.degree) {
+    showToast('Complete your profile first!', 'error');
+    return;
+  }
+  const setOpt = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el || !val) return;
+    for (let o of el.options) { if (o.value === val) { o.selected = true; break; } }
+    el.closest('.fl-group').classList.add('has-value');
+  };
+  const setInp = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val) { el.value = val; el.closest('.fl-group').classList.add('has-value'); }
+  };
+  setOpt('fl-degree', cachedProfile.degree);
+  setOpt('fl-major',  cachedProfile.major);
+  setInp('fl-cgpa',   cachedProfile.cgpa);
+  setInp('fl-exp',    cachedProfile.experience);
+  setInp('fl-skills', cachedProfile.skills);
+  showToast('Profile data loaded into form! ⚡', 'info');
+}
+
+// ===== ROLE COLORS & CATEGORIES =====
+const ROLE_COLORS = {
+  'Data Scientist': 4, 'Machine Learning': 1, 'Data Analyst': 2,
+  'Software Engineer': 3, 'Frontend': 2, 'Backend': 4,
+  'Full Stack': 1, 'DevOps': 5, 'Cloud': 2,
+  'Project Manager': 6, 'Business Analyst': 5, 'Financial Analyst': 6,
+  'Electrical': 3, 'Mechanical': 5, 'Civil': 4
+};
+const COLOR_PALETTE = ['','#a855f7','#22d3ee','#3b82f6','#6366f1','#22c55e','#f59e0b','#ec4899'];
+const ROLE_CATEGORIES = {
+  'Data Scientist': 'Data Science & AI', 'Machine Learning': 'Data Science & AI', 'Data Analyst': 'Analytics & BI',
+  'Software Engineer': 'Software Eng', 'Frontend': 'Web Development', 'Backend': 'Cloud & Systems',
+  'Full Stack': 'Web Development', 'DevOps': 'Cloud & DevOps', 'Cloud': 'Cloud Infrastructure',
+  'Project Manager': 'Management', 'Business Analyst': 'Business & Strategy', 'Financial Analyst': 'Finance & Valuation',
+  'Electrical': 'Core Engineering', 'Mechanical': 'Core Engineering', 'Civil': 'Core Engineering'
+};
+
+function getRoleColor(role) {
+  if (!role) return COLOR_PALETTE[1];
+  for (let key in ROLE_COLORS) { if (role.includes(key)) return COLOR_PALETTE[ROLE_COLORS[key]]; }
+  return COLOR_PALETTE[1];
+}
+
+function getRoleCategory(role) {
+  if (!role) return 'Career';
+  for (let key in ROLE_CATEGORIES) { if (role.includes(key)) return ROLE_CATEGORIES[key]; }
+  return 'Technology';
+}
+
+// ===== RESUME UPLOAD & PARSING =====
+async function handleResumeUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    showToast('Please upload a valid PDF resume file', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnResumeUpload');
+  btn.querySelector('.btn-resume-text').style.display = 'none';
+  btn.querySelector('.btn-resume-loading').style.display = 'inline-flex';
+  btn.disabled = true;
+
+  const formData = new FormData();
+  formData.append('resume', file);
+
+  try {
+    const res = await fetch('/api/resume/parse', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await res.json();
+
+    if (res.ok && result.data) {
+      const d = result.data;
+      const setOpt = (id, val) => {
+        const el = document.getElementById(id);
+        if (!el || !val) return;
+        for (let o of el.options) {
+          if (o.value.toLowerCase() === val.toLowerCase() || o.text.toLowerCase() === val.toLowerCase()) {
+            o.selected = true;
+            el.closest('.fl-group')?.classList.add('has-value');
+            break;
+          }
+        }
+      };
+      const setInp = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined && val !== null && val !== '') {
+          el.value = val;
+          el.closest('.fl-group')?.classList.add('has-value');
+        }
+      };
+
+      setOpt('fl-degree', d.degree);
+      setOpt('fl-major',  d.major);
+      setInp('fl-cgpa',   d.cgpa);
+      setInp('fl-exp',    d.experience);
+      setInp('fl-skills', d.skills);
+      setInp('fl-certs',  d.certifications);
+
+      showToast(`Resume parsed! Extracted ${d.skills_list ? d.skills_list.length : 'all'} skills & profile data 📄⚡`, 'success');
+    } else {
+      showToast(result.error || 'Failed to parse resume PDF. Please try again.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while parsing resume file.', 'error');
+  }
+
+  btn.querySelector('.btn-resume-text').style.display = 'inline-flex';
+  btn.querySelector('.btn-resume-loading').style.display = 'none';
+  btn.disabled = false;
+  e.target.value = '';
+}
+
+// ===== PREDICTION =====
+document.getElementById('predictForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('predictBtn');
+  btn.querySelector('.btn-text').style.display   = 'none';
+  btn.querySelector('.btn-loading').style.display = 'flex';
+  btn.disabled = true;
+
+  const data = Object.fromEntries(new FormData(e.target).entries());
+  try {
+    const res    = await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const result = await res.json();
+    if (res.ok) {
+      renderPredictionResult(result);
+      launchConfetti();
+      showToast('Career prediction generated successfully! 🎯', 'success');
+      loadHistory();
+    } else {
+      showToast('Prediction failed: ' + (result.error || 'Please check your inputs'), 'error');
+    }
+  } catch {
+    showToast('Network error while analyzing profile. Please try again.', 'error');
+  }
+
+  btn.querySelector('.btn-text').style.display   = 'flex';
+  btn.querySelector('.btn-loading').style.display = 'none';
+  btn.disabled = false;
+});
+
+function renderPredictionResult(result) {
+  const wrapper = document.getElementById('resultWrapper');
+  wrapper.style.display = 'block';
+  setTimeout(() => wrapper.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+
+  const sorted = [...result.graph_data].sort((a,b) => b.confidence - a.confidence);
+  const medals = ['🥇 Rank 1','🥈 Rank 2','🥉 Rank 3'];
+
+  // Top 3 ranked cards
+  document.getElementById('topRolesGrid').innerHTML = sorted.slice(0,3).map((item,i) => `
+    <div class="top-role-card ${i===0?'winner':''}" style="--rc:${getRoleColor(item.role)}">
+      <div class="trc-medal">${medals[i]}</div>
+      <div class="trc-role">${item.role}</div>
+      <div class="trc-tier-badge" style="background:${item.color || '#3B82F6'}22;color:${item.color || '#3B82F6'};padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:600;display:inline-block;margin:6px 0">${item.badge || '⭐ Matched'}</div>
+      <div class="trc-conf">${(item.confidence*100).toFixed(1)}% Match</div>
+      <div class="trc-bar-bg"><div class="trc-bar-fill" style="width:${(item.confidence*100).toFixed(1)}%"></div></div>
+    </div>`).join('');
+
+  // Skill Gap Analysis Card
+  if (result.skill_gap) {
+    const sg = result.skill_gap;
+    document.getElementById('sgTargetRole').textContent = sg.predicted_role || result.prediction;
+    document.getElementById('sgBoostBadge').textContent = sg.potential_boost || '+30% Match Potential';
+    document.getElementById('rmVal').textContent = (sg.readiness_percentage || 70) + '%';
+    document.getElementById('rmFill').style.width = (sg.readiness_percentage || 70) + '%';
+
+    document.getElementById('sgMatchedPills').innerHTML = (sg.matched_skills || []).map(s => `
+      <span class="sg-pill matched">✅ ${s}</span>`).join('') || '<span class="sg-empty">No direct matches recorded</span>';
+
+    document.getElementById('sgMissingPills').innerHTML = (sg.missing_skills || []).map(s => `
+      <span class="sg-pill missing">⚡ ${s}</span>`).join('') || '<span class="sg-empty">Great job! You have all core skills!</span>';
+
+    // Curated Learning Roadmap Timeline
+    if (sg.roadmap && sg.roadmap.length > 0) {
+      document.getElementById('roadmapTimeline').innerHTML = sg.roadmap.map((phase, idx) => `
+        <div class="rm-phase-item">
+          <div class="rm-phase-dot-col">
+            <div class="rm-phase-dot">${idx + 1}</div>
+            <div class="rm-phase-line"></div>
+          </div>
+          <div class="rm-phase-body">
+            <div class="rm-phase-head">
+              <span class="rm-phase-title">${phase.phase}</span>
+              <span class="rm-phase-duration">⏱️ ${phase.duration}</span>
+            </div>
+            <div class="rm-phase-topics">📚 ${phase.topics}</div>
+            <div class="rm-phase-resources">
+              ${(phase.resources || []).map(r => `
+                <a href="${r.url}" target="_blank" rel="noopener noreferrer" class="rm-res-link">
+                  🔗 ${r.title} <span class="rm-link-arrow">↗</span>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // AI Mock Interview Questions Accordion
+    if (sg.interview_questions && sg.interview_questions.length > 0) {
+      document.getElementById('interviewAccordion').innerHTML = sg.interview_questions.map((item, idx) => `
+        <div class="interview-item">
+          <button type="button" class="interview-q-btn" onclick="toggleInterviewAccordion(this)">
+            <span class="iq-num">Q${idx + 1}</span>
+            <span class="iq-text">${item.q}</span>
+            <span class="iq-chevron">▼</span>
+          </button>
+          <div class="interview-ans-body">
+            <div class="ia-inner">
+              <div class="ia-badge">💡 Model Answer Guidelines</div>
+              <p>${item.a}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Confidence Chart
+  if (window.predChart) { window.predChart.destroy(); window.predChart = null; }
+  const top10 = sorted.slice(0, 10);
+  const chartLabels = top10.map(i => i.role);
+  const chartData   = top10.map(i => parseFloat((i.confidence * 100).toFixed(1)));
+  const chartColors = top10.map((item, i) => i === 0 ? 'rgba(99, 102, 241, 0.9)' : `hsla(${240 + i * 20}, 75%, 60%, 0.65)`);
+
+  const chartCanvas = document.getElementById('predictionChart');
+  window.predChart = new Chart(chartCanvas, {
+    type: 'bar',
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        label: 'Confidence %',
+        data: chartData,
+        backgroundColor: chartColors,
+        borderColor: chartColors.map(c => c.replace('0.65', '1').replace('0.9', '1')),
+        borderWidth: 1,
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` Match Score: ${ctx.parsed.y}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#a0a0c0', maxRotation: 45, minRotation: 0, font: { family: 'Inter', size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            stepSize: 20,
+            callback: v => v + '%',
+            color: '#a0a0c0',
+            font: { family: 'Inter', size: 11 }
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        }
+      }
+    }
+  });
+}
+
+function toggleInterviewAccordion(btn) {
+  const item = btn.closest('.interview-item');
+  if (item) {
+    item.classList.toggle('open');
+  }
+}
+
+// ===== HISTORY TAB =====
+let allRows = [], sortOrder = 'latest';
+
+async function loadHistory() {
+  const res = await fetch('/api/history');
+  if (!res.ok) return;
+  allRows = await res.json();
+  document.getElementById('predCount').textContent = allRows.length;
+  renderTimeline();
+  renderActivityFeed();
+  const histSection = document.getElementById('history');
+  if (histSection && histSection.classList.contains('active')) {
+    setTimeout(renderHistoryCharts, 50);
+  }
+}
+
+function renderTimeline() {
+  const container     = document.getElementById('timelineContainer');
+  const noHist        = document.getElementById('noHistory');
+  const noSearchMatch = document.getElementById('noSearchMatch');
+  const chartsRow     = document.getElementById('historyChartsRow');
+  const search        = (document.getElementById('historySearch')?.value || '').toLowerCase().trim();
+
+  if (!allRows.length) {
+    container.innerHTML = '';
+    noHist.style.display = 'block';
+    noSearchMatch.style.display = 'none';
+    if(chartsRow) chartsRow.style.display = 'none';
+    return;
+  }
+
+  noHist.style.display = 'none';
+  if(chartsRow) chartsRow.style.display = 'grid';
+
+  let rows = [...allRows];
+  if (search) {
+    rows = rows.filter(r => (r.predicted_role || '').toLowerCase().includes(search) || (r.skills || '').toLowerCase().includes(search));
+  }
+  if (sortOrder === 'oldest') rows.reverse();
+
+  if (!rows.length) {
+    container.innerHTML = '';
+    noSearchMatch.style.display = 'block';
+    return;
+  }
+  noSearchMatch.style.display = 'none';
+
+  container.innerHTML = rows.map(r => {
+    const color = getRoleColor(r.predicted_role || '');
+    const category = getRoleCategory(r.predicted_role || '');
+    const confVal = (r.confidence !== null && r.confidence !== undefined && r.confidence !== '') ? parseFloat(r.confidence) : 94.2;
+    const confScore = confVal.toFixed(1) + '% Match';
+    const date  = r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const skills = (r.skills || '').split(',').filter(Boolean).slice(0,5).map(s => `<span class="tc-skill">⚡ ${s.trim()}</span>`).join('');
+    const info = [r.degree, r.major && '• ' + r.major, r.cgpa && '• CGPA ' + r.cgpa, r.experience && '• ' + r.experience + 'y exp'].filter(Boolean).join(' ');
+
+    return `
+    <div class="timeline-card" style="--tc:${color}">
+      <div class="tc-dot-col"><div class="tc-dot"></div><div class="tc-line"></div></div>
+      <div class="tc-body">
+        <div class="tc-top-row">
+          <div class="tc-role-wrap">
+            <span class="tc-role">🎯 ${r.predicted_role || '—'}</span>
+            <span class="tc-cat-badge">${category}</span>
+            <span class="tc-conf-badge">${confScore}</span>
+          </div>
+          <span class="tc-date">${date}</span>
+        </div>
+        <div class="tc-info">${info}</div>
+        <div class="tc-skills">${skills}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterHistory() { renderTimeline(); }
+function sortHistory(order) {
+  sortOrder = order;
+  document.getElementById('sortLatest').classList.toggle('active', order === 'latest');
+  document.getElementById('sortOldest').classList.toggle('active', order === 'oldest');
+  renderTimeline();
+}
+
+function renderActivityFeed() {
+  const card = document.getElementById('activityFeedCard');
+  if (!allRows.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  document.getElementById('activityFeed').innerHTML = allRows.slice(0,3).map(r => {
+    const color = getRoleColor(r.predicted_role || '');
+    const date  = r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
+    return `<div class="af-item" onclick="switchTab('history')">
+      <div class="af-dot" style="background:${color}"></div>
+      <div class="af-info">
+        <div class="af-role">${r.predicted_role || '—'}</div>
+        <div class="af-sub">${[r.degree, r.major].filter(Boolean).join(' • ')}</div>
+      </div>
+      <div class="af-date">${date}</div>
+    </div>`;
+  }).join('');
+
+  if (allRows[0]) {
+    document.getElementById('lastPredCard').style.display = 'flex';
+    document.getElementById('lastPredRole').textContent = '🎯 ' + allRows[0].predicted_role;
+    const d = allRows[0].created_at;
+    document.getElementById('lastPredDate').textContent = d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
+  }
+}
+
+function renderHistoryCharts() {
+  const historySec = document.getElementById('history');
+  if (!historySec || !historySec.classList.contains('active')) return;
+  if (!allRows || !allRows.length) return;
+
+  const roleWrap = document.getElementById('roleChartWrap');
+  const skillWrap = document.getElementById('skillChartWrap');
+  if (!roleWrap || !skillWrap) return;
+
+  if (window.roleChart) {
+    try { window.roleChart.destroy(); } catch (e) {}
+    window.roleChart = null;
+  }
+  if (window.skillChart) {
+    try { window.skillChart.destroy(); } catch (e) {}
+    window.skillChart = null;
+  }
+
+  // Re-inject pristine canvas elements to guarantee 100% accurate layout & dimensions
+  roleWrap.innerHTML = '<canvas id="roleChart"></canvas><div id="noRoleChartMsg" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--muted);font-size:0.85rem;text-align:center;">📊 Make a prediction to see role distribution.</div>';
+  skillWrap.innerHTML = '<canvas id="skillChart"></canvas><div id="noSkillChartMsg" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--muted);font-size:0.85rem;text-align:center;padding:1rem;">⚡ Add skills to your predictions to see skill frequency insights.</div>';
+
+  const roleCanvas = document.getElementById('roleChart');
+  const skillCanvas = document.getElementById('skillChart');
+  const roleMsg = document.getElementById('noRoleChartMsg');
+  const skillMsg = document.getElementById('noSkillChartMsg');
+
+  const rc = {}, sk = {};
+  allRows.forEach(r => { if (r.predicted_role) rc[r.predicted_role] = (rc[r.predicted_role] || 0) + 1; });
+  allRows.forEach(r => {
+    if (r.skills) {
+      r.skills.split(',').forEach(s => {
+        s = s.trim();
+        if (s) {
+          const cap = s.charAt(0).toUpperCase() + s.slice(1);
+          sk[cap] = (sk[cap] || 0) + 1;
+        }
+      });
+    }
+  });
+
+  const roleLabels = Object.keys(rc);
+  const roleValues = Object.values(rc);
+  if (roleLabels.length > 0) {
+    if (roleMsg) roleMsg.style.display = 'none';
+    roleCanvas.style.display = 'block';
+    window.roleChart = new Chart(roleCanvas, {
+      type: 'bar',
+      data: {
+        labels: roleLabels,
+        datasets: [{
+          label: 'Predictions Count',
+          data: roleValues,
+          backgroundColor: roleLabels.map((_, i) => `hsla(${230 + i * 35}, 75%, 60%, 0.85)`),
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#a0a0c0', font: { family: 'Inter', size: 11 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { beginAtZero: true, ticks: { stepSize: 1, color: '#a0a0c0', font: { family: 'Inter' } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+        }
+      }
+    });
+  } else {
+    roleCanvas.style.display = 'none';
+    if (roleMsg) roleMsg.style.display = 'flex';
+  }
+
+  const topSkills = Object.entries(sk).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const skillLabels = topSkills.map(i => i[0]);
+  const skillValues = topSkills.map(i => i[1]);
+  if (skillLabels.length > 0) {
+    if (skillMsg) skillMsg.style.display = 'none';
+    skillCanvas.style.display = 'block';
+    window.skillChart = new Chart(skillCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: skillLabels,
+        datasets: [{
+          data: skillValues,
+          backgroundColor: skillLabels.map((_, i) => `hsla(${260 + i * 30}, 70%, 60%, 0.85)`),
+          borderWidth: 2,
+          borderColor: '#111128'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { color: '#a0a0c0', font: { family: 'Inter', size: 11 }, padding: 12 } }
+        }
+      }
+    });
+  } else {
+    skillCanvas.style.display = 'none';
+    if (skillMsg) skillMsg.style.display = 'flex';
+  }
+}
+
+// ===== CONFETTI BURST =====
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const pieces = []; const colors = ['#6366f1','#a855f7','#ec4899','#22d3ee','#22c55e','#f59e0b'];
+  for(let i=0;i<130;i++) pieces.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height-canvas.height,w:6+Math.random()*8,h:6+Math.random()*8,color:colors[Math.floor(Math.random()*colors.length)],vx:(Math.random()-.5)*5,vy:2+Math.random()*5,opacity:1,rot:Math.random()*360,rs:(Math.random()-.5)*7});
+  let frame = 0;
+  (function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => { ctx.save(); ctx.globalAlpha=p.opacity; ctx.fillStyle=p.color; ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180); ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); p.x+=p.vx; p.y+=p.vy; p.rot+=p.rs; p.opacity-=0.01; });
+    if(++frame<120) requestAnimationFrame(draw);
+    else { ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; }
+  })();
+}
+
+// ===== CHATBOT (Markdown formatting + Timestamps) =====
+const chatToggle = document.getElementById('chatToggle'), chatBox = document.getElementById('chatBox');
+let acTimer;
+chatToggle.onclick = () => {
+  chatBox.classList.toggle('open');
+  if (chatBox.classList.contains('open')) {
+    document.getElementById('chatText').focus();
+    resetAC();
+  }
+};
+document.getElementById('chatClose').onclick = () => { chatBox.classList.remove('open'); clearTimeout(acTimer); };
+function resetAC() { clearTimeout(acTimer); acTimer = setTimeout(() => chatBox.classList.remove('open'), 40000); }
+
+function parseMarkdown(text) {
+  if (!text) return '';
+  let escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Bold
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Lists
+  const lines = escaped.split('\n');
+  let inList = false;
+  let html = '';
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      html += `<li>${trimmed.substring(2)}</li>`;
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (trimmed) html += `<p>${line}</p>`;
+    }
+  });
+  if (inList) html += '</ul>';
+  return html;
+}
+
+function addMsg(side, rawText) {
+  const msgs = document.getElementById('chatMsgs');
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formattedContent = side === 'bot' ? parseMarkdown(rawText) : rawText;
+
+  if (side === 'bot') {
+    msgs.innerHTML += `
+      <div class="bot-msg">
+        <div class="chat-msg-avatar">AI</div>
+        <div class="chat-msg-body">
+          <div class="chat-msg-text">${formattedContent}</div>
+          <div class="chat-msg-time">${timeStr}</div>
+        </div>
+      </div>`;
+  } else {
+    msgs.innerHTML += `
+      <div class="user-msg">
+        <div class="chat-msg-body user-body">
+          <div class="chat-msg-text">${formattedContent}</div>
+          <div class="chat-msg-time">${timeStr}</div>
+        </div>
+      </div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('chatMsgs');
+  const el = document.createElement('div');
+  el.className = 'bot-msg typing-msg';
+  el.innerHTML = `
+    <div class="chat-msg-avatar">AI</div>
+    <div class="chat-msg-body">
+      <div class="chat-msg-text"><span class="typing-dots"><span></span><span></span><span></span></span></div>
+    </div>`;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+
+function sendChip(msg) {
+  document.getElementById('chatChips').style.display = 'none';
+  sendChatMsg(msg);
+}
+
+async function sendChatMsg(msg) {
+  if (!msg) return;
+  addMsg('user', msg);
+  document.getElementById('chatText').value = '';
+  resetAC();
+  const typing = addTyping();
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg })
+    });
+    const d = await res.json();
+    typing.remove();
+    addMsg('bot', d.reply || 'No response generated.');
+  } catch {
+    typing.remove();
+    addMsg('bot', '⚠️ Error connecting to AI career assistant. Please try again.');
+  }
+}
+document.getElementById('chatForm').addEventListener('submit', e => {
+  e.preventDefault();
+  sendChatMsg(document.getElementById('chatText').value.trim());
+});
+
+// ===== HISTORY NOTICE DISMISS =====
+function dismissHistoryNotice() {
+  const el = document.getElementById('historyNotice');
+  if (el) {
+    el.style.opacity = '0';
+    setTimeout(() => el.style.display = 'none', 300);
+    localStorage.setItem('edu2job_history_notice_dismissed', 'true');
+  }
+}
+function checkHistoryNotice() {
+  if (localStorage.getItem('edu2job_history_notice_dismissed') === 'true') {
+    const el = document.getElementById('historyNotice');
+    if (el) el.style.display = 'none';
+  } else {
+    setTimeout(dismissHistoryNotice, 5000);
+  }
+}
+
+// ===== FAQ ACCORDION INTERACTIVITY =====
+function toggleFaqAccordion(btn) {
+  const item = btn.closest('.faq-item');
+  if (!item) return;
+  const wasActive = item.classList.contains('active');
+  document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+  if (!wasActive) {
+    item.classList.add('active');
+  }
+}
+
+// ===== INIT =====
+switchTab('home');
+loadHistory();
+initFloatingLabels();
+document.querySelectorAll('.stat-num[data-target]').forEach(el => countUp(el, parseInt(el.dataset.target), el.dataset.suffix || ''));
+loadProfile();
+checkHistoryNotice();
+</script>
+</body>
+</html>
