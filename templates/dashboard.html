@@ -471,6 +471,20 @@
           <div class="cm-hint" id="cmHint">Loading profile details...</div>
         </div>
 
+        <!-- Creative Profile Bio / About Me Box (Placed right above Latest Prediction Card) -->
+        <div class="ph-bio-quote-card" id="phBioCard" onclick="editHeaderBio()" title="Click to edit your bio / career objective">
+          <div class="ph-bio-left-accent">
+            <div class="ph-bio-icon">✨</div>
+          </div>
+          <div class="ph-bio-text-wrap">
+            <div class="ph-bio-label">
+              <span>ABOUT &amp; CAREER OBJECTIVE</span>
+              <span class="ph-bio-edit-hint">✎ Click to Edit</span>
+            </div>
+            <div class="ph-bio-content" id="hdrBioText">“Click here to add your personal summary, career objectives, or brief background...”</div>
+          </div>
+        </div>
+
         <!-- Latest AI Career Match Highlight Card -->
         <div class="profile-latest-pred-card" id="profileLatestPredCard">
           <div class="plp-header">
@@ -568,10 +582,6 @@
           <div class="pg-item" onclick="activateInlineEdit(this, 'passout_year', 'number', 'Passout Year (e.g. 2026)')">
             <div class="pg-label"><span>Passout Year</span><span class="pg-edit-hint">✎ Edit</span></div>
             <div class="pg-value" id="val_passout_year">—</div>
-          </div>
-          <div class="pg-item full-span" onclick="activateInlineEdit(this, 'bio', 'text', 'Short Bio (e.g. Passionate Computer Science student specializing in Machine Learning and Web Tech...)')">
-            <div class="pg-label"><span>📝 About Me / Bio</span><span class="pg-edit-hint">✎ Edit</span></div>
-            <div class="pg-value" id="val_bio">—</div>
           </div>
           <div class="pg-item full-span" onclick="activateInlineEdit(this, 'skills', 'text', 'Skills (comma-separated, e.g. Python, SQL, React)')">
             <div class="pg-label"><span>Technical Skills</span><span class="pg-edit-hint">✎ Edit</span></div>
@@ -1183,6 +1193,37 @@ function editHeaderLocation() {
   });
 }
 
+function editHeaderBio() {
+  const card = document.getElementById('phBioCard');
+  const textEl = document.getElementById('hdrBioText');
+  if (!card || !textEl || card.classList.contains('editing')) return;
+
+  const currentVal = pendingEdits['bio'] !== undefined ? pendingEdits['bio'] : (cachedProfile.bio || '');
+  card.classList.add('editing');
+
+  textEl.innerHTML = `<textarea class="hdr-bio-textarea" placeholder="Tell us about yourself, your career goals, and technical background...">${currentVal.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>`;
+  const textarea = textEl.querySelector('textarea');
+  textarea.focus();
+  textarea.select();
+
+  const finishBioEdit = () => {
+    const newVal = textarea.value.trim();
+    if (newVal !== (cachedProfile.bio || '')) {
+      pendingEdits['bio'] = newVal;
+      document.getElementById('profileSaveBar').classList.add('show');
+    }
+    card.classList.remove('editing');
+    const val = (pendingEdits['bio'] !== undefined ? pendingEdits['bio'] : (cachedProfile.bio || '')).trim();
+    textEl.textContent = val ? `“${val}”` : '“Click here to add your personal summary, career objectives, or brief background...”';
+  };
+
+  textarea.addEventListener('blur', finishBioEdit);
+  textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); textarea.blur(); }
+    if (e.key === 'Escape') { textarea.value = cachedProfile.bio || ''; textarea.blur(); }
+  });
+}
+
 async function loadProfile() {
   const res = await fetch('/api/profile');
   if (!res.ok) return;
@@ -1212,6 +1253,10 @@ async function loadProfile() {
   // Header location badge
   const locEl = document.getElementById('hdrLocationText');
   if (locEl) locEl.textContent = (d.location && String(d.location).trim()) ? d.location : 'Add Location';
+
+  // Header bio card
+  const bioEl = document.getElementById('hdrBioText');
+  if (bioEl) bioEl.textContent = (d.bio && String(d.bio).trim()) ? `“${d.bio}”` : '“Click here to add your personal summary, career objectives, or brief background...”';
 
   // Render values in grid
   const fields = ['name','email','phone','location','college_name','degree','major','cgpa','experience','passout_year','bio','skills','linkedin','github','portfolio'];
