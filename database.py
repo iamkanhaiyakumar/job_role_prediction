@@ -118,8 +118,18 @@ def init_db():
         """)
 
         pred_cols = [
+            ("degree", "VARCHAR(100) NULL"),
+            ("major", "VARCHAR(100) NULL"),
+            ("cgpa", "FLOAT NULL"),
+            ("employed", "VARCHAR(50) NULL"),
+            ("experience", "INT NULL"),
+            ("skills", "TEXT NULL"),
+            ("certifications", "TEXT NULL"),
+            ("industry", "VARCHAR(100) NULL"),
+            ("predicted_role", "VARCHAR(100) NULL"),
             ("confidence", "FLOAT NULL"),
             ("resume_filename", "VARCHAR(255) NULL"),
+            ("created_at", "DATETIME NULL"),
         ]
         for col_name, col_type in pred_cols:
             try:
