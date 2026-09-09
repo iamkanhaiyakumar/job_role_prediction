@@ -545,10 +545,6 @@
             <div class="pg-label"><span>Phone Number</span><span class="pg-edit-hint">✎ Edit</span></div>
             <div class="pg-value" id="val_phone">—</div>
           </div>
-          <div class="pg-item" onclick="activateInlineEdit(this, 'location', 'text', 'Current Location / City (e.g. Bangalore, India)')">
-            <div class="pg-label"><span>📍 Location / City</span><span class="pg-edit-hint">✎ Edit</span></div>
-            <div class="pg-value" id="val_location">—</div>
-          </div>
           <div class="pg-item" onclick="activateInlineEdit(this, 'college_name', 'text', 'College / University (e.g. IIT Delhi, NIT)')">
             <div class="pg-label"><span>College / University</span><span class="pg-edit-hint">✎ Edit</span></div>
             <div class="pg-value" id="val_college_name">—</div>
@@ -1158,11 +1154,33 @@ function handleSocialClick(e, type) {
 }
 
 function editHeaderLocation() {
-  const locItem = document.getElementById('val_location')?.closest('.pg-item');
-  if (locItem) {
-    locItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    locItem.click();
-  }
+  const badge = document.getElementById('hdrLocationBadge');
+  const textEl = document.getElementById('hdrLocationText');
+  if (!badge || !textEl || badge.classList.contains('editing')) return;
+
+  const currentVal = pendingEdits['location'] !== undefined ? pendingEdits['location'] : (cachedProfile.location || '');
+  badge.classList.add('editing');
+
+  textEl.innerHTML = `<input type="text" class="hdr-loc-input" value="${currentVal.replace(/"/g, '&quot;')}" placeholder="City, Country...">`;
+  const input = textEl.querySelector('input');
+  input.focus();
+  input.select();
+
+  const finishLocEdit = () => {
+    const newVal = input.value.trim();
+    if (newVal !== (cachedProfile.location || '')) {
+      pendingEdits['location'] = newVal;
+      document.getElementById('profileSaveBar').classList.add('show');
+    }
+    badge.classList.remove('editing');
+    textEl.textContent = (pendingEdits['location'] !== undefined ? pendingEdits['location'] : (cachedProfile.location || '')) || 'Add Location';
+  };
+
+  input.addEventListener('blur', finishLocEdit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Escape') { input.value = cachedProfile.location || ''; input.blur(); }
+  });
 }
 
 async function loadProfile() {

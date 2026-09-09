@@ -404,8 +404,17 @@ button{cursor:pointer;border:none;font-family:inherit;}
   background:rgba(34,211,238,0.2);border-color:var(--cyan);transform:translateY(-1px);
   box-shadow:0 3px 12px rgba(34,211,238,0.25);
 }
+.ph-location-badge.editing{
+  background:rgba(34,211,238,0.18);border-color:var(--cyan);
+  padding:0.12rem 0.5rem;box-shadow:0 0 10px rgba(34,211,238,0.3);
+}
+.hdr-loc-input{
+  background:transparent;border:none;outline:none;color:var(--cyan);
+  font-size:0.75rem;font-weight:600;font-family:inherit;min-width:90px;max-width:160px;
+}
 .ph-chip-edit-icon{font-size:0.7rem;opacity:0.6;transition:opacity 0.2s;}
 .ph-location-badge:hover .ph-chip-edit-icon{opacity:1;}
+.ph-location-badge.editing .ph-chip-edit-icon{display:none;}
 .ph-email{font-size:0.82rem;color:var(--muted);margin-top:0.15rem;}
 
 /* Header Social / Developer Links */
