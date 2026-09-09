@@ -258,6 +258,13 @@
               <input type="email" id="regEmail" placeholder="you@example.com" required>
             </div>
           </div>
+          <div class="form-group">
+            <label for="regPhone">Phone Number</label>
+            <div class="input-wrap">
+              <span class="icon">📞</span>
+              <input type="tel" id="regPhone" placeholder="+91 98765 43210">
+            </div>
+          </div>
 
           <div class="form-group">
             <label for="regPassword">Password</label>
@@ -492,6 +499,7 @@ registerForm.addEventListener('submit',async e=>{
     await postJson('/api/profile',{
       name:document.getElementById('regName').value.trim(),
       email:document.getElementById('regEmail').value.trim(),
+      phone:document.getElementById('regPhone') ? document.getElementById('regPhone').value.trim() : '',
       college_name:document.getElementById('regCollege').value.trim(),
       degree:document.getElementById('regDegree').value.trim(),
       major:document.getElementById('regMajor').value.trim(),

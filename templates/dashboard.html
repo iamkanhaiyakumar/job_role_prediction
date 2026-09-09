@@ -484,6 +484,10 @@
             <div class="pg-label"><span>Email Address</span><span class="pg-lock-hint">🔒 Registered</span></div>
             <div class="pg-value" id="val_email">—</div>
           </div>
+          <div class="pg-item" onclick="activateInlineEdit(this, 'phone', 'tel', 'Phone Number (e.g. +91 9876543210)')">
+            <div class="pg-label"><span>Phone Number</span><span class="pg-edit-hint">✎ Edit</span></div>
+            <div class="pg-value" id="val_phone">—</div>
+          </div>
           <div class="pg-item" onclick="activateInlineEdit(this, 'college_name', 'text', 'College / University')">
             <div class="pg-label"><span>College / University</span><span class="pg-edit-hint">✎ Edit</span></div>
             <div class="pg-value" id="val_college_name">—</div>
@@ -1028,7 +1032,7 @@ async function loadProfile() {
   if (d.name) document.getElementById('navUserName').textContent = d.name;
 
   // Render values in grid
-  const fields = ['name','email','college_name','degree','major','cgpa','experience','passout_year','skills'];
+  const fields = ['name','email','phone','college_name','degree','major','cgpa','experience','passout_year','skills'];
   fields.forEach(f => {
     const el = document.getElementById('val_' + f);
     if (!el) return;
@@ -1104,7 +1108,7 @@ async function renderProfileLatestPrediction() {
 
 function updateCompletionMeter(d) {
   const meterEl = document.getElementById('completionMeter');
-  const fields = ['name','email','college_name','degree','major','cgpa','experience','passout_year','skills'];
+  const fields = ['name','email','phone','college_name','degree','major','cgpa','experience','passout_year','skills'];
   const filled = fields.filter(f => d[f] && String(d[f]).trim() !== '' && String(d[f]) !== '0');
   const pct = Math.round((filled.length / fields.length) * 100);
 
@@ -1120,7 +1124,7 @@ function updateCompletionMeter(d) {
   document.getElementById('cmPct').textContent = pct + '%';
   setTimeout(() => document.getElementById('cmFill').style.width = pct + '%', 100);
   const missing = fields.filter(f => !d[f] || String(d[f]).trim() === '' || String(d[f]) === '0');
-  const labels = {college_name:'College', passout_year:'Passout Year', cgpa:'CGPA', experience:'Experience', skills:'Skills'};
+  const labels = {phone:'Phone Number', college_name:'College', passout_year:'Passout Year', cgpa:'CGPA', experience:'Experience', skills:'Skills'};
   document.getElementById('cmHint').textContent = missing.length > 0
     ? `Add ${labels[missing[0]] || missing[0]} to improve prediction accuracy`
     : 'Profile 100% complete! Great job! 🎉';
@@ -1528,7 +1532,7 @@ function renderTimeline() {
     const confVal = (r.confidence !== null && r.confidence !== undefined && r.confidence !== '') ? parseFloat(r.confidence) : 94.2;
     const confScore = confVal.toFixed(1) + '% Match';
     const date  = r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-    const skills = (r.skills || '').split(',').filter(Boolean).slice(0,5).map(s => `<span class="tc-skill">⚡ ${s.trim()}</span>`).join('');
+    const skills = (r.skills || '').split(',').filter(Boolean).slice(0,6).map(s => `<span class="tc-skill">${s.trim()}</span>`).join('');
     const info = [r.degree, r.major && '• ' + r.major, r.cgpa && '• CGPA ' + r.cgpa, r.experience && '• ' + r.experience + 'y exp'].filter(Boolean).join(' ');
 
     return `
@@ -1537,20 +1541,17 @@ function renderTimeline() {
       <div class="tc-body">
         <div class="tc-top-row">
           <div class="tc-role-wrap">
-            <span class="tc-role">🎯 ${r.predicted_role || '—'}</span>
+            <span class="tc-role">${r.predicted_role || '—'}</span>
             <span class="tc-cat-badge">${category}</span>
             <span class="tc-conf-badge">${confScore}</span>
           </div>
-          <span class="tc-date">${date}</span>
+          <div class="tc-right-meta">
+            <span class="tc-date">${date}</span>
+            <button class="tc-details-btn" onclick="openHistoryDetails(${idx})" title="View Complete Details">View Details</button>
+          </div>
         </div>
         <div class="tc-info">${info}</div>
         <div class="tc-skills">${skills}</div>
-      </div>
-      <div class="tc-action-col">
-        <button class="tc-details-btn" onclick="openHistoryDetails(${idx})" title="View Complete Prediction Details">
-          <span>View Details</span>
-          <span class="tc-btn-arrow">🔍</span>
-        </button>
       </div>
     </div>`;
   }).join('');
@@ -1868,11 +1869,11 @@ function openHistoryDetails(index) {
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
   }) : '—';
 
-  document.getElementById('hmdRole').textContent = '🎯 ' + (r.predicted_role || '—');
+  document.getElementById('hmdRole').textContent = r.predicted_role || '—';
   document.getElementById('hmdRole').style.color = color || '#fff';
   document.getElementById('hmdCategory').textContent = category;
   document.getElementById('hmdConf').textContent = confVal.toFixed(1) + '% Match Score';
-  document.getElementById('hmdDate').textContent = '📅 ' + dateStr;
+  document.getElementById('hmdDate').textContent = dateStr;
 
   document.getElementById('hmdDegree').textContent = r.degree || '—';
   document.getElementById('hmdMajor').textContent = r.major || '—';
@@ -1881,22 +1882,22 @@ function openHistoryDetails(index) {
   document.getElementById('hmdEmployed').textContent = r.employed || 'No';
   document.getElementById('hmdIndustry').textContent = r.industry || 'Information Technology';
 
-  // Render Skills Badges
+  // Render Skills Badges (no emojis)
   const skillsArr = (r.skills || '').split(',').map(s => s.trim()).filter(Boolean);
   const skillsContainer = document.getElementById('hmdSkillsList');
   if (skillsArr.length) {
-    skillsContainer.innerHTML = skillsArr.map(s => `<span class="h-chip">⚡ ${s}</span>`).join('');
+    skillsContainer.innerHTML = skillsArr.map(s => `<span class="h-chip">${s}</span>`).join('');
   } else {
     skillsContainer.innerHTML = '<span style="color:var(--muted);font-size:0.85rem">No skills recorded</span>';
   }
 
-  // Render Certifications Badges
+  // Render Certifications Badges (no emojis)
   const certsArr = (r.certifications || '').split(',').map(c => c.trim()).filter(Boolean);
   const certsContainer = document.getElementById('hmdCertsList');
   const certsBlock = document.getElementById('hmdCertsBlock');
   if (certsArr.length) {
     certsBlock.style.display = 'block';
-    certsContainer.innerHTML = certsArr.map(c => `<span class="h-chip h-chip-cert">📜 ${c}</span>`).join('');
+    certsContainer.innerHTML = certsArr.map(c => `<span class="h-chip h-chip-cert">${c}</span>`).join('');
   } else {
     certsBlock.style.display = 'none';
   }
@@ -1941,7 +1942,7 @@ function repredictFromHistory() {
   if (activeHistoryRow.certifications) setInp('fl-certs', activeHistoryRow.certifications);
   if (activeHistoryRow.industry) setOpt('fl-industry', activeHistoryRow.industry);
 
-  showToast('Loaded details into prediction form! 🚀', 'info');
+  showToast('Loaded details into prediction form!', 'info');
 }
 
 // Close modal on Escape key
@@ -1958,16 +1959,16 @@ loadProfile();
 checkHistoryNotice();
 </script>
 
-<!-- ===== HISTORY DETAIL MODAL POPUP ===== -->
+<!-- ===== HISTORY DETAIL MODAL POPUP (CLEAN PROFESSIONAL UI) ===== -->
 <div class="h-modal-overlay" id="historyDetailModal" onclick="if(event.target===this)closeHistoryDetails()">
   <div class="h-modal-card">
     <div class="h-modal-header">
       <div>
-        <div class="h-modal-title" id="hmdRole">🎯 Data Scientist</div>
+        <div class="h-modal-title" id="hmdRole">Data Scientist</div>
         <div class="h-modal-badges">
           <span class="tc-cat-badge" id="hmdCategory">Data Science & AI</span>
           <span class="tc-conf-badge" id="hmdConf">90.8% Match</span>
-          <span style="font-size:0.8rem;color:var(--muted)" id="hmdDate">📅 09 Sept 2026</span>
+          <span style="font-size:0.8rem;color:var(--muted)" id="hmdDate">09 Sept 2026</span>
         </div>
       </div>
       <button class="h-modal-close" onclick="closeHistoryDetails()" title="Close details">✕</button>
@@ -1977,99 +1978,93 @@ checkHistoryNotice();
       <!-- Academic & Professional Stats Grid -->
       <div class="h-detail-grid">
         <div class="h-detail-item">
-          <div class="h-detail-label">🎓 Degree</div>
+          <div class="h-detail-label">Degree</div>
           <div class="h-detail-value" id="hmdDegree">B.Tech</div>
         </div>
         <div class="h-detail-item">
-          <div class="h-detail-label">📚 Major / Specialization</div>
+          <div class="h-detail-label">Major / Specialization</div>
           <div class="h-detail-value" id="hmdMajor">Computer Science</div>
         </div>
         <div class="h-detail-item">
-          <div class="h-detail-label">📈 Current CGPA</div>
+          <div class="h-detail-label">Current CGPA</div>
           <div class="h-detail-value" id="hmdCgpa">7.43 / 10</div>
         </div>
         <div class="h-detail-item">
-          <div class="h-detail-label">💼 Experience</div>
+          <div class="h-detail-label">Experience</div>
           <div class="h-detail-value" id="hmdExp">0 Years</div>
         </div>
         <div class="h-detail-item">
-          <div class="h-detail-label">🏢 Target Industry</div>
+          <div class="h-detail-label">Target Industry</div>
           <div class="h-detail-value" id="hmdIndustry">Information Technology</div>
         </div>
         <div class="h-detail-item">
-          <div class="h-detail-label">💼 Employed Status</div>
+          <div class="h-detail-label">Employed Status</div>
           <div class="h-detail-value" id="hmdEmployed">No</div>
         </div>
       </div>
 
       <!-- Skills Section -->
       <div class="h-skills-block">
-        <div class="h-block-title">⚡ Evaluated Technical Skills</div>
+        <div class="h-block-title">Technical Skills</div>
         <div class="h-chips-wrap" id="hmdSkillsList">
-          <span class="h-chip">⚡ Python</span>
-          <span class="h-chip">⚡ C</span>
-          <span class="h-chip">⚡ Javascript</span>
-          <span class="h-chip">⚡ Html</span>
-          <span class="h-chip">⚡ CSS</span>
+          <span class="h-chip">Python</span>
+          <span class="h-chip">C</span>
+          <span class="h-chip">Javascript</span>
+          <span class="h-chip">Html</span>
+          <span class="h-chip">CSS</span>
         </div>
       </div>
 
       <!-- Certifications Section -->
       <div class="h-certs-block" id="hmdCertsBlock" style="display:none">
-        <div class="h-block-title">📜 Certifications & Licenses</div>
+        <div class="h-block-title">Certifications & Licenses</div>
         <div class="h-chips-wrap" id="hmdCertsList"></div>
       </div>
     </div>
 
     <div class="h-modal-footer">
       <button class="h-btn-secondary" onclick="closeHistoryDetails()">Close</button>
-      <button class="h-btn-primary" onclick="repredictFromHistory()">🔮 Re-run Prediction</button>
+      <button class="h-btn-primary" onclick="repredictFromHistory()">Re-run Prediction</button>
     </div>
   </div>
 </div>
 
 <style>
-/* History Timeline Card Action Button */
-.timeline-card {
+/* History Timeline Card Integrated Action Layout */
+.tc-top-row {
   display: flex;
-  align-items: center;
-  position: relative;
-  transition: all 0.25s ease;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
-.tc-action-col {
-  margin-left: auto;
-  padding-left: 1.2rem;
-  display: flex;
+.tc-right-meta {
+  display: inline-flex;
   align-items: center;
-  flex-shrink: 0;
+  gap: 0.85rem;
+  margin-left: auto;
 }
 .tc-details-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.15rem;
-  border-radius: 0.85rem;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.35);
-  color: #fff;
-  font-size: 0.82rem;
+  justify-content: center;
+  padding: 0.38rem 0.85rem;
+  border-radius: 0.6rem;
+  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #e0e7ff;
+  font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
+  letter-spacing: 0.02em;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 .tc-details-btn:hover {
   background: var(--gradient, linear-gradient(135deg, #6366f1, #a855f7));
   border-color: transparent;
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-}
-.tc-details-btn .tc-btn-arrow {
-  font-size: 0.9rem;
-  transition: transform 0.2s;
-}
-.tc-details-btn:hover .tc-btn-arrow {
-  transform: scale(1.2);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
 /* History Details Modal */

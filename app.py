@@ -129,6 +129,7 @@ def profile():
                 SELECT 
                     COALESCE(p.name, u.name) AS name,
                     COALESCE(p.email, u.email) AS email,
+                    p.phone,
                     p.college_name,
                     p.degree,
                     p.major,
@@ -148,12 +149,13 @@ def profile():
         data = request.json
         cur.execute(
             """
-            INSERT INTO profiles(user_id, name, email, college_name, degree, major,
+            INSERT INTO profiles(user_id, name, email, phone, college_name, degree, major,
                                  cgpa, experience, skills, passout_year)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             ON DUPLICATE KEY UPDATE
                 name=VALUES(name),
                 email=VALUES(email),
+                phone=VALUES(phone),
                 college_name=VALUES(college_name),
                 degree=VALUES(degree),
                 major=VALUES(major),
@@ -166,6 +168,7 @@ def profile():
                 uid,
                 data.get("name", ""),
                 data.get("email", ""),
+                data.get("phone", ""),
                 data.get("college_name", ""),
                 data.get("degree", ""),
                 data.get("major", ""),

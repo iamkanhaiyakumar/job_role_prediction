@@ -65,6 +65,7 @@ def init_db():
             name VARCHAR(100) NOT NULL,
             college_name VARCHAR(150) NULL,
             email VARCHAR(100) NOT NULL,
+            phone VARCHAR(20) NULL,
             degree VARCHAR(100),
             major VARCHAR(100),
             cgpa FLOAT,
@@ -74,6 +75,12 @@ def init_db():
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     """)
+
+    # Ensure phone column exists for existing DB tables
+    try:
+        c.execute("ALTER TABLE profiles ADD COLUMN phone VARCHAR(20) NULL AFTER email")
+    except Exception:
+        pass
 
     # Predictions table
     c.execute("""
