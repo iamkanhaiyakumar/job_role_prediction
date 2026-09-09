@@ -64,6 +64,72 @@ def get_match_tier(score: float) -> Dict[str, str]:
         return {'tier': 'Excellent Match', 'badge': '⭐ Excellent Match', 'color': '#10B981'}
     elif score >= 70.0:
         return {'tier': 'Strong Match', 'badge': '🎯 Strong Match', 'color': '#3B82F6'}
+# career_engine.py
+"""
+Career Intelligence & Hybrid Recommendation Engine for Edu2Job (v4 Multi-Sector Edition).
+
+Features:
+- Full coverage of 31 Canonical Roles across 20 Sectors
+- Qualification Gating Layer for Regulated Professions (Doctor, Lawyer, Architect, CA, Educator)
+- Career Switcher Enablement for Open Professions (Data Analyst, Full Stack, SCM, Marketing, etc.)
+- Multi-Tier Weighted Skill Fit (Core 3x, Important 2x, Supporting 1x, General Baseline)
+- Token-Bounded Skill Extraction (Zero substring false positives)
+- Explainable Decision Drivers (Matched Skills, Missing Skills, Positive & Negative Evidence)
+- Curated 4-Phase Step-by-Step Learning Roadmaps & Targeted Mock Interview Q&As
+"""
+
+import math
+import numpy as np
+from typing import Dict, Any, List, Optional, Set, Tuple
+
+import taxonomy
+
+CANONICAL_ROLES: List[str] = taxonomy.CANONICAL_ROLES
+ROLE_TAXONOMY: Dict[str, Dict[str, Any]] = taxonomy.CAREER_TAXONOMY
+
+HYBRID_WEIGHTS: Dict[str, float] = {
+    'ml_probability': 0.35,
+    'skill_fit': 0.40,
+    'academic_fit': 0.15,
+    'experience_fit': 0.05,
+    'industry_fit': 0.05
+}
+
+DEFAULT_ROLE_INFO: Dict[str, Any] = {
+    'sector': 'Technology',
+    'category': 'Technology',
+    'description': 'General professional career track.',
+    'qualification_required': False,
+    'required_degrees': [],
+    'career_switch_allowed': True,
+    'compatible_degrees': ['B.Tech', 'BCA', 'B.Sc', 'BBA', 'B.Com', 'MBA'],
+    'compatible_majors': ['Computer Science', 'Information Technology', 'General', 'Business'],
+    'industries': ['IT', 'Corporate', 'Consulting'],
+    'core_skills': ['Problem Solving', 'Communication', 'Analytical Skills'],
+    'important_skills': ['Project Management', 'Data Analysis'],
+    'supporting_skills': ['Excel', 'Documentation'],
+    'general_skills': ['Teamwork', 'Time Management'],
+    'certifications': ['Professional Foundations'],
+    'roadmap': [
+        {'phase': 'Phase 1: Fundamentals', 'duration': 'Weeks 1-4', 'topics': 'Core domain foundations and workflow tools.', 'resources': [{'title': 'Foundations Guide', 'url': 'https://coursera.org'}]},
+        {'phase': 'Phase 2: Core Skills', 'duration': 'Weeks 5-8', 'topics': 'Hands-on practical projects and industry tools.', 'resources': [{'title': 'Skill Builder', 'url': 'https://edx.org'}]},
+        {'phase': 'Phase 3: Advanced Applications', 'duration': 'Weeks 9-12', 'topics': 'End-to-end domain problem solving and optimization.', 'resources': [{'title': 'Advanced Tutorials', 'url': 'https://khanacademy.org'}]},
+        {'phase': 'Phase 4: Industry & Interview Prep', 'duration': 'Weeks 13-16', 'topics': 'Portfolio building, mock interviews, and case studies.', 'resources': [{'title': 'Career Preparation', 'url': 'https://roadmap.sh'}]}
+    ],
+    'interview_questions': [
+        {'q': 'What are your core strengths and how do they apply to this role?', 'a': 'Focus on proven problem-solving, domain knowledge, adaptability, and continuous learning agility.'},
+        {'q': 'How do you prioritize competing deadlines on complex projects?', 'a': 'Use impact vs effort matrices, maintain transparent stakeholder communication, and align with business OKRs.'},
+        {'q': 'Describe a complex problem you resolved using systematic analysis.', 'a': 'Detail the situation, task, analytical steps taken, data examined, solution implemented, and measurable business impact.'}
+    ]
+}
+
+
+def get_match_tier(score: float) -> Dict[str, str]:
+    """Returns visual match tier badge and colors based on match percentage."""
+    if score >= 85.0:
+        return {'tier': 'Excellent Match', 'badge': '⭐ Excellent Match', 'color': '#10B981'}
+    elif score >= 70.0:
+        return {'tier': 'Strong Match', 'badge': '🎯 Strong Match', 'color': '#3B82F6'}
     elif score >= 50.0:
         return {'tier': 'Good Match', 'badge': '👍 Good Match', 'color': '#F59E0B'}
     else:
@@ -139,12 +205,12 @@ def calculate_hybrid_score(
                 skill_fit = min(1.0, raw_skill_ratio * 1.08 + 0.05)
             elif len(matched_core) == 0 and len(matched_imp) == 0:
                 # Heavy penalty if zero core and zero important skills match
-                skill_fit = max(0.02, raw_skill_ratio * 0.25)
+                skill_fit = max(0.01, raw_skill_ratio * 0.15)
             else:
                 skill_fit = raw_skill_ratio
         else:
             # Baseline if no skills entered
-            skill_fit = 0.15 if not user_skills_set else 0.05
+            skill_fit = 0.15 if not user_skills_set else 0.02
 
         # ----------------------------------------------------
         # 2. Academic & Qualification Compatibility (Weight = 15%)
@@ -172,8 +238,11 @@ def calculate_hybrid_score(
                 academic_fit = 0.65
             elif not user_degree_norm and not user_major_norm:
                 academic_fit = 0.50
+            elif len(matched_core) == 0 and len(matched_imp) == 0 and not deg_match and not maj_match:
+                # Zero skills and zero academic alignment across different sector
+                academic_fit = 0.02
             else:
-                academic_fit = 0.25
+                academic_fit = 0.15
 
         # ----------------------------------------------------
         # 3. Experience Fit (Weight = 5%)
@@ -184,12 +253,13 @@ def calculate_hybrid_score(
         # 4. Industry Fit (Weight = 5%)
         # ----------------------------------------------------
         role_industries = [ind.lower() for ind in role_info.get('industries', [])]
-        if user_industry_raw and any(user_industry_raw in ri or ri in user_industry_raw for ri in role_industries):
+        role_sector = role_info.get('sector', '').lower()
+        if user_industry_raw and (any(user_industry_raw in ri or ri in user_industry_raw for ri in role_industries) or user_industry_raw in role_sector or role_sector in user_industry_raw):
             industry_fit = 1.0
         elif not user_industry_raw:
-            industry_fit = 0.60
+            industry_fit = 0.50
         else:
-            industry_fit = 0.35
+            industry_fit = 0.05
 
         # ----------------------------------------------------
         # 5. Composite Hybrid Score Computation
