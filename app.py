@@ -75,6 +75,8 @@ def register():
         conn.commit()
         cur.close()
         conn.close()
+        session["user_name"] = name
+        session["user_email"] = email
         return jsonify({"message": "Registered"})
     except mysql.connector.errors.IntegrityError:
         return jsonify({"error": "Email already exists"}), 400
@@ -101,6 +103,8 @@ def login():
 
     if row and bcrypt.checkpw(password.encode("utf-8"), row["password"]):
         session["user_id"] = row["id"]
+        session["user_name"] = row.get("name", "")
+        session["user_email"] = row.get("email", "")
         return jsonify({"message": "Logged in"})
 
     return jsonify({"error": "Invalid credentials"}), 401
@@ -143,10 +147,22 @@ def profile():
             row = cur.fetchone()
             cur.close()
             conn.close()
-            return jsonify(row or {})
+            if row:
+                if not row.get("name"):
+                    row["name"] = session.get("user_name", "")
+                if not row.get("email"):
+                    row["email"] = session.get("user_email", "")
+                return jsonify(row)
+            return jsonify({
+                "name": session.get("user_name", ""),
+                "email": session.get("user_email", "")
+            })
         except Exception as e:
             logger.warning(f"Profile fetch warning (DB unreachable): {e}")
-            return jsonify({})  # Return empty profile gracefully to prevent 500 error in DevTools
+            return jsonify({
+                "name": session.get("user_name", ""),
+                "email": session.get("user_email", "")
+            })
 
     try:
         conn = get_db()
