@@ -391,10 +391,37 @@ button{cursor:pointer;border:none;font-family:inherit;}
   box-shadow:0 0 25px rgba(99,102,241,0.3);flex-shrink:0;
   letter-spacing:-1px;
 }
-.ph-info{flex:1;}
+.ph-info{flex:1;min-width:200px;}
 .ph-info h3{font-size:1.2rem;font-weight:700;margin-bottom:0.25rem;}
 .role-tag{display:inline-block;padding:0.2rem 0.7rem;border-radius:2rem;background:rgba(168,85,247,0.1);color:var(--purple);font-size:0.73rem;font-weight:600;}
 .ph-email{font-size:0.8rem;color:var(--muted);margin-top:0.3rem;}
+
+/* Header Social / Developer Links */
+.ph-social-links{display:flex;align-items:center;gap:0.55rem;margin-left:auto;flex-wrap:wrap;}
+.ph-social-btn{
+  display:inline-flex;align-items:center;gap:0.4rem;padding:0.42rem 0.85rem;border-radius:2rem;
+  font-size:0.78rem;font-weight:600;text-decoration:none;border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);color:var(--muted);transition:all 0.25s ease;cursor:pointer;
+}
+.ph-social-btn:hover{transform:translateY(-2px);color:#fff;}
+.ph-social-btn.linkedin-btn:hover, .ph-social-btn.linkedin-btn.active{
+  background:rgba(10,102,194,0.18);border-color:#0a66c2;color:#38bdf8;box-shadow:0 4px 14px rgba(10,102,194,0.3);
+}
+.ph-social-btn.github-btn:hover, .ph-social-btn.github-btn.active{
+  background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.45);color:#ffffff;box-shadow:0 4px 14px rgba(255,255,255,0.18);
+}
+.ph-social-btn.portfolio-btn:hover, .ph-social-btn.portfolio-btn.active{
+  background:rgba(34,211,238,0.18);border-color:#22d3ee;color:#22d3ee;box-shadow:0 4px 14px rgba(34,211,238,0.3);
+}
+
+.pg-link-badge{
+  display:inline-flex;align-items:center;gap:0.45rem;padding:0.25rem 0.65rem;border-radius:0.5rem;
+  font-size:0.82rem;font-weight:500;text-decoration:none;transition:var(--t);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.pg-link-badge.linkedin-badge{background:rgba(10,102,194,0.15);color:#38bdf8;border:1px solid rgba(10,102,194,0.35);}
+.pg-link-badge.github-badge{background:rgba(255,255,255,0.08);color:#f1f5f9;border:1px solid rgba(255,255,255,0.25);}
+.pg-link-badge.portfolio-badge{background:rgba(34,211,238,0.15);color:#22d3ee;border:1px solid rgba(34,211,238,0.35);}
+.pg-link-badge:hover{filter:brightness(1.2);transform:translateY(-1px);}
 
 .completion-meter{padding:1rem 1.2rem;border-radius:var(--r);background:rgba(255,255,255,0.03);border:1px solid var(--border);margin-bottom:1.3rem;}
 .cm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;}

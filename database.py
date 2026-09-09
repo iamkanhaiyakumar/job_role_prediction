@@ -89,6 +89,10 @@ def init_db():
             ("experience", "INT NULL"),
             ("skills", "TEXT NULL"),
             ("passout_year", "INT NULL"),
+            ("linkedin", "VARCHAR(255) NULL"),
+            ("github", "VARCHAR(255) NULL"),
+            ("portfolio", "VARCHAR(255) NULL"),
+            ("bio", "TEXT NULL"),
         ]
         for col_name, col_type in profile_cols:
             try:

@@ -171,7 +171,11 @@ def profile():
             "cgpa": "",
             "experience": "",
             "skills": "",
-            "passout_year": ""
+            "passout_year": "",
+            "linkedin": "",
+            "github": "",
+            "portfolio": "",
+            "bio": ""
         }
         try:
             conn = get_db()
@@ -209,8 +213,8 @@ def profile():
         cur.execute(
             """
             INSERT INTO profiles(user_id, name, email, phone, college_name, degree, major,
-                                 cgpa, experience, skills, passout_year)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                                 cgpa, experience, skills, passout_year, linkedin, github, portfolio, bio)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             ON DUPLICATE KEY UPDATE
                 name=VALUES(name),
                 email=VALUES(email),
@@ -221,7 +225,11 @@ def profile():
                 cgpa=VALUES(cgpa),
                 experience=VALUES(experience),
                 skills=VALUES(skills),
-                passout_year=VALUES(passout_year)
+                passout_year=VALUES(passout_year),
+                linkedin=VALUES(linkedin),
+                github=VALUES(github),
+                portfolio=VALUES(portfolio),
+                bio=VALUES(bio)
             """,
             (
                 uid,
@@ -235,6 +243,10 @@ def profile():
                 int(data.get("experience") or 0),
                 data.get("skills", ""),
                 int(data.get("passout_year") or 0),
+                data.get("linkedin", ""),
+                data.get("github", ""),
+                data.get("portfolio", ""),
+                data.get("bio", ""),
             ),
         )
         conn.commit()
