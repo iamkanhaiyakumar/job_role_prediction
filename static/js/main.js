@@ -111,38 +111,44 @@ if (predictBtn) {
 }
 
 function simulatePrediction(degree, major, skills, cgpa, exp, industry) {
-  const skillsLower = skills.toLowerCase();
+  const skillsLower = (skills || '').toLowerCase();
   const roleScores = {};
 
-  // Skill-based scoring
+  // Multi-Sector Skill-based scoring
   const skillMap = {
-    'ML Engineer': ['machine learning', 'deep learning', 'tensorflow', 'pytorch', 'neural', 'nlp', 'computer vision', 'ai'],
-    'Data Scientist': ['data science', 'statistics', 'pandas', 'numpy', 'r programming', 'visualization', 'data analysis', 'jupyter'],
-    'Software Developer': ['java', 'c++', 'software', 'algorithms', 'oop', 'git', 'agile', 'design patterns'],
-    'Web Developer': ['html', 'css', 'javascript', 'react', 'node', 'angular', 'vue', 'frontend', 'backend', 'web'],
-    'Data Analyst': ['excel', 'sql', 'tableau', 'power bi', 'analytics', 'reporting', 'data analysis'],
-    'DevOps Engineer': ['docker', 'kubernetes', 'ci/cd', 'aws', 'azure', 'linux', 'terraform', 'devops', 'cloud'],
-    'Cloud Architect': ['aws', 'azure', 'gcp', 'cloud', 'microservices', 'serverless'],
-    'Cybersecurity Analyst': ['security', 'ethical hacking', 'penetration', 'firewall', 'encryption', 'cybersecurity'],
-    'Database Administrator': ['sql', 'mysql', 'postgresql', 'mongodb', 'database', 'oracle', 'redis'],
-    'AI Research Scientist': ['research', 'deep learning', 'ai', 'reinforcement learning', 'transformers', 'gpt']
+    'Machine Learning Engineer': ['machine learning', 'deep learning', 'tensorflow', 'pytorch', 'neural', 'nlp', 'computer vision', 'ai'],
+    'Data Scientist': ['data science', 'statistics', 'pandas', 'numpy', 'r programming', 'data visualization', 'python', 'analytics'],
+    'Full Stack Developer': ['javascript', 'react', 'node', 'express', 'full stack', 'html', 'css', 'typescript', 'mongodb'],
+    'DevOps Engineer': ['docker', 'kubernetes', 'ci/cd', 'aws', 'linux', 'terraform', 'jenkins', 'ansible'],
+    'Financial Analyst': ['financial modeling', 'valuation', 'excel', 'bloomberg', 'corporate finance', 'accounting', 'dcf'],
+    'Mechanical Engineer': ['solidworks', 'autocad', 'catia', 'thermodynamics', 'ansys', 'cad', 'manufacturing'],
+    'Civil Engineer': ['staad pro', 'autocad', 'structural analysis', 'revit', 'concrete design', 'surveying', 'geotechnical'],
+    'Architect': ['revit', 'autocad', 'rhino', 'architectural design', 'sketchup', 'bim', 'lumion'],
+    'Medical Practitioner': ['clinical diagnostics', 'patient care', 'pharmacology', 'internal medicine', 'pathology', 'surgery'],
+    'Corporate Legal Counsel': ['corporate law', 'contract negotiation', 'legal research', 'compliance', 'mergers', 'litigation'],
+    'UI/UX Designer': ['figma', 'wireframing', 'user research', 'prototyping', 'adobe xd', 'design systems'],
+    'Supply Chain Analyst': ['supply chain', 'inventory management', 'sap', 'logistics', 'procurement', 'operations'],
+    'Cybersecurity Analyst': ['security', 'penetration testing', 'firewall', 'soc', 'siem', 'cryptography', 'incident response']
   };
 
   Object.entries(skillMap).forEach(([role, keywords]) => {
     let score = 0;
-    keywords.forEach(kw => { if (skillsLower.includes(kw)) score += 12; });
+    keywords.forEach(kw => { if (skillsLower.includes(kw)) score += 14; });
     if (score > 0) roleScores[role] = score;
   });
 
   // Major bonus
   const majorBonus = {
-    'Computer Science': { 'Software Developer': 10, 'ML Engineer': 8, 'Web Developer': 7 },
-    'Data Science': { 'Data Scientist': 15, 'ML Engineer': 10, 'Data Analyst': 8 },
-    'Artificial Intelligence': { 'ML Engineer': 15, 'AI Research Scientist': 12, 'Data Scientist': 8 },
-    'Information Technology': { 'Web Developer': 10, 'DevOps Engineer': 8, 'Software Developer': 7 },
-    'Electronics': { 'DevOps Engineer': 5, 'Software Developer': 4 },
-    'Mathematics': { 'Data Scientist': 10, 'ML Engineer': 8, 'Data Analyst': 7 },
-    'Business': { 'Data Analyst': 10, 'Database Administrator': 5 }
+    'Computer Science': { 'Full Stack Developer': 12, 'Machine Learning Engineer': 10, 'Data Scientist': 8 },
+    'Data Science': { 'Data Scientist': 18, 'Machine Learning Engineer': 12 },
+    'Artificial Intelligence': { 'Machine Learning Engineer': 18, 'Data Scientist': 12 },
+    'Mechanical Engineering': { 'Mechanical Engineer': 20 },
+    'Civil Engineering': { 'Civil Engineer': 20 },
+    'Electrical Engineering': { 'DevOps Engineer': 8, 'Full Stack Developer': 6 },
+    'Finance / Accounting': { 'Financial Analyst': 20 },
+    'Medicine / Healthcare': { 'Medical Practitioner': 25 },
+    'Law / Legal Studies': { 'Corporate Legal Counsel': 25 },
+    'Architecture': { 'Architect': 25 }
   };
   if (majorBonus[major]) {
     Object.entries(majorBonus[major]).forEach(([r, s]) => {
@@ -151,17 +157,17 @@ function simulatePrediction(degree, major, skills, cgpa, exp, industry) {
   }
 
   // CGPA and experience bonus
-  const cgpaVal = parseFloat(cgpa) || 7;
+  const cgpaVal = parseFloat(cgpa) || 7.5;
   const expVal = parseInt(exp) || 0;
   Object.keys(roleScores).forEach(r => {
     roleScores[r] += cgpaVal * 1.5 + expVal * 2;
   });
 
-  // If no matches, add defaults
+  // If no matches, add sensible baseline
   if (Object.keys(roleScores).length === 0) {
-    roleScores['Software Developer'] = 45 + cgpaVal * 2;
-    roleScores['Data Analyst'] = 35 + cgpaVal * 1.5;
-    roleScores['Web Developer'] = 30 + cgpaVal;
+    roleScores['Data Scientist'] = 45 + cgpaVal * 2;
+    roleScores['Full Stack Developer'] = 40 + cgpaVal * 1.5;
+    roleScores['Financial Analyst'] = 35 + cgpaVal;
   }
 
   // Normalize to confidence
@@ -169,7 +175,7 @@ function simulatePrediction(degree, major, skills, cgpa, exp, industry) {
   const maxScore = sorted[0][1];
   const results = sorted.map(([role, score]) => ({
     role,
-    confidence: Math.min(98, Math.max(30, (score / maxScore) * 95 + Math.random() * 5)).toFixed(1)
+    confidence: Math.min(96, Math.max(35, (score / maxScore) * 92 + Math.random() * 4)).toFixed(1)
   }));
 
   return { topRole: results[0].role, topConfidence: results[0].confidence, all: results };

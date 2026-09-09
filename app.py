@@ -13,6 +13,7 @@ import time
 
 # import time  # OLD: duplicate import was here at line 188 — removed
 
+import taxonomy
 from database import get_db, init_db, model, target_encoder, feature_encoders
 from resume_parser import extract_text_from_pdf, parse_resume_text
 from career_engine import (
@@ -268,20 +269,25 @@ def predict():
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
-    data = request.json
+    data = request.json or {}
 
     try:
-        # OLD (crashed with ValueError on unseen labels like 'Data Science'):
-        # def encode(col, val):
-        #     le = feature_encoders["label_encoders"].get(col)
-        #     return le.transform([val.title()])[0] if le and val else 0
-
-        # NEW: Safe encoder with case-insensitive matching & intelligent semantic fallback for new options
         def encode(col, val):
             le = feature_encoders["label_encoders"].get(col)
             if not le or not val:
                 return 0
             v = str(val).strip()
+            
+            # Check normalized degree/major first
+            if col == "degree":
+                norm_d = taxonomy.normalize_degree(v)
+                if norm_d in le.classes_:
+                    return int(le.transform([norm_d])[0])
+            elif col == "major":
+                norm_m = taxonomy.normalize_major(v)
+                if norm_m in le.classes_:
+                    return int(le.transform([norm_m])[0])
+
             if v in le.classes_:
                 return int(le.transform([v])[0])
             if v.title() in le.classes_:
@@ -289,98 +295,32 @@ def predict():
             for idx, c in enumerate(le.classes_):
                 if c.lower() == v.lower():
                     return int(idx)
-            lower_v = v.lower()
-            if col == "degree":
-                if any(k in lower_v for k in ["bca", "b.tech", "btech", "b.e", "be"]):
-                    return int(le.transform(["B.Tech"])[0]) if "B.Tech" in le.classes_ else 0
-                if "mca" in lower_v:
-                    return int(le.transform(["Mca"])[0]) if "Mca" in le.classes_ else 0
-                if any(k in lower_v for k in ["mba", "bba", "b.com", "bcom"]):
-                    return int(le.transform(["Mba"])[0]) if "Mba" in le.classes_ else 0
-                if any(k in lower_v for k in ["m.tech", "mtech", "me"]):
-                    return int(le.transform(["M.Tech"])[0]) if "M.Tech" in le.classes_ else 0
-                if any(k in lower_v for k in ["b.sc", "bsc"]):
-                    return int(le.transform(["B.Sc"])[0]) if "B.Sc" in le.classes_ else 0
-                if any(k in lower_v for k in ["m.sc", "msc"]):
-                    return int(le.transform(["M.Sc"])[0]) if "M.Sc" in le.classes_ else 0
-            elif col == "major":
-                if any(k in lower_v for k in ["data", "ai", "intelligence", "machine", "software", "information", "it"]):
-                    return int(le.transform(["Computer Science"])[0]) if "Computer Science" in le.classes_ else 0
-                if any(k in lower_v for k in ["business", "commerce", "management"]):
-                    return int(le.transform(["Management"])[0]) if "Management" in le.classes_ else 0
-                if "electronics" in lower_v:
-                    return int(le.transform(["Electronics"])[0]) if "Electronics" in le.classes_ else 0
-                if "mechanical" in lower_v:
-                    return int(le.transform(["Mechanical"])[0]) if "Mechanical" in le.classes_ else 0
-                if "civil" in lower_v:
-                    return int(le.transform(["Civil"])[0]) if "Civil" in le.classes_ else 0
-                if "electrical" in lower_v:
-                    return int(le.transform(["Electrical"])[0]) if "Electrical" in le.classes_ else 0
-            elif col == "industrypreference":
-                if any(k in lower_v for k in ["data", "software", "tech", "it", "web", "ai", "cloud"]):
-                    return int(le.transform(["It"])[0]) if "It" in le.classes_ else 0
-                if any(k in lower_v for k in ["consult", "market", "business", "fin"]):
-                    return int(le.transform(["Finance"])[0]) if "Finance" in le.classes_ else 0
-                if any(k in lower_v for k in ["engineer", "mechanic", "civil", "construct"]):
-                    return int(le.transform(["Core Engineering"])[0]) if "Core Engineering" in le.classes_ else 0
-                if "health" in lower_v or "med" in lower_v:
-                    return int(le.transform(["Healthcare"])[0]) if "Healthcare" in le.classes_ else 0
-                if "edu" in lower_v or "teach" in lower_v:
-                    return int(le.transform(["Education"])[0]) if "Education" in le.classes_ else 0
             return 0
 
-        # NEW: input validation — clamp values to safe ranges
         cgpa = float(data.get("cgpa") or 0)
-        cgpa = max(0.0, min(10.0, cgpa))   # NEW: clamp CGPA between 0 and 10
+        cgpa = max(0.0, min(10.0, cgpa))
 
         exp = int(data.get("experience") or 0)
-        exp = max(0, min(50, exp))          # NEW: clamp experience between 0 and 50
+        exp = max(0, min(50, exp))
 
         degree   = encode("degree", data.get("degree"))
         major    = encode("major",  data.get("major"))
         employed = encode("employed", data.get("employed"))
-
-        # OLD (wrong key name — caused KeyError crash):
-        # industry = encode("industry_preference", data.get("industry_preference"))
-
-        # NEW: fixed key to match actual training column name "industrypreference"
         industry = encode("industrypreference", data.get("industry_preference"))
 
-        # Case-insensitive skill and cert mapping
-        skill_classes = feature_encoders["skills_encoder"].classes_
-        skill_map = {c.lower(): c for c in skill_classes}
-        raw_skills = [s.strip().lower() for s in (data.get("skills") or "").split(",") if s.strip()]
-        matched_skills = []
-        for s in raw_skills:
-            if s in skill_map:
-                matched_skills.append(skill_map[s])
-            else:
-                for k, orig in skill_map.items():
-                    if s == k or (len(s) > 3 and s in k) or (len(k) > 3 and k in s):
-                        matched_skills.append(orig)
-                        break
-        skills_vec = feature_encoders["skills_encoder"].transform([list(set(matched_skills))])
+        # Token-bounded normalized skill and cert extraction
+        norm_skills = taxonomy.extract_normalized_skills(data.get("skills") or "")
+        skills_vec = feature_encoders["skills_encoder"].transform([norm_skills])
 
-        cert_classes = feature_encoders["certs_encoder"].classes_
-        cert_map = {c.lower(): c for c in cert_classes}
-        raw_certs = [c.strip().lower() for c in (data.get("certifications") or "").split(",") if c.strip()]
-        matched_certs = []
-        for c in raw_certs:
-            if c in cert_map:
-                matched_certs.append(cert_map[c])
-            else:
-                for k, orig in cert_map.items():
-                    if c == k or (len(c) > 3 and c in k) or (len(k) > 3 and k in c):
-                        matched_certs.append(orig)
-                        break
-        certs_vec = feature_encoders["certs_encoder"].transform([list(set(matched_certs))])
+        raw_certs = [c.strip() for c in (data.get("certifications") or "").split(",") if c.strip()]
+        certs_vec = feature_encoders["certs_encoder"].transform([raw_certs])
 
         X = np.hstack([[degree, major, cgpa, exp, industry, employed], skills_vec[0], certs_vec[0]])
         probs_raw = model.predict_proba([X])[0]
         labels = target_encoder.inverse_transform(np.arange(len(probs_raw)))
 
         # Temperature calibration
-        T = float(feature_encoders.get("calibration_temperature") or feature_encoders.get("temperature", 0.1656))
+        T = float(feature_encoders.get("calibration_temperature") or feature_encoders.get("temperature", 0.2043))
         logits = np.log(np.clip(probs_raw, 1e-12, 1.0)) / max(0.01, T)
         exp_logits = np.exp(logits - np.max(logits))
         calibrated_probs = exp_logits / np.sum(exp_logits)
@@ -408,9 +348,13 @@ def predict():
                 "confidence": m["career_match_score"] / 100.0,
                 "career_match_score": m["career_match_score"],
                 "ml_probability": m["ml_probability"],
+                "sector": m.get("sector", "Technology"),
+                "category": m.get("category", "Technology"),
                 "tier": m["tier"],
                 "badge": m["badge"],
-                "color": m["color"]
+                "color": m["color"],
+                "eligible": m.get("eligible", True),
+                "eligibility_status": m.get("eligibility_status", "Eligible")
             }
             for m in career_matches
         ]
@@ -436,7 +380,7 @@ def predict():
         except Exception as db_err:
             logger.warning(f"Failed to record prediction in DB: {db_err}")
 
-        gap_data = analyze_skill_gap(role, data.get("skills") or "")
+        gap_data = analyze_skill_gap(role, data.get("skills") or "", degree=data.get("degree") or "", major=data.get("major") or "")
 
         return jsonify({
             "prediction": role,
@@ -449,6 +393,23 @@ def predict():
     except Exception as e:
         logger.error(f"Predict error: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 400
+
+
+@app.route("/api/engine/status", methods=["GET"])
+def engine_status():
+    """Returns dynamic model metadata and system intelligence status."""
+    meta = feature_encoders.get("metadata", {})
+    return jsonify({
+        "status": "online",
+        "engine_version": meta.get("model_version", "v4.0-multisector-calibrated"),
+        "train_date": meta.get("train_date", ""),
+        "accuracy": meta.get("test_accuracy", 0.95),
+        "top_3_accuracy": meta.get("top_3_accuracy", 0.995),
+        "macro_f1": meta.get("macro_f1", 0.95),
+        "canonical_roles_count": len(feature_encoders.get("canonical_roles", CANONICAL_ROLES)),
+        "calibration_temperature": feature_encoders.get("calibration_temperature", 0.2043),
+        "num_samples": meta.get("num_samples", 23250)
+    })
 
 
 # -------------------- RESUME PARSER --------------------

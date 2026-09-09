@@ -73,16 +73,21 @@
       </div>
 
       <!-- Animated count-up stats -->
-      <div class="stats-row">
+      <div class="stats-row" style="grid-template-columns: repeat(4, 1fr);">
         <div class="stat-card g-card">
           <div class="stat-icon-wrap">🎯</div>
-          <div class="stat-num" data-target="99" data-suffix="%+">0</div>
-          <div class="stat-label">Model Accuracy</div>
+          <div class="stat-num" data-target="95" data-suffix="%+">0</div>
+          <div class="stat-label">Calibrated Accuracy</div>
         </div>
         <div class="stat-card g-card">
           <div class="stat-icon-wrap">💼</div>
-          <div class="stat-num" data-target="15" data-suffix=" Roles">0</div>
-          <div class="stat-label">Supported Roles</div>
+          <div class="stat-num" data-target="31" data-suffix=" Roles">0</div>
+          <div class="stat-label">Canonical Roles</div>
+        </div>
+        <div class="stat-card g-card">
+          <div class="stat-icon-wrap">🌐</div>
+          <div class="stat-num" data-target="20" data-suffix=" Sectors">0</div>
+          <div class="stat-label">Industry Sectors</div>
         </div>
         <div class="stat-card g-card">
           <div class="stat-icon-wrap">📈</div>
@@ -120,18 +125,18 @@
       <div class="home-grid">
         <div class="g-card home-card">
           <div class="hc-icon">🎯</div>
-          <h3>Smart Prediction</h3>
-          <p>Advanced ML models predict job roles tailored to your unique profile and skills.</p>
+          <h3>Multi-Sector Prediction</h3>
+          <p>Multi-sector AI covering 20 industries with qualification gating &amp; career-switch intelligence.</p>
         </div>
         <div class="g-card home-card">
           <div class="hc-icon">📊</div>
           <h3>Track Growth</h3>
-          <p>All predictions saved permanently. Monitor career trends over time.</p>
+          <p>All predictions saved permanently. Monitor career trends and skill gap evolution over time.</p>
         </div>
         <div class="g-card home-card" style="cursor:pointer" onclick="switchTab('about')">
           <div class="hc-icon">⚙️</div>
           <h3>AI Architecture</h3>
-          <p>Explore our 180-tree model, 151 feature space, and 5-factor hybrid scoring.</p>
+          <p>Explore our 220-tree model, 172-dim feature space, gating logic, and 5-factor hybrid scoring.</p>
         </div>
       </div>
 
@@ -140,10 +145,10 @@
         <div class="df-top">
           <div class="df-brand">
             <div class="df-logo">Edu2<span>Job</span></div>
-            <p class="df-tagline">AI-Powered Career Role Prediction &amp; Educational Navigation System.</p>
+            <p class="df-tagline">AI-Powered Multi-Sector Career Role Prediction &amp; Educational Navigation System.</p>
             <div class="df-status-pill">
               <span class="live-pulse"></span>
-              <span>AI Engine Active (v2.0-calibrated)</span>
+              <span>AI Engine Active (v4.0 Multi-Sector)</span>
             </div>
           </div>
 
@@ -158,10 +163,10 @@
 
           <div class="df-links-col">
             <h4>AI Transparency</h4>
-            <a href="#" onclick="switchTab('about');return false">📐 151-Dim Pipeline</a>
-            <a href="#" onclick="switchTab('about');return false">🌲 180 Ensemble Trees</a>
-            <a href="#" onclick="switchTab('about');return false">⚖️ 5-Factor Formula</a>
-            <a href="#" onclick="switchTab('about');return false">💼 15 Canonical Roles</a>
+            <a href="#" onclick="switchTab('about');return false">📐 172-Dim Pipeline</a>
+            <a href="#" onclick="switchTab('about');return false">🌲 220 Ensemble Trees</a>
+            <a href="#" onclick="switchTab('about');return false">🛡️ Qualification Gating</a>
+            <a href="#" onclick="switchTab('about');return false">💼 31 Canonical Roles</a>
           </div>
 
           <div class="df-links-col">
@@ -222,7 +227,12 @@
                   <option value="" disabled selected></option>
                   <option>B.Tech</option><option>M.Tech</option><option>BCA</option>
                   <option>MCA</option><option>B.Sc</option><option>M.Sc</option>
-                  <option>MBA</option><option>PhD</option><option>BBA</option><option>B.Com</option>
+                  <option>B.E.</option><option>M.E.</option><option>MBA</option>
+                  <option>BBA</option><option>B.Com</option><option>M.Com</option>
+                  <option>MBBS</option><option>MD</option><option>BDS</option>
+                  <option>LLB</option><option>LLM</option><option>JD</option>
+                  <option>B.Arch</option><option>M.Arch</option><option>PhD</option>
+                  <option>Diploma</option><option>Other</option>
                 </select>
                 <label for="fl-degree">Degree *</label>
               </div>
@@ -230,12 +240,18 @@
                 <select name="major" id="fl-major" required>
                   <option value="" disabled selected></option>
                   <option>Computer Science</option><option>Information Technology</option>
-                  <option>Electronics</option><option>Mechanical</option>
-                  <option>Data Science</option><option>Artificial Intelligence</option>
-                  <option>Business</option><option>Mathematics</option>
-                  <option>Civil</option><option>Electrical</option>
+                  <option>Artificial Intelligence</option><option>Data Science</option>
+                  <option>Software Engineering</option><option>Electronics</option>
+                  <option>Mechanical</option><option>Civil</option>
+                  <option>Electrical</option><option>Medicine / Healthcare</option>
+                  <option>Law / Legal Studies</option><option>Architecture</option>
+                  <option>Finance</option><option>Accounting</option>
+                  <option>Human Resources</option><option>Marketing</option>
+                  <option>Supply Chain</option><option>Biology / Life Sciences</option>
+                  <option>Mathematics</option><option>Business Administration</option>
+                  <option>Other</option>
                 </select>
-                <label for="fl-major">Major *</label>
+                <label for="fl-major">Major / Specialization *</label>
               </div>
               <div class="fl-group">
                 <input type="number" name="cgpa" id="fl-cgpa" step="0.01" min="0" max="10" placeholder=" " required>
@@ -250,53 +266,84 @@
 
           <!-- Section B: Professional -->
           <div class="form-section">
-            <div class="form-section-label">💼 Professional Details</div>
+            <div class="form-section-label">💼 Professional &amp; Industry Details</div>
             <div class="form-grid">
               <div class="fl-group">
                 <select name="employed" id="fl-employed">
                   <option value="" disabled selected></option>
                   <option value="Yes">Currently Employed</option>
-                  <option value="No">Not Employed</option>
+                  <option value="No">Not Employed / Student</option>
                 </select>
                 <label for="fl-employed">Employment Status</label>
               </div>
               <div class="fl-group">
                 <select name="industry_preference" id="fl-industry">
                   <option value="" disabled selected></option>
-                  <option value="IT">IT / Software</option>
-                  <option value="Data Science">Data Science</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Healthcare">Healthcare</option>
-                  <option value="Education">Education</option>
-                  <option value="Consulting">Consulting</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Engineering">Engineering</option>
+                  <option value="IT">IT &amp; Software</option>
+                  <option value="AI &amp; Machine Learning">AI &amp; Machine Learning</option>
+                  <option value="Data &amp; Analytics">Data &amp; Analytics</option>
+                  <option value="Cloud &amp; DevOps">Cloud &amp; DevOps</option>
+                  <option value="Cybersecurity">Cybersecurity</option>
+                  <option value="Embedded &amp; IoT">Embedded &amp; IoT</option>
+                  <option value="Business &amp; Management">Business &amp; Management</option>
+                  <option value="Quality Assurance">Quality Assurance</option>
+                  <option value="UI/UX &amp; Design">UI/UX &amp; Design</option>
+                  <option value="Finance &amp; Banking">Finance &amp; Banking</option>
+                  <option value="Accounting &amp; Audit">Accounting &amp; Audit</option>
+                  <option value="Human Resources">Human Resources</option>
+                  <option value="Sales &amp; Marketing">Sales &amp; Marketing</option>
+                  <option value="Supply Chain &amp; Logistics">Supply Chain &amp; Logistics</option>
+                  <option value="Healthcare &amp; Life Sciences">Healthcare &amp; Life Sciences</option>
+                  <option value="Legal &amp; Compliance">Legal &amp; Compliance</option>
+                  <option value="Mechanical Engineering">Mechanical Engineering</option>
+                  <option value="Civil &amp; Structural">Civil &amp; Structural</option>
+                  <option value="Electrical &amp; Power">Electrical &amp; Power</option>
+                  <option value="Education &amp; Academic">Education &amp; Academic</option>
                 </select>
-                <label for="fl-industry">Industry Preference</label>
+                <label for="fl-industry">Industry Sector Preference</label>
               </div>
               <div class="fl-group full-width">
                 <input type="text" name="skills" id="fl-skills" placeholder=" ">
-                <label for="fl-skills">Skills (comma-separated, e.g. python, ml, sql)</label>
+                <label for="fl-skills">Skills (e.g., python, sql, autocad, financial modeling, legal research, figma)</label>
               </div>
               <div class="fl-group full-width">
                 <input type="text" name="certifications" id="fl-certs" placeholder=" ">
-                <label for="fl-certs">Certifications (e.g. AWS, Google ML, Azure)</label>
+                <label for="fl-certs">Certifications (e.g. AWS, CFA, Google Data, PMP, Six Sigma, Bar License)</label>
               </div>
             </div>
           </div>
 
           <button type="submit" class="predict-submit-btn" id="predictBtn">
             <span class="btn-text">🔮 Predict My Job Role</span>
-            <span class="btn-loading" style="display:none"><span class="spinner"></span>Analyzing your profile...</span>
+            <span class="btn-loading" style="display:none"><span class="spinner"></span>Analyzing 20 Industry Sectors...</span>
           </button>
         </form>
       </div>
 
       <!-- Result Section -->
       <div id="resultWrapper" style="display:none">
+        
+        <!-- Qualification Gating Alert (if applicable) -->
+        <div id="gatingAlertBox" class="gating-warning-box" style="display:none">
+          <div class="gwb-icon">🛡️</div>
+          <div class="gwb-body">
+            <h4>Academic Prerequisite Advisory</h4>
+            <p id="gatingAlertText"></p>
+          </div>
+        </div>
+
+        <!-- Career Switch Rationale (if applicable) -->
+        <div id="careerSwitchBox" class="career-switch-box" style="display:none">
+          <div class="csb-icon">🔄</div>
+          <div class="csb-body">
+            <h4>Cross-Domain Career Transition Detected</h4>
+            <p id="careerSwitchText"></p>
+          </div>
+        </div>
+
         <!-- Top 3 Roles Card -->
         <div class="g-card top-roles-card">
-          <h3 class="card-title" style="margin-bottom:1.2rem">🏆 Top Predicted Roles</h3>
+          <h3 class="card-title" style="margin-bottom:1.2rem">🏆 Top Predicted Roles (Multi-Sector Fit)</h3>
           <div class="top-roles-grid" id="topRolesGrid"></div>
         </div>
 
@@ -304,8 +351,8 @@
         <div class="g-card skill-gap-card" id="skillGapCard">
           <div class="sgc-header">
             <div>
-              <h3 class="card-title">🎯 AI Skill Gap Analysis</h3>
-              <p class="sgc-sub">Role Readiness for <strong id="sgTargetRole" style="color:var(--cyan)">—</strong></p>
+              <h3 class="card-title">🎯 AI Skill Gap &amp; Explainability</h3>
+              <p class="sgc-sub">Role Readiness Analysis for <strong id="sgTargetRole" style="color:var(--cyan)">—</strong></p>
             </div>
             <div class="sgc-boost-badge" id="sgBoostBadge">+35% Match Potential</div>
           </div>
@@ -329,26 +376,38 @@
               <div class="sg-pills" id="sgMissingPills"></div>
             </div>
           </div>
+
+          <!-- Explainability Factors (Positive vs Gaps) -->
+          <div class="explain-factors-row" id="explainFactorsRow">
+            <div class="ef-column">
+              <div class="ef-title ef-positive-title"><span>🌟</span> Key Recommendation Drivers</div>
+              <div class="ef-list" id="efPositiveList"></div>
+            </div>
+            <div class="ef-column">
+              <div class="ef-title ef-negative-title"><span>⚡</span> Areas for Upskilling &amp; Focus</div>
+              <div class="ef-list" id="efNegativeList"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Curated Learning Roadmap Card -->
         <div class="g-card roadmap-card" id="roadmapCard">
-          <h3 class="card-title" style="margin-bottom:0.3rem">🗺️ Step-by-Step Learning Roadmap</h3>
-          <p class="sgc-sub" style="margin-bottom:1.4rem">Curated phase-by-phase action plan with free official &amp; community tutorials</p>
+          <h3 class="card-title" style="margin-bottom:0.3rem">🗺️ Step-by-Step Learning Roadmap (4 Phases)</h3>
+          <p class="sgc-sub" style="margin-bottom:1.4rem">Curated phase-by-phase action plan with verified official resources</p>
           <div class="roadmap-timeline" id="roadmapTimeline"></div>
         </div>
 
         <!-- AI Mock Interview Questions Card -->
         <div class="g-card interview-card" id="interviewCard">
-          <h3 class="card-title" style="margin-bottom:0.3rem">💡 Top 5 Technical Interview Questions</h3>
+          <h3 class="card-title" style="margin-bottom:0.3rem">💡 Technical &amp; Domain Mock Interview Questions</h3>
           <p class="sgc-sub" style="margin-bottom:1.2rem">Frequently asked interview questions for this role with model answers</p>
           <div class="interview-accordion" id="interviewAccordion"></div>
         </div>
 
         <!-- All Role Confidences Bar Chart -->
         <div class="g-card chart-card">
-          <h3 class="card-title">📊 All Role Confidences</h3>
-          <div style="height:280px;margin-top:1rem;position:relative;width:100%"><canvas id="predictionChart"></canvas></div>
+          <h3 class="card-title">📊 Multi-Sector Role Alignment Scores</h3>
+          <div style="height:300px;margin-top:1rem;position:relative;width:100%"><canvas id="predictionChart"></canvas></div>
           <div class="predict-again-wrap">
             <button class="btn-predict-again" onclick="resetPredictForm(true)">🔮 Predict Again</button>
           </div>
@@ -618,29 +677,29 @@
       
       <!-- Hero Header -->
       <div class="about-hero g-card">
-        <div class="about-hero-badge">✦ Smart Career Guidance</div>
-        <h2>About <span class="hl">Edu2Job</span></h2>
+        <div class="about-hero-badge">✦ Multi-Sector AI Intelligence</div>
+        <h2>About <span class="hl">Edu2Job v4.0</span></h2>
         <p class="about-hero-sub">
-          Edu2Job bridges the gap between college education and industry careers. Using transparent machine learning, we analyze your skills, degree, and background to predict your ideal career path with actionable roadmaps and skill gap insights.
+          Edu2Job bridges academic learning and 20 real-world industry domains. Built on a calibrated 220-tree Random Forest ensemble, multi-tier skill weighting, qualification gating, and cross-domain career switching intelligence, we deliver realistic recommendations, 4-phase step-by-step roadmaps, and mock interview prep.
         </p>
       </div>
 
       <!-- 3 Key Value Pillars -->
       <div class="about-grid">
         <div class="about-card g-card">
-          <div class="ac-icon">🎯</div>
-          <h3>Smart Role Matching</h3>
-          <p>Instantly map your background to 15 top tech &amp; engineering career tracks with high-confidence predictions.</p>
+          <div class="ac-icon">🌐</div>
+          <h3>20 Industry Sectors</h3>
+          <p>Comprehensive career intelligence across AI, Software, Cloud, Cyber, Core Engineering, Healthcare, Law, Finance, Architecture &amp; Business.</p>
         </div>
         <div class="about-card g-card">
-          <div class="ac-icon">⚡</div>
-          <h3>Skill Gap Analysis</h3>
-          <p>See exactly which core technologies you already know and which high-demand skills you need to learn next.</p>
+          <div class="ac-icon">🛡️</div>
+          <h3>Qualification Gating</h3>
+          <p>Protects regulated professions (Doctors, Lawyers, Architects, CAs) requiring degree credentials while enabling open career switching.</p>
         </div>
         <div class="about-card g-card">
           <div class="ac-icon">🚀</div>
           <h3>Actionable Roadmaps</h3>
-          <p>Get curated learning milestones, free study resources, salary insights, and top interview questions for your dream role.</p>
+          <p>Get curated 4-phase learning milestones, free verified tutorials, salary ranges, and technical interview questions for 31 canonical roles.</p>
         </div>
       </div>
 
@@ -656,29 +715,29 @@
           <div class="pipeline-step">
             <div class="p-step-num">Step 1</div>
             <div class="p-step-icon">📄</div>
-            <h4>Input or Resume</h4>
-            <p>Enter your profile details or simply upload your PDF resume to auto-fill skills, CGPA, and degree in one click.</p>
+            <h4>Input or PDF Resume</h4>
+            <p>Enter your profile details or upload your PDF resume for token-bounded extraction across 250+ technical skill aliases.</p>
           </div>
 
           <div class="pipeline-step">
             <div class="p-step-num">Step 2</div>
             <div class="p-step-icon">🧠</div>
-            <h4>AI Skill Analysis</h4>
-            <p>Our 180-tree Random Forest model (calibrated <em>T = 0.1656</em>) evaluates your profile across 151 technical attributes and certifications.</p>
+            <h4>Multi-Sector ML Engine</h4>
+            <p>Our 220-tree Random Forest model (temperature-calibrated <em>T = 0.2043</em>) evaluates your profile across a 172-dimensional feature space.</p>
           </div>
 
           <div class="pipeline-step">
             <div class="p-step-num">Step 3</div>
             <div class="p-step-icon">⚖️</div>
-            <h4>Hybrid Fit Scoring</h4>
-            <p>Combines AI probability with practical skill overlap (40%), academics (15%), and experience for realistic match scores.</p>
+            <h4>Gated Hybrid Scoring</h4>
+            <p>Combines multi-tier skill fit (Core 3x, Important 2x), AI evidence, academic prerequisites, and career-switching incentives.</p>
           </div>
 
           <div class="pipeline-step">
             <div class="p-step-num">Step 4</div>
             <div class="p-step-icon">🎯</div>
-            <h4>Roadmaps &amp; Prep</h4>
-            <p>Unlock tailored study paths, interview prep questions, salary ranges, and 24/7 guidance from CareerBot.</p>
+            <h4>4-Phase Roadmaps &amp; Prep</h4>
+            <p>Receive milestone-based learning roadmaps, verified free tutorials, mock interview Q&amp;As, and 24/7 AI mentor guidance from CareerBot.</p>
           </div>
         </div>
       </div>
@@ -687,30 +746,30 @@
       <div class="g-card metrics-card">
         <div class="section-head-sm">
           <div class="sh-badge">📊 Verified AI Performance</div>
-          <h3>Engineered for Precision &amp; Reliability</h3>
-          <p>Audited benchmarks from our calibrated machine learning engine</p>
+          <h3>Engineered for Precision &amp; Realism</h3>
+          <p>Empirically verified benchmarks across 23,250 synthesized real-world candidate profiles</p>
         </div>
 
         <div class="metrics-grid" style="grid-template-columns: repeat(4, 1fr);">
           <div class="metric-item">
-            <div class="m-val hl-text">99.78%</div>
-            <div class="m-label">Test Accuracy</div>
-            <div class="m-sub">Verified test benchmark</div>
+            <div class="m-val hl-text">95.01%</div>
+            <div class="m-label">Top-1 Accuracy</div>
+            <div class="m-sub">99.51% Top-3 Accuracy</div>
           </div>
           <div class="metric-item">
-            <div class="m-val">180</div>
+            <div class="m-val">220</div>
             <div class="m-label">Decision Trees</div>
-            <div class="m-sub">Trained ensemble model</div>
+            <div class="m-sub">Calibrated ensemble (T=0.2043)</div>
           </div>
           <div class="metric-item">
-            <div class="m-val">151</div>
-            <div class="m-label">Evaluated Features</div>
-            <div class="m-sub">Skills, certs &amp; academics</div>
+            <div class="m-val">172</div>
+            <div class="m-label">Feature Dimensions</div>
+            <div class="m-sub">Bounded skills &amp; credentials</div>
           </div>
           <div class="metric-item">
-            <div class="m-val">15</div>
-            <div class="m-label">Career Roles</div>
-            <div class="m-sub">Recognized job tracks</div>
+            <div class="m-val">31</div>
+            <div class="m-label">Canonical Roles</div>
+            <div class="m-sub">Across 20 Industry Sectors</div>
           </div>
         </div>
       </div>
@@ -718,37 +777,37 @@
       <!-- Match Score Breakdown -->
       <div class="g-card formula-card">
         <div class="section-head-sm">
-          <div class="sh-badge">🧮 How Match Score is Calculated</div>
-          <h3>Transparent 5-Factor Career Fit</h3>
-          <p>We combine multiple factors so your prediction is balanced and trustworthy</p>
+          <div class="sh-badge">🧮 Transparent Scoring Formula</div>
+          <h3>Explainable Multi-Tier Hybrid Career Fit</h3>
+          <p>Balanced scoring combining machine learning probabilities, hierarchical skills, and academic prerequisites</p>
         </div>
 
         <div class="formula-bars">
           <div class="formula-row">
             <div class="fr-meta">
-              <span class="fr-name">⚡ Direct Skill Alignment</span>
+              <span class="fr-name">⚡ Multi-Tier Skill Alignment</span>
               <span class="fr-pct">40% Weight</span>
             </div>
             <div class="fr-track"><div class="fr-fill" style="width: 40%"></div></div>
-            <div class="fr-desc">How closely your current technical skills match the core requirements of the job role.</div>
+            <div class="fr-desc">Weighted skill fit prioritizing Core (3.0x), Important (2.0x), Supporting (1.0x), and General (0.5x) competencies.</div>
           </div>
 
           <div class="formula-row">
             <div class="fr-meta">
-              <span class="fr-name">🤖 AI Model Confidence</span>
+              <span class="fr-name">🤖 Calibrated AI Evidence</span>
               <span class="fr-pct">35% Weight</span>
             </div>
             <div class="fr-track"><div class="fr-fill" style="width: 35%"></div></div>
-            <div class="fr-desc">Calibrated prediction likelihood from our trained 180-tree Random Forest model.</div>
+            <div class="fr-desc">Calibrated prediction likelihood from our 220-tree Random Forest model with temperature scaling (T=0.2043).</div>
           </div>
 
           <div class="formula-row">
             <div class="fr-meta">
-              <span class="fr-name">🎓 Academic Background &amp; CGPA</span>
+              <span class="fr-name">🎓 Academic Prerequisites &amp; CGPA</span>
               <span class="fr-pct">15% Weight</span>
             </div>
             <div class="fr-track"><div class="fr-fill" style="width: 15%"></div></div>
-            <div class="fr-desc">Relevance of your degree program, academic major, and overall performance.</div>
+            <div class="fr-desc">Degree &amp; major alignment with qualification gating checks for legally regulated professions.</div>
           </div>
 
           <div class="formula-row">
@@ -757,7 +816,7 @@
               <span class="fr-pct">5% Weight</span>
             </div>
             <div class="fr-track"><div class="fr-fill" style="width: 5%"></div></div>
-            <div class="fr-desc">Years of industry exposure compared against entry or mid-level expectations.</div>
+            <div class="fr-desc">Years of relevant industry exposure evaluated against entry-level and mid-level benchmarks.</div>
           </div>
 
           <div class="formula-row">
@@ -766,7 +825,7 @@
               <span class="fr-pct">5% Weight</span>
             </div>
             <div class="fr-track"><div class="fr-fill" style="width: 5%"></div></div>
-            <div class="fr-desc">Your preferred career domain and verified professional certifications.</div>
+            <div class="fr-desc">Preferred domain alignment and recognized professional certifications (e.g. AWS, CFA, PMP, Six Sigma).</div>
           </div>
         </div>
       </div>
@@ -777,35 +836,74 @@
         <div class="tc-content">
           <h4>Clear &amp; Honest Guidance</h4>
           <p>
-            Your <strong>Career Match Score</strong> indicates how well your skills align with industry expectations for guidance and skill discovery. It serves as an educational roadmap to help you prepare — not a guarantee of a job offer.
+            Your <strong>Career Match Score</strong> indicates mathematical alignment with industry competency standards. It serves as an educational roadmap to discover strengths, bridge gaps, and prepare for interviews — not an automated employment guarantee.
           </p>
         </div>
       </div>
 
-      <!-- Supported Roles Directory -->
+      <!-- Supported Roles Directory with Sector Filters -->
       <div class="g-card roles-directory-card">
         <div class="section-head-sm">
           <div class="sh-badge">💼 Supported Careers</div>
-          <h3>15 Industry Job Tracks</h3>
-          <p>Career paths currently evaluated and recommended by the platform</p>
+          <h3>31 Canonical Roles Across 20 Industry Sectors</h3>
+          <p>Explore career roles evaluated, gated, and recommended by Edu2Job</p>
         </div>
 
-        <div class="roles-grid-modern">
-          <div class="role-pill-item"><span class="rp-icon">🤖</span><span class="rp-title">Data Scientist</span><span class="rp-cat">AI &amp; Data</span></div>
-          <div class="role-pill-item"><span class="rp-icon">🧠</span><span class="rp-title">Machine Learning Engineer</span><span class="rp-cat">AI &amp; Data</span></div>
-          <div class="role-pill-item"><span class="rp-icon">📊</span><span class="rp-title">Data Analyst</span><span class="rp-cat">Analytics</span></div>
-          <div class="role-pill-item"><span class="rp-icon">💻</span><span class="rp-title">Software Engineer</span><span class="rp-cat">Engineering</span></div>
-          <div class="role-pill-item"><span class="rp-icon">🌐</span><span class="rp-title">Full Stack Developer</span><span class="rp-cat">Engineering</span></div>
-          <div class="role-pill-item"><span class="rp-icon">🎨</span><span class="rp-title">Frontend Developer</span><span class="rp-cat">Engineering</span></div>
-          <div class="role-pill-item"><span class="rp-icon">⚙️</span><span class="rp-title">Backend Developer</span><span class="rp-cat">Engineering</span></div>
-          <div class="role-pill-item"><span class="rp-icon">♾️</span><span class="rp-title">DevOps Engineer</span><span class="rp-cat">Cloud &amp; Ops</span></div>
-          <div class="role-pill-item"><span class="rp-icon">☁️</span><span class="rp-title">Cloud Architect</span><span class="rp-cat">Cloud &amp; Ops</span></div>
-          <div class="role-pill-item"><span class="rp-icon">📈</span><span class="rp-title">Business Analyst</span><span class="rp-cat">Strategy</span></div>
-          <div class="role-pill-item"><span class="rp-icon">💵</span><span class="rp-title">Financial Analyst</span><span class="rp-cat">Finance</span></div>
-          <div class="role-pill-item"><span class="rp-icon">📋</span><span class="rp-title">Project Manager</span><span class="rp-cat">Management</span></div>
-          <div class="role-pill-item"><span class="rp-icon">⚡</span><span class="rp-title">Electrical Engineer</span><span class="rp-cat">Core Eng</span></div>
-          <div class="role-pill-item"><span class="rp-icon">🔧</span><span class="rp-title">Mechanical Engineer</span><span class="rp-cat">Core Eng</span></div>
-          <div class="role-pill-item"><span class="rp-icon">🏗️</span><span class="rp-title">Civil Engineer</span><span class="rp-cat">Core Eng</span></div>
+        <!-- Sector Filter Pills -->
+        <div class="sector-filter-wrap">
+          <button class="sector-filter-btn active" onclick="filterRolesDirectory('all', this)">All (31)</button>
+          <button class="sector-filter-btn" onclick="filterRolesDirectory('AI & Data', this)">AI &amp; Data (5)</button>
+          <button class="sector-filter-btn" onclick="filterRolesDirectory('Software & Cloud', this)">Software &amp; Cloud (7)</button>
+          <button class="sector-filter-btn" onclick="filterRolesDirectory('Core Engineering', this)">Core Engineering (4)</button>
+          <button class="sector-filter-btn" onclick="filterRolesDirectory('Finance & Accounting', this)">Finance &amp; Audit (3)</button>
+          <button class="sector-filter-btn" onclick="filterRolesDirectory('Healthcare & Law', this)">Healthcare &amp; Law (3)</button>
+          <button class="sector-filter-btn" onclick="filterRolesDirectory('Business & Operations', this)">Business &amp; Operations (9)</button>
+        </div>
+
+        <div class="roles-grid-modern" id="rolesGridModern">
+          <!-- AI & Data -->
+          <div class="role-pill-item" data-group="AI & Data"><span class="rp-icon">🤖</span><span class="rp-title">Data Scientist</span><span class="rp-cat">Data &amp; Analytics</span></div>
+          <div class="role-pill-item" data-group="AI & Data"><span class="rp-icon">🧠</span><span class="rp-title">Machine Learning Engineer</span><span class="rp-cat">AI &amp; ML</span></div>
+          <div class="role-pill-item" data-group="AI & Data"><span class="rp-icon">📊</span><span class="rp-title">Data Analyst</span><span class="rp-cat">Data &amp; Analytics</span></div>
+          <div class="role-pill-item" data-group="AI & Data"><span class="rp-icon">📈</span><span class="rp-title">BI Developer</span><span class="rp-cat">Data &amp; Analytics</span></div>
+          <div class="role-pill-item" data-group="AI & Data"><span class="rp-icon">🔬</span><span class="rp-title">AI Research Scientist</span><span class="rp-cat">AI &amp; ML</span></div>
+
+          <!-- Software & Cloud -->
+          <div class="role-pill-item" data-group="Software & Cloud"><span class="rp-icon">🌐</span><span class="rp-title">Full Stack Developer</span><span class="rp-cat">Software Dev</span></div>
+          <div class="role-pill-item" data-group="Software & Cloud"><span class="rp-icon">🎨</span><span class="rp-title">Frontend Developer</span><span class="rp-cat">Software Dev</span></div>
+          <div class="role-pill-item" data-group="Software & Cloud"><span class="rp-icon">⚙️</span><span class="rp-title">Backend Developer</span><span class="rp-cat">Software Dev</span></div>
+          <div class="role-pill-item" data-group="Software & Cloud"><span class="rp-icon">📱</span><span class="rp-title">Mobile Developer</span><span class="rp-cat">Software Dev</span></div>
+          <div class="role-pill-item" data-group="Software & Cloud"><span class="rp-icon">♾️</span><span class="rp-title">DevOps Engineer</span><span class="rp-cat">Cloud &amp; DevOps</span></div>
+          <div class="role-pill-item" data-group="Software & Cloud"><span class="rp-icon">☁️</span><span class="rp-title">Cloud Architect</span><span class="rp-cat">Cloud &amp; DevOps</span></div>
+          <div class="role-pill-item" data-group="Software & Cloud"><span class="rp-icon">🔒</span><span class="rp-title">Cybersecurity Analyst</span><span class="rp-cat">Cybersecurity</span></div>
+
+          <!-- Core Engineering -->
+          <div class="role-pill-item" data-group="Core Engineering"><span class="rp-icon">🔧</span><span class="rp-title">Mechanical Engineer</span><span class="rp-cat">Mechanical</span></div>
+          <div class="role-pill-item" data-group="Core Engineering"><span class="rp-icon">🏗️</span><span class="rp-title">Civil Engineer</span><span class="rp-cat">Civil &amp; Struct</span></div>
+          <div class="role-pill-item" data-group="Core Engineering"><span class="rp-icon">⚡</span><span class="rp-title">Electrical Engineer</span><span class="rp-cat">Electrical</span></div>
+          <div class="role-pill-item" data-group="Core Engineering"><span class="rp-icon">📟</span><span class="rp-title">Embedded Systems Engineer</span><span class="rp-cat">Embedded &amp; IoT</span></div>
+
+          <!-- Finance & Accounting -->
+          <div class="role-pill-item" data-group="Finance & Accounting"><span class="rp-icon">💵</span><span class="rp-title">Financial Analyst</span><span class="rp-cat">Finance</span></div>
+          <div class="role-pill-item" data-group="Finance & Accounting"><span class="rp-icon">🏦</span><span class="rp-title">Investment Banking Analyst</span><span class="rp-cat">Finance</span></div>
+          <div class="role-pill-item" data-group="Finance & Accounting"><span class="rp-icon">📑</span><span class="rp-title">Chartered Accountant (Regulated)</span><span class="rp-cat">Accounting</span></div>
+
+          <!-- Healthcare & Law -->
+          <div class="role-pill-item" data-group="Healthcare & Law"><span class="rp-icon">🩺</span><span class="rp-title">Medical Practitioner (Regulated)</span><span class="rp-cat">Healthcare</span></div>
+          <div class="role-pill-item" data-group="Healthcare & Law"><span class="rp-icon">🏥</span><span class="rp-title">Healthcare Data Analyst</span><span class="rp-cat">Healthcare</span></div>
+          <div class="role-pill-item" data-group="Healthcare & Law"><span class="rp-icon">⚖️</span><span class="rp-title">Corporate Legal Counsel (Regulated)</span><span class="rp-cat">Legal</span></div>
+
+          <!-- Business & Operations -->
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">📐</span><span class="rp-title">Architect (Regulated)</span><span class="rp-cat">Architecture</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">💼</span><span class="rp-title">Business Analyst</span><span class="rp-cat">Business</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">🚀</span><span class="rp-title">Product Manager</span><span class="rp-cat">Product</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">📋</span><span class="rp-title">IT Project Manager</span><span class="rp-cat">Management</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">🧪</span><span class="rp-title">QA Automation Engineer</span><span class="rp-cat">Quality Assur</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">✨</span><span class="rp-title">UI/UX Designer</span><span class="rp-cat">Design</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">👥</span><span class="rp-title">HR Specialist</span><span class="rp-cat">HR</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">📢</span><span class="rp-title">Digital Marketing Specialist</span><span class="rp-cat">Marketing</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">📦</span><span class="rp-title">Supply Chain Analyst</span><span class="rp-cat">Logistics</span></div>
+          <div class="role-pill-item" data-group="Business & Operations"><span class="rp-icon">🎓</span><span class="rp-title">Academic Educator (Regulated)</span><span class="rp-cat">Education</span></div>
         </div>
       </div>
 
@@ -814,58 +912,58 @@
         <div class="section-head-sm">
           <div class="sh-badge">❓ Common Questions</div>
           <h3>Frequently Asked Questions</h3>
-          <p>Quick answers to help you get the most out of Edu2Job</p>
+          <p>Quick answers about multi-sector predictions, qualification gating, and calibration</p>
         </div>
 
         <div class="faq-accordion">
           
           <div class="faq-item">
             <button class="faq-header" onclick="toggleFaqAccordion(this)">
-              <span class="faq-q">How does Edu2Job pick the best career role for me?</span>
+              <span class="faq-q">How does Edu2Job evaluate multi-sector career roles?</span>
               <span class="faq-icon">+</span>
             </button>
             <div class="faq-body">
-              <p>Edu2Job matches your degree, CGPA, experience, and technical skills against real industry patterns using a trained 180-tree Random Forest model. We blend the AI probability with your direct skill match so you get realistic, reliable recommendations.</p>
+              <p>Edu2Job uses a 220-tree Random Forest classifier calibrated on 23,250 realistic multi-sector profiles across 20 industries. It evaluates token-bounded skills, academic specialization, years of experience, and certifications without bias toward any single sector.</p>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-header" onclick="toggleFaqAccordion(this)">
-              <span class="faq-q">Can I just upload my PDF resume instead of typing?</span>
+              <span class="faq-q">What is Qualification Gating for regulated professions?</span>
               <span class="faq-icon">+</span>
             </button>
             <div class="faq-body">
-              <p>Yes! Simply click "📄 Upload PDF Resume" on the Predict tab. Our parser automatically detects your degree, major, CGPA, years of experience, skills, and certifications, instantly filling the form for you.</p>
+              <p>Certain professions (Doctors, Lawyers, Architects, Chartered Accountants, University Lecturers) legally require specific academic degrees (e.g. MBBS, LLB, B.Arch, Master's/PhD). For these roles, Edu2Job checks prerequisite degree eligibility. If ineligible, the match is clamped and flagged with an advisory.</p>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-header" onclick="toggleFaqAccordion(this)">
-              <span class="faq-q">What if I have missing skills for my dream role?</span>
+              <span class="faq-q">Can I switch careers into Tech/Analytics from a non-CS background?</span>
               <span class="faq-icon">+</span>
             </button>
             <div class="faq-body">
-              <p>When you run a prediction, we generate a Skill Gap Matrix highlighting the exact skills you're missing. You'll also receive curated 3-phase study roadmaps with free tutorials and top interview prep questions to help you bridge that gap.</p>
+              <p>Yes! For open professions like Data Analyst, Full Stack Developer, Business Analyst, Digital Marketer, or Supply Chain Analyst, Edu2Job rewards verified practical skills and transition certifications regardless of your undergraduate major.</p>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-header" onclick="toggleFaqAccordion(this)">
-              <span class="faq-q">What does the Career Match Percentage mean?</span>
+              <span class="faq-q">Can I upload my PDF resume instead of typing manually?</span>
               <span class="faq-icon">+</span>
             </button>
             <div class="faq-body">
-              <p>It represents how closely your current background aligns with the job profile. 85%+ is an Excellent Match, 70-84% is a Strong Match, 50-69% is a Good Match, and below 50% shows areas where upskilling will make the biggest impact.</p>
+              <p>Yes! Simply click "⚡ Upload Resume PDF" on the Predict tab. Our parser extracts your degree, major, CGPA, years of experience, and 250+ normalized skills using strict token-boundary matching with zero false positives.</p>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-header" onclick="toggleFaqAccordion(this)">
-              <span class="faq-q">Is my profile data private and permanently saved?</span>
+              <span class="faq-q">What is Temperature Calibration (T = 0.2043)?</span>
               <span class="faq-icon">+</span>
             </button>
             <div class="faq-body">
-              <p>Yes. Your account data, uploaded details, and prediction history are securely stored in your personal database account. Your history is never automatically deleted, allowing you to track your growth over time.</p>
+              <p>Raw machine learning probabilities are often overconfident or underconfident. We apply temperature scaling optimization (Platt scaling) with T = 0.2043 to ensure predicted probabilities match real-world empirical likelihoods.</p>
             </div>
           </div>
 
@@ -875,7 +973,7 @@
               <span class="faq-icon">+</span>
             </button>
             <div class="faq-body">
-              <p>CareerBot is your 24/7 AI career mentor powered by Mistral AI. You can click the chat bubble anytime to ask for interview tips, career transitions, resume feedback, or explanations of specific technologies.</p>
+              <p>CareerBot is your 24/7 AI mentor powered by Mistral AI. Click the chat bubble anytime to ask for interview preparation tips, roadmap explanations, resume optimization, or transition advice across any of our 20 industry sectors.</p>
             </div>
           </div>
 
@@ -889,12 +987,13 @@
           <h3>Modern Technologies &amp; Standards</h3>
         </div>
         <div class="tech-tags">
-          <span class="tech-badge">🐍 Python 3</span>
+          <span class="tech-badge">🐍 Python 3.11</span>
           <span class="tech-badge">🌶️ Flask Framework</span>
           <span class="tech-badge">🤖 Scikit-Learn</span>
-          <span class="tech-badge">🌲 Random Forest (180 Trees)</span>
+          <span class="tech-badge">🌲 Random Forest (220 Trees)</span>
+          <span class="tech-badge">🛡️ Qualification Gating</span>
           <span class="tech-badge">🔮 Mistral AI</span>
-          <span class="tech-badge">🐬 MySQL</span>
+          <span class="tech-badge">🐬 MySQL Database</span>
           <span class="tech-badge">📊 Chart.js</span>
           <span class="tech-badge">🎨 Glassmorphism UI</span>
         </div>
@@ -905,10 +1004,10 @@
         <div class="df-top">
           <div class="df-brand">
             <div class="df-logo">Edu2<span>Job</span></div>
-            <p class="df-tagline">AI-Powered Career Role Prediction &amp; Educational Navigation System.</p>
+            <p class="df-tagline">AI-Powered Multi-Sector Career Role Prediction &amp; Educational Navigation System.</p>
             <div class="df-status-pill">
               <span class="live-pulse"></span>
-              <span>AI Engine Active (v2.0-calibrated)</span>
+              <span>AI Engine Active (v4.0 Multi-Sector)</span>
             </div>
           </div>
 
@@ -923,10 +1022,10 @@
 
           <div class="df-links-col">
             <h4>AI Transparency</h4>
-            <a href="#" onclick="switchTab('about');return false">📐 151-Dim Pipeline</a>
-            <a href="#" onclick="switchTab('about');return false">🌲 180 Ensemble Trees</a>
-            <a href="#" onclick="switchTab('about');return false">⚖️ 5-Factor Formula</a>
-            <a href="#" onclick="switchTab('about');return false">💼 15 Canonical Roles</a>
+            <a href="#" onclick="switchTab('about');return false">📐 172-Dim Pipeline</a>
+            <a href="#" onclick="switchTab('about');return false">🌲 220 Ensemble Trees</a>
+            <a href="#" onclick="switchTab('about');return false">🛡️ Qualification Gating</a>
+            <a href="#" onclick="switchTab('about');return false">💼 31 Canonical Roles</a>
           </div>
 
           <div class="df-links-col">
@@ -1452,21 +1551,36 @@ function autoFillFromProfile() {
   showToast('Profile data loaded into form! ⚡', 'info');
 }
 
-// ===== ROLE COLORS & CATEGORIES =====
+// ===== ROLE COLORS, CATEGORIES & ICONS (31 CANONICAL ROLES) =====
 const ROLE_COLORS = {
-  'Data Scientist': 4, 'Machine Learning': 1, 'Data Analyst': 2,
-  'Software Engineer': 3, 'Frontend': 2, 'Backend': 4,
-  'Full Stack': 1, 'DevOps': 5, 'Cloud': 2,
-  'Project Manager': 6, 'Business Analyst': 5, 'Financial Analyst': 6,
-  'Electrical': 3, 'Mechanical': 5, 'Civil': 4
+  'Data Scientist': 4, 'Machine Learning': 1, 'Data Analyst': 2, 'BI Developer': 2, 'AI Research': 1,
+  'Software Engineer': 3, 'Frontend': 2, 'Backend': 4, 'Full Stack': 1, 'Mobile': 3,
+  'DevOps': 5, 'Cloud': 2, 'Cybersecurity': 6, 'Embedded': 5,
+  'Mechanical': 5, 'Civil': 4, 'Architect': 4, 'Electrical': 3,
+  'Financial': 6, 'Investment': 6, 'Chartered': 6,
+  'Medical': 7, 'Healthcare': 2, 'Legal': 7,
+  'Business Analyst': 5, 'Product Manager': 1, 'Project Manager': 5,
+  'QA Automation': 3, 'UI/UX': 7, 'HR': 7, 'Marketing': 7,
+  'Supply Chain': 5, 'Educator': 4
 };
 const COLOR_PALETTE = ['','#a855f7','#22d3ee','#3b82f6','#6366f1','#22c55e','#f59e0b','#ec4899'];
 const ROLE_CATEGORIES = {
-  'Data Scientist': 'Data Science & AI', 'Machine Learning': 'Data Science & AI', 'Data Analyst': 'Analytics & BI',
-  'Software Engineer': 'Software Eng', 'Frontend': 'Web Development', 'Backend': 'Cloud & Systems',
-  'Full Stack': 'Web Development', 'DevOps': 'Cloud & DevOps', 'Cloud': 'Cloud Infrastructure',
-  'Project Manager': 'Management', 'Business Analyst': 'Business & Strategy', 'Financial Analyst': 'Finance & Valuation',
-  'Electrical': 'Core Engineering', 'Mechanical': 'Core Engineering', 'Civil': 'Core Engineering'
+  'Data Scientist': 'Data & Analytics', 'Machine Learning Engineer': 'AI & Machine Learning',
+  'Data Analyst': 'Data & Analytics', 'BI Developer': 'Data & Analytics', 'AI Research Scientist': 'AI & Machine Learning',
+  'Software Engineer': 'Software Dev', 'Frontend Developer': 'Software Dev', 'Backend Developer': 'Software Dev',
+  'Full Stack Developer': 'Software Dev', 'Mobile Developer': 'Software Dev',
+  'DevOps Engineer': 'Cloud & DevOps', 'Cloud Solutions Architect': 'Cloud & DevOps',
+  'Cybersecurity Analyst': 'Cybersecurity', 'Embedded Systems Engineer': 'Embedded & IoT',
+  'Mechanical Engineer': 'Core Engineering', 'Civil Engineer': 'Core Engineering',
+  'Architect': 'Architecture & Design', 'Electrical Engineer': 'Core Engineering',
+  'Financial Analyst': 'Finance & Banking', 'Investment Banking Analyst': 'Finance & Banking',
+  'Chartered Accountant': 'Accounting & Audit', 'Medical Practitioner': 'Healthcare & Medicine',
+  'Healthcare Data Analyst': 'Healthcare & Life Sciences', 'Corporate Legal Counsel': 'Legal & Compliance',
+  'Business Analyst': 'Business & Strategy', 'Product Manager': 'Product Management',
+  'IT Project Manager': 'Project Management', 'QA Automation Engineer': 'Quality Assurance',
+  'UI/UX Designer': 'UI/UX Design', 'HR Specialist': 'Human Resources',
+  'Digital Marketing Specialist': 'Sales & Marketing', 'Supply Chain Analyst': 'Supply Chain & Logistics',
+  'Academic Educator': 'Education & Research'
 };
 
 function getRoleColor(role) {
@@ -1476,9 +1590,22 @@ function getRoleColor(role) {
 }
 
 function getRoleCategory(role) {
-  if (!role) return 'Career';
+  if (!role) return 'Technology & Engineering';
   for (let key in ROLE_CATEGORIES) { if (role.includes(key)) return ROLE_CATEGORIES[key]; }
   return 'Technology';
+}
+
+function filterRolesDirectory(group, btn) {
+  document.querySelectorAll('.sector-filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const items = document.querySelectorAll('#rolesGridModern .role-pill-item');
+  items.forEach(item => {
+    if (group === 'all' || item.getAttribute('data-group') === group) {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
 }
 
 // ===== RESUME UPLOAD & PARSING =====
@@ -1654,7 +1781,31 @@ function renderPredictionResult(result) {
   const sorted = [...result.graph_data].sort((a,b) => b.confidence - a.confidence);
   const medals = ['🥇 Rank 1','🥈 Rank 2','🥉 Rank 3'];
 
-  // Top 3 ranked cards
+  // 1. Qualification Gating Alert Handling
+  const gatingBox = document.getElementById('gatingAlertBox');
+  const gatingTxt = document.getElementById('gatingAlertText');
+  if (result.skill_gap && result.skill_gap.qualification_status && result.skill_gap.qualification_status.eligible === false) {
+    if (gatingBox && gatingTxt) {
+      gatingBox.style.display = 'flex';
+      gatingTxt.textContent = result.skill_gap.qualification_status.reason || 'Prerequisite degree or licensure is required for this role.';
+    }
+  } else if (gatingBox) {
+    gatingBox.style.display = 'none';
+  }
+
+  // 2. Career Switch Rationale Handling
+  const switchBox = document.getElementById('careerSwitchBox');
+  const switchTxt = document.getElementById('careerSwitchText');
+  if (result.skill_gap && result.skill_gap.career_switch && result.skill_gap.career_switch.is_switch) {
+    if (switchBox && switchTxt) {
+      switchBox.style.display = 'flex';
+      switchTxt.textContent = result.skill_gap.career_switch.rationale || 'Cross-disciplinary practical skills and certifications recognized for transition.';
+    }
+  } else if (switchBox) {
+    switchBox.style.display = 'none';
+  }
+
+  // 3. Top 3 ranked cards
   document.getElementById('topRolesGrid').innerHTML = sorted.slice(0,3).map((item,i) => `
     <div class="top-role-card ${i===0?'winner':''}" style="--rc:${getRoleColor(item.role)}">
       <div class="trc-medal">${medals[i]}</div>
@@ -1664,7 +1815,7 @@ function renderPredictionResult(result) {
       <div class="trc-bar-bg"><div class="trc-bar-fill" style="width:${(item.confidence*100).toFixed(1)}%"></div></div>
     </div>`).join('');
 
-  // Skill Gap Analysis Card
+  // 4. Skill Gap & Explainability Drivers
   if (result.skill_gap) {
     const sg = result.skill_gap;
     document.getElementById('sgTargetRole').textContent = sg.predicted_role || result.prediction;
@@ -1678,7 +1829,17 @@ function renderPredictionResult(result) {
     document.getElementById('sgMissingPills').innerHTML = (sg.missing_skills || []).map(s => `
       <span class="sg-pill missing">⚡ ${s}</span>`).join('') || '<span class="sg-empty">Great job! You have all core skills!</span>';
 
-    // Curated Learning Roadmap Timeline
+    // Explainability Drivers
+    const posList = document.getElementById('efPositiveList');
+    const negList = document.getElementById('efNegativeList');
+    if (posList) {
+      posList.innerHTML = (sg.positive_factors || []).map(f => `<div class="ef-item ef-item-pos"><span>✅</span><span>${f}</span></div>`).join('') || '<div class="ef-item">General background profile alignment</div>';
+    }
+    if (negList) {
+      negList.innerHTML = (sg.negative_factors || []).map(f => `<div class="ef-item ef-item-neg"><span>⚠️</span><span>${f}</span></div>`).join('') || '<div class="ef-item">No major skill gaps identified!</div>';
+    }
+
+    // 5. Curated Learning Roadmap Timeline
     if (sg.roadmap && sg.roadmap.length > 0) {
       document.getElementById('roadmapTimeline').innerHTML = sg.roadmap.map((phase, idx) => `
         <div class="rm-phase-item">
@@ -1704,7 +1865,7 @@ function renderPredictionResult(result) {
       `).join('');
     }
 
-    // AI Mock Interview Questions Accordion
+    // 6. AI Mock Interview Questions Accordion
     if (sg.interview_questions && sg.interview_questions.length > 0) {
       document.getElementById('interviewAccordion').innerHTML = sg.interview_questions.map((item, idx) => `
         <div class="interview-item">
@@ -1724,12 +1885,12 @@ function renderPredictionResult(result) {
     }
   }
 
-  // Confidence Chart
+  // 7. Confidence Bar Chart (Top 12 Multi-Sector Roles)
   if (window.predChart) { window.predChart.destroy(); window.predChart = null; }
-  const top10 = sorted.slice(0, 10);
-  const chartLabels = top10.map(i => i.role);
-  const chartData   = top10.map(i => parseFloat((i.confidence * 100).toFixed(1)));
-  const chartColors = top10.map((item, i) => i === 0 ? 'rgba(99, 102, 241, 0.9)' : `hsla(${240 + i * 20}, 75%, 60%, 0.65)`);
+  const top12 = sorted.slice(0, 12);
+  const chartLabels = top12.map(i => i.role);
+  const chartData   = top12.map(i => parseFloat((i.confidence * 100).toFixed(1)));
+  const chartColors = top12.map((item, i) => i === 0 ? 'rgba(99, 102, 241, 0.9)' : `hsla(${210 + i * 18}, 75%, 60%, 0.65)`);
 
   const chartCanvas = document.getElementById('predictionChart');
   window.predChart = new Chart(chartCanvas, {
@@ -1750,9 +1911,7 @@ function renderPredictionResult(result) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: false
-        },
+        legend: { display: false },
         tooltip: {
           callbacks: {
             label: ctx => ` Match Score: ${ctx.parsed.y}%`
