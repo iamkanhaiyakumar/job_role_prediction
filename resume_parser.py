@@ -126,6 +126,23 @@ def parse_resume_text(text: str) -> Dict[str, Any]:
     email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
     email = email_match.group(0) if email_match else ''
 
+    phone_match = re.search(r'(?:\+?91[-.\s]?)?[6-9]\d{9}\b|\b\d{5}[-.\s]?\d{5}\b', text)
+    phone = phone_match.group(0) if phone_match else ''
+
+    passout_match = re.search(r'\b(201[5-9]|202[0-9]|203[0-5])\b', text)
+    passout_year = int(passout_match.group(1)) if passout_match else 2026
+
+    college_name = ''
+    colleges = re.findall(r'([A-Z][\w\s&.,-]{2,40}\b(?:Institute|University|College|School of Engineering|IIT|NIT|IIIT|VIT|BITS|SRM)\b[\w\s&.,-]*)', text, re.IGNORECASE)
+    if colleges:
+        college_name = colleges[0].strip().title()
+    elif 'university' in lower_text or 'college' in lower_text:
+        for l in text.split('\n'):
+            if any(k in l.lower() for k in ['university', 'college', 'institute', 'technology']):
+                if len(l.strip()) < 80:
+                    college_name = l.strip().title()
+                    break
+
     name = ''
     lines = [l.strip() for l in text.split('\n') if l.strip()]
     for l in lines[:4]:
@@ -136,11 +153,14 @@ def parse_resume_text(text: str) -> Dict[str, Any]:
     return {
         'name': name,
         'email': email,
+        'phone': phone,
+        'college_name': college_name or 'College of Engineering & Technology',
         'degree': degree or 'B.Tech',
         'major': major or 'Computer Science',
         'cgpa': cgpa if cgpa is not None else 7.8,
         'experience': experience,
-        'skills': ', '.join(clean_skills[:12]),
+        'passout_year': passout_year,
+        'skills': ', '.join(clean_skills[:15]),
         'skills_list': clean_skills,
         'certifications': ', '.join(certs[:3]) if certs else ''
     }

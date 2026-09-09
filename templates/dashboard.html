@@ -470,7 +470,25 @@
           </div>
           <div class="plp-footer">
             <span class="plp-meta" id="plpMeta">Explore matching technical skills and tailored roadmaps.</span>
-            <button class="plp-action-btn" id="plpActionBtn" onclick="switchTab('predict')">🔮 Make Prediction →</button>
+            <button class="plp-action-btn" id="plpActionBtn" onclick="switchTab('predict')">Make Prediction →</button>
+          </div>
+        </div>
+
+        <!-- Profile Resume Auto-Fill Banner -->
+        <div class="profile-resume-banner">
+          <div class="prb-left">
+            <div class="prb-icon">📄</div>
+            <div class="prb-text">
+              <h4>Auto-Fill Profile from PDF Resume</h4>
+              <p>Upload your resume to automatically extract College, Degree, CGPA, Phone, and Technical Skills in 1 click.</p>
+            </div>
+          </div>
+          <div class="prb-right">
+            <input type="file" id="profileResumeFileInput" accept=".pdf" style="display:none" onchange="handleProfileResumeUpload(event)">
+            <button type="button" class="btn-profile-resume" id="btnProfileResumeUpload" onclick="document.getElementById('profileResumeFileInput').click()">
+              <span class="bpr-text">Upload Resume PDF</span>
+              <span class="bpr-loading" style="display:none">Extracting &amp; Saving...</span>
+            </button>
           </div>
         </div>
 
@@ -1306,6 +1324,71 @@ async function handleResumeUpload(e) {
 
   btn.querySelector('.btn-resume-text').style.display = 'inline-flex';
   btn.querySelector('.btn-resume-loading').style.display = 'none';
+  btn.disabled = false;
+  e.target.value = '';
+}
+
+// ===== PROFILE RESUME AUTO-FILL =====
+async function handleProfileResumeUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    showToast('Please upload a valid PDF resume file', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnProfileResumeUpload');
+  btn.querySelector('.bpr-text').style.display = 'none';
+  btn.querySelector('.bpr-loading').style.display = 'inline-flex';
+  btn.disabled = true;
+
+  const formData = new FormData();
+  formData.append('resume', file);
+
+  try {
+    const res = await fetch('/api/resume/parse', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await res.json();
+
+    if (res.ok && result.data) {
+      const d = result.data;
+      
+      const updatedData = {
+        name: cachedProfile.name || d.name || '',
+        email: cachedProfile.email || d.email || '',
+        phone: d.phone || cachedProfile.phone || '',
+        college_name: d.college_name || cachedProfile.college_name || '',
+        degree: d.degree || cachedProfile.degree || '',
+        major: d.major || cachedProfile.major || '',
+        cgpa: (d.cgpa !== null && d.cgpa !== undefined) ? d.cgpa : (cachedProfile.cgpa || 7.5),
+        experience: d.experience !== undefined ? d.experience : (cachedProfile.experience || 0),
+        passout_year: d.passout_year || cachedProfile.passout_year || 2026,
+        skills: d.skills || cachedProfile.skills || ''
+      };
+
+      // Auto-save to backend
+      const saveRes = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+
+      cachedProfile = updatedData;
+      pendingEdits = {};
+      loadProfile();
+
+      showToast(`Profile auto-filled & saved from resume! Extracted ${d.skills_list ? d.skills_list.length : 'all'} skills`, 'success');
+    } else {
+      showToast(result.error || 'Failed to parse resume PDF. Please try again.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while parsing resume file.', 'error');
+  }
+
+  btn.querySelector('.bpr-text').style.display = 'inline-flex';
+  btn.querySelector('.bpr-loading').style.display = 'none';
   btn.disabled = false;
   e.target.value = '';
 }
