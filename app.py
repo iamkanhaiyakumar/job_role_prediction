@@ -120,11 +120,10 @@ def profile():
 
     uid = session["user_id"]
 
-    try:
-        conn = get_db()
-        cur  = conn.cursor(dictionary=True)
-
-        if request.method == "GET":
+    if request.method == "GET":
+        try:
+            conn = get_db()
+            cur  = conn.cursor(dictionary=True)
             cur.execute("""
                 SELECT 
                     COALESCE(p.name, u.name) AS name,
@@ -145,7 +144,13 @@ def profile():
             cur.close()
             conn.close()
             return jsonify(row or {})
+        except Exception as e:
+            logger.warning(f"Profile fetch warning (DB unreachable): {e}")
+            return jsonify({})  # Return empty profile gracefully to prevent 500 error in DevTools
 
+    try:
+        conn = get_db()
+        cur  = conn.cursor(dictionary=True)
         data = request.json
         cur.execute(
             """
@@ -185,7 +190,7 @@ def profile():
 
     except Exception as e:
         logger.error(f"Profile error: {e}")
-        return jsonify({"error": "Server error"}), 500
+        return jsonify({"error": "Failed to save profile: " + str(e)}), 500
 
 
 # -------------------- PREDICTION --------------------
@@ -349,12 +354,12 @@ def predict():
                 cursor.execute("""
                     INSERT INTO predictions(user_id, degree, major, cgpa, employed,
                                             experience, skills, certifications,
-                                            industry, predicted_role, confidence, created_at)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                                            industry, predicted_role, confidence, resume_filename, created_at)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """, (session["user_id"], data.get("degree"), data.get("major"), cgpa,
                       data.get("employed"), exp, data.get("skills") or "",
                       data.get("certifications") or "", data.get("industry_preference") or "",
-                      role, top_conf, datetime.now()))
+                      role, top_conf, data.get("resume_filename") or None, datetime.now()))
                 conn.commit()
             finally:
                 cursor.close()
@@ -569,7 +574,7 @@ def history():
         cur = conn.cursor(dictionary=True)
         cur.execute(
             """
-            SELECT degree, major, cgpa, employed, experience, skills, certifications, industry, predicted_role, confidence, created_at
+            SELECT degree, major, cgpa, employed, experience, skills, certifications, industry, predicted_role, confidence, resume_filename, created_at
             FROM predictions
             WHERE user_id=%s
             ORDER BY id DESC

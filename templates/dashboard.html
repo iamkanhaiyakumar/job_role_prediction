@@ -1288,6 +1288,7 @@ async function handleResumeUpload(e) {
         }
       };
 
+      window.lastUploadedResume = file.name;
       setOpt('fl-degree', d.degree);
       setOpt('fl-major',  d.major);
       setInp('fl-cgpa',   d.cgpa);
@@ -1295,7 +1296,7 @@ async function handleResumeUpload(e) {
       setInp('fl-skills', d.skills);
       setInp('fl-certs',  d.certifications);
 
-      showToast(`Resume parsed! Extracted ${d.skills_list ? d.skills_list.length : 'all'} skills & profile data 📄⚡`, 'success');
+      showToast(`Resume parsed! Extracted ${d.skills_list ? d.skills_list.length : 'all'} skills & profile data`, 'success');
     } else {
       showToast(result.error || 'Failed to parse resume PDF. Please try again.', 'error');
     }
@@ -1318,6 +1319,9 @@ document.getElementById('predictForm').addEventListener('submit', async e => {
   btn.disabled = true;
 
   const data = Object.fromEntries(new FormData(e.target).entries());
+  if (window.lastUploadedResume) {
+    data.resume_filename = window.lastUploadedResume;
+  }
   try {
     const res    = await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     const result = await res.json();
@@ -1532,6 +1536,7 @@ function renderTimeline() {
     const confVal = (r.confidence !== null && r.confidence !== undefined && r.confidence !== '') ? parseFloat(r.confidence) : 94.2;
     const confScore = confVal.toFixed(1) + '% Match';
     const date  = r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const resumeTag = r.resume_filename ? `<span class="tc-resume-pill" title="Evaluated from: ${r.resume_filename}">Resume: ${r.resume_filename}</span>` : '';
     const skills = (r.skills || '').split(',').filter(Boolean).slice(0,6).map(s => `<span class="tc-skill">${s.trim()}</span>`).join('');
     const info = [r.degree, r.major && '• ' + r.major, r.cgpa && '• CGPA ' + r.cgpa, r.experience && '• ' + r.experience + 'y exp'].filter(Boolean).join(' ');
 
@@ -1544,6 +1549,7 @@ function renderTimeline() {
             <span class="tc-role">${r.predicted_role || '—'}</span>
             <span class="tc-cat-badge">${category}</span>
             <span class="tc-conf-badge">${confScore}</span>
+            ${resumeTag}
           </div>
           <div class="tc-right-meta">
             <span class="tc-date">${date}</span>
@@ -1881,6 +1887,7 @@ function openHistoryDetails(index) {
   document.getElementById('hmdExp').textContent = (r.experience !== null && r.experience !== undefined && r.experience !== '') ? (r.experience + ' Years') : '0 Years';
   document.getElementById('hmdEmployed').textContent = r.employed || 'No';
   document.getElementById('hmdIndustry').textContent = r.industry || 'Information Technology';
+  document.getElementById('hmdResume').textContent = r.resume_filename ? ('Resume (' + r.resume_filename + ')') : 'Manual Form Entry';
 
   // Render Skills Badges (no emojis)
   const skillsArr = (r.skills || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -2001,6 +2008,10 @@ checkHistoryNotice();
           <div class="h-detail-label">Employed Status</div>
           <div class="h-detail-value" id="hmdEmployed">No</div>
         </div>
+        <div class="h-detail-item">
+          <div class="h-detail-label">Source Evaluation</div>
+          <div class="h-detail-value" id="hmdResume">Manual Form Entry</div>
+        </div>
       </div>
 
       <!-- Skills Section -->
@@ -2031,6 +2042,21 @@ checkHistoryNotice();
 
 <style>
 /* History Timeline Card Integrated Action Layout */
+.tc-resume-pill {
+  padding: 0.16rem 0.55rem;
+  border-radius: 2rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: rgba(34, 211, 238, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  color: #22d3ee;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-flex;
+  align-items: center;
+}
 .tc-top-row {
   display: flex;
   align-items: flex-start;

@@ -97,10 +97,17 @@ def init_db():
             industry VARCHAR(100),
             predicted_role VARCHAR(100),
             confidence FLOAT NULL,
+            resume_filename VARCHAR(255) NULL,
             created_at DATETIME,
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     """)
+
+    # Ensure resume_filename column exists for existing DB tables
+    try:
+        c.execute("ALTER TABLE predictions ADD COLUMN resume_filename VARCHAR(255) NULL AFTER confidence")
+    except Exception:
+        pass
 
     conn.commit()
     c.close()
