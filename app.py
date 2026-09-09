@@ -125,7 +125,21 @@ def profile():
         cur  = conn.cursor(dictionary=True)
 
         if request.method == "GET":
-            cur.execute("SELECT * FROM profiles WHERE user_id=%s", (uid,))
+            cur.execute("""
+                SELECT 
+                    COALESCE(p.name, u.name) AS name,
+                    COALESCE(p.email, u.email) AS email,
+                    p.college_name,
+                    p.degree,
+                    p.major,
+                    p.cgpa,
+                    p.experience,
+                    p.skills,
+                    p.passout_year
+                FROM users u
+                LEFT JOIN profiles p ON u.id = p.user_id
+                WHERE u.id = %s
+            """, (uid,))
             row = cur.fetchone()
             cur.close()
             conn.close()
@@ -324,22 +338,26 @@ def predict():
             for m in career_matches
         ]
 
-        conn   = get_db()
-        cursor = conn.cursor()
-        try:  # NEW: try/finally so connection always closes
-            cursor.execute("""
-                INSERT INTO predictions(user_id, degree, major, cgpa, employed,
-                                        experience, skills, certifications,
-                                        industry, predicted_role, confidence, created_at)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """, (session["user_id"], data.get("degree"), data.get("major"), cgpa,
-                  data.get("employed"), exp, data.get("skills") or "",
-                  data.get("certifications") or "", data.get("industry_preference") or "",
-                  role, top_conf, datetime.now()))
-            conn.commit()
-        finally:
-            cursor.close()
-            conn.close()
+        # Save to DB safely without crashing prediction if DB is unreachable
+        try:
+            conn   = get_db()
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    INSERT INTO predictions(user_id, degree, major, cgpa, employed,
+                                            experience, skills, certifications,
+                                            industry, predicted_role, confidence, created_at)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """, (session["user_id"], data.get("degree"), data.get("major"), cgpa,
+                      data.get("employed"), exp, data.get("skills") or "",
+                      data.get("certifications") or "", data.get("industry_preference") or "",
+                      role, top_conf, datetime.now()))
+                conn.commit()
+            finally:
+                cursor.close()
+                conn.close()
+        except Exception as db_err:
+            logger.warning(f"Failed to record prediction in DB: {db_err}")
 
         gap_data = analyze_skill_gap(role, data.get("skills") or "")
 
@@ -548,7 +566,7 @@ def history():
         cur = conn.cursor(dictionary=True)
         cur.execute(
             """
-            SELECT degree, major, cgpa, experience, skills, predicted_role, confidence, created_at
+            SELECT degree, major, cgpa, employed, experience, skills, certifications, industry, predicted_role, confidence, created_at
             FROM predictions
             WHERE user_id=%s
             ORDER BY id DESC
