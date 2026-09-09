@@ -440,7 +440,7 @@
         </div>
 
         <!-- Profile Completion Meter -->
-        <div class="completion-meter">
+        <div class="completion-meter" id="completionMeter">
           <div class="cm-top">
             <span class="cm-label">Profile Completion</span>
             <span class="cm-pct" id="cmPct">0%</span>
@@ -474,14 +474,14 @@
           </div>
         </div>
 
-        <!-- Inline Click-to-Edit Grid -->
+        <!-- Profile Details Grid (Academic & Skills editable, Account credentials locked) -->
         <div class="profile-grid-new">
-          <div class="pg-item" onclick="activateInlineEdit(this, 'name', 'text', 'Full Name')">
-            <div class="pg-label"><span>Full Name</span><span class="pg-edit-hint">✎ Edit</span></div>
+          <div class="pg-item locked" title="Account Name is linked to registration">
+            <div class="pg-label"><span>Full Name</span><span class="pg-lock-hint">🔒 Account</span></div>
             <div class="pg-value" id="val_name">—</div>
           </div>
-          <div class="pg-item" onclick="activateInlineEdit(this, 'email', 'email', 'Email Address')">
-            <div class="pg-label"><span>Email Address</span><span class="pg-edit-hint">✎ Edit</span></div>
+          <div class="pg-item locked" title="Primary Email cannot be modified">
+            <div class="pg-label"><span>Email Address</span><span class="pg-lock-hint">🔒 Registered</span></div>
             <div class="pg-value" id="val_email">—</div>
           </div>
           <div class="pg-item" onclick="activateInlineEdit(this, 'college_name', 'text', 'College / University')">
@@ -1103,9 +1103,20 @@ async function renderProfileLatestPrediction() {
 }
 
 function updateCompletionMeter(d) {
+  const meterEl = document.getElementById('completionMeter');
   const fields = ['name','email','college_name','degree','major','cgpa','experience','passout_year','skills'];
   const filled = fields.filter(f => d[f] && String(d[f]).trim() !== '' && String(d[f]) !== '0');
   const pct = Math.round((filled.length / fields.length) * 100);
+
+  if (meterEl) {
+    if (pct >= 100) {
+      meterEl.style.display = 'none';
+      return;
+    } else {
+      meterEl.style.display = 'block';
+    }
+  }
+
   document.getElementById('cmPct').textContent = pct + '%';
   setTimeout(() => document.getElementById('cmFill').style.width = pct + '%', 100);
   const missing = fields.filter(f => !d[f] || String(d[f]).trim() === '' || String(d[f]) === '0');
@@ -1511,7 +1522,7 @@ function renderTimeline() {
   }
   noSearchMatch.style.display = 'none';
 
-  container.innerHTML = rows.map(r => {
+  container.innerHTML = rows.map((r, idx) => {
     const color = getRoleColor(r.predicted_role || '');
     const category = getRoleCategory(r.predicted_role || '');
     const confVal = (r.confidence !== null && r.confidence !== undefined && r.confidence !== '') ? parseFloat(r.confidence) : 94.2;
@@ -1534,6 +1545,12 @@ function renderTimeline() {
         </div>
         <div class="tc-info">${info}</div>
         <div class="tc-skills">${skills}</div>
+      </div>
+      <div class="tc-action-col">
+        <button class="tc-details-btn" onclick="openHistoryDetails(${idx})" title="View Complete Prediction Details">
+          <span>View Details</span>
+          <span class="tc-btn-arrow">🔍</span>
+        </button>
       </div>
     </div>`;
   }).join('');
@@ -1829,6 +1846,109 @@ function toggleFaqAccordion(btn) {
   }
 }
 
+// ===== HISTORY DETAILS MODAL HANDLERS =====
+let activeHistoryRow = null;
+
+function openHistoryDetails(index) {
+  let rows = [...allRows];
+  const search = (document.getElementById('historySearch').value || '').trim().toLowerCase();
+  if (search) {
+    rows = rows.filter(r => (r.predicted_role || '').toLowerCase().includes(search) || (r.skills || '').toLowerCase().includes(search));
+  }
+  if (sortOrder === 'oldest') rows.reverse();
+
+  const r = rows[index];
+  if (!r) return;
+  activeHistoryRow = r;
+
+  const color = getRoleColor(r.predicted_role || '');
+  const category = getRoleCategory(r.predicted_role || '');
+  const confVal = (r.confidence !== null && r.confidence !== undefined && r.confidence !== '') ? parseFloat(r.confidence) : 94.2;
+  const dateStr = r.created_at ? new Date(r.created_at).toLocaleString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  }) : '—';
+
+  document.getElementById('hmdRole').textContent = '🎯 ' + (r.predicted_role || '—');
+  document.getElementById('hmdRole').style.color = color || '#fff';
+  document.getElementById('hmdCategory').textContent = category;
+  document.getElementById('hmdConf').textContent = confVal.toFixed(1) + '% Match Score';
+  document.getElementById('hmdDate').textContent = '📅 ' + dateStr;
+
+  document.getElementById('hmdDegree').textContent = r.degree || '—';
+  document.getElementById('hmdMajor').textContent = r.major || '—';
+  document.getElementById('hmdCgpa').textContent = (r.cgpa !== null && r.cgpa !== undefined && r.cgpa !== '') ? r.cgpa : '—';
+  document.getElementById('hmdExp').textContent = (r.experience !== null && r.experience !== undefined && r.experience !== '') ? (r.experience + ' Years') : '0 Years';
+  document.getElementById('hmdEmployed').textContent = r.employed || 'No';
+  document.getElementById('hmdIndustry').textContent = r.industry || 'Information Technology';
+
+  // Render Skills Badges
+  const skillsArr = (r.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+  const skillsContainer = document.getElementById('hmdSkillsList');
+  if (skillsArr.length) {
+    skillsContainer.innerHTML = skillsArr.map(s => `<span class="h-chip">⚡ ${s}</span>`).join('');
+  } else {
+    skillsContainer.innerHTML = '<span style="color:var(--muted);font-size:0.85rem">No skills recorded</span>';
+  }
+
+  // Render Certifications Badges
+  const certsArr = (r.certifications || '').split(',').map(c => c.trim()).filter(Boolean);
+  const certsContainer = document.getElementById('hmdCertsList');
+  const certsBlock = document.getElementById('hmdCertsBlock');
+  if (certsArr.length) {
+    certsBlock.style.display = 'block';
+    certsContainer.innerHTML = certsArr.map(c => `<span class="h-chip h-chip-cert">📜 ${c}</span>`).join('');
+  } else {
+    certsBlock.style.display = 'none';
+  }
+
+  const modal = document.getElementById('historyDetailModal');
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeHistoryDetails() {
+  const modal = document.getElementById('historyDetailModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function repredictFromHistory() {
+  if (!activeHistoryRow) return;
+  closeHistoryDetails();
+  switchTab('predict');
+
+  const setOpt = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el || !val) return;
+    for (let o of el.options) { if (o.value.toLowerCase() === val.toLowerCase()) { o.selected = true; break; } }
+    el.closest('.fl-group')?.classList.add('has-value');
+  };
+  const setInp = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) {
+      el.value = val;
+      el.closest('.fl-group')?.classList.add('has-value');
+    }
+  };
+
+  setOpt('fl-degree', activeHistoryRow.degree);
+  setOpt('fl-major', activeHistoryRow.major);
+  setInp('fl-cgpa', activeHistoryRow.cgpa);
+  setInp('fl-exp', activeHistoryRow.experience);
+  setInp('fl-skills', activeHistoryRow.skills);
+  if (activeHistoryRow.certifications) setInp('fl-certs', activeHistoryRow.certifications);
+  if (activeHistoryRow.industry) setOpt('fl-industry', activeHistoryRow.industry);
+
+  showToast('Loaded details into prediction form! 🚀', 'info');
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeHistoryDetails();
+});
+
 // ===== INIT =====
 switchTab('home');
 loadHistory();
@@ -1837,5 +1957,343 @@ document.querySelectorAll('.stat-num[data-target]').forEach(el => countUp(el, pa
 loadProfile();
 checkHistoryNotice();
 </script>
+
+<!-- ===== HISTORY DETAIL MODAL POPUP ===== -->
+<div class="h-modal-overlay" id="historyDetailModal" onclick="if(event.target===this)closeHistoryDetails()">
+  <div class="h-modal-card">
+    <div class="h-modal-header">
+      <div>
+        <div class="h-modal-title" id="hmdRole">🎯 Data Scientist</div>
+        <div class="h-modal-badges">
+          <span class="tc-cat-badge" id="hmdCategory">Data Science & AI</span>
+          <span class="tc-conf-badge" id="hmdConf">90.8% Match</span>
+          <span style="font-size:0.8rem;color:var(--muted)" id="hmdDate">📅 09 Sept 2026</span>
+        </div>
+      </div>
+      <button class="h-modal-close" onclick="closeHistoryDetails()" title="Close details">✕</button>
+    </div>
+
+    <div class="h-modal-body">
+      <!-- Academic & Professional Stats Grid -->
+      <div class="h-detail-grid">
+        <div class="h-detail-item">
+          <div class="h-detail-label">🎓 Degree</div>
+          <div class="h-detail-value" id="hmdDegree">B.Tech</div>
+        </div>
+        <div class="h-detail-item">
+          <div class="h-detail-label">📚 Major / Specialization</div>
+          <div class="h-detail-value" id="hmdMajor">Computer Science</div>
+        </div>
+        <div class="h-detail-item">
+          <div class="h-detail-label">📈 Current CGPA</div>
+          <div class="h-detail-value" id="hmdCgpa">7.43 / 10</div>
+        </div>
+        <div class="h-detail-item">
+          <div class="h-detail-label">💼 Experience</div>
+          <div class="h-detail-value" id="hmdExp">0 Years</div>
+        </div>
+        <div class="h-detail-item">
+          <div class="h-detail-label">🏢 Target Industry</div>
+          <div class="h-detail-value" id="hmdIndustry">Information Technology</div>
+        </div>
+        <div class="h-detail-item">
+          <div class="h-detail-label">💼 Employed Status</div>
+          <div class="h-detail-value" id="hmdEmployed">No</div>
+        </div>
+      </div>
+
+      <!-- Skills Section -->
+      <div class="h-skills-block">
+        <div class="h-block-title">⚡ Evaluated Technical Skills</div>
+        <div class="h-chips-wrap" id="hmdSkillsList">
+          <span class="h-chip">⚡ Python</span>
+          <span class="h-chip">⚡ C</span>
+          <span class="h-chip">⚡ Javascript</span>
+          <span class="h-chip">⚡ Html</span>
+          <span class="h-chip">⚡ CSS</span>
+        </div>
+      </div>
+
+      <!-- Certifications Section -->
+      <div class="h-certs-block" id="hmdCertsBlock" style="display:none">
+        <div class="h-block-title">📜 Certifications & Licenses</div>
+        <div class="h-chips-wrap" id="hmdCertsList"></div>
+      </div>
+    </div>
+
+    <div class="h-modal-footer">
+      <button class="h-btn-secondary" onclick="closeHistoryDetails()">Close</button>
+      <button class="h-btn-primary" onclick="repredictFromHistory()">🔮 Re-run Prediction</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* History Timeline Card Action Button */
+.timeline-card {
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: all 0.25s ease;
+}
+.tc-action-col {
+  margin-left: auto;
+  padding-left: 1.2rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.tc-details-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: 0.85rem;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.tc-details-btn:hover {
+  background: var(--gradient, linear-gradient(135deg, #6366f1, #a855f7));
+  border-color: transparent;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+.tc-details-btn .tc-btn-arrow {
+  font-size: 0.9rem;
+  transition: transform 0.2s;
+}
+.tc-details-btn:hover .tc-btn-arrow {
+  transform: scale(1.2);
+}
+
+/* History Details Modal */
+.h-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 20, 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.h-modal-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+.h-modal-card {
+  background: rgba(18, 18, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.3);
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(20px) scale(0.96);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: #f0f0ff;
+}
+.h-modal-overlay.active .h-modal-card {
+  transform: translateY(0) scale(1);
+}
+.h-modal-header {
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(168,85,247,0.12));
+}
+.h-modal-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.h-modal-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+.h-modal-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.h-modal-close:hover {
+  background: rgba(239, 68, 68, 0.35);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: rotate(90deg);
+}
+.h-modal-body {
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.h-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+.h-detail-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.85rem 1rem;
+  border-radius: 0.9rem;
+}
+.h-detail-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a0a0c0;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+}
+.h-detail-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+}
+.h-skills-block, .h-certs-block {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.2rem;
+  border-radius: 1rem;
+}
+.h-block-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  color: #22d3ee;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.h-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.h-chip {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #e0e7ff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.h-chip-cert {
+  background: rgba(236, 72, 153, 0.15);
+  border-color: rgba(236, 72, 153, 0.35);
+  color: #fce7f3;
+}
+.h-modal-footer {
+  padding: 1.2rem 1.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  background: rgba(0, 0, 0, 0.2);
+}
+.h-btn-secondary {
+  padding: 0.65rem 1.2rem;
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.h-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.h-btn-primary {
+  padding: 0.65rem 1.4rem;
+  border-radius: 0.8rem;
+  background: var(--gradient, linear-gradient(135deg, #6366f1, #a855f7));
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+.h-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+}
+
+@media (max-width: 640px) {
+  .timeline-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tc-action-col {
+    margin-left: 0;
+    margin-top: 0.8rem;
+    padding-left: 0;
+    width: 100%;
+  }
+  .tc-details-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* Profile Locked Account Fields */
+.pg-item.locked {
+  cursor: default !important;
+  opacity: 0.88;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+.pg-item.locked:hover {
+  transform: none !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+}
+.pg-lock-hint {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--muted);
+  opacity: 0.8;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+</style>
 </body>
 </html>
