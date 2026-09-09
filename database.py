@@ -44,71 +44,91 @@ def get_db():
 
 
 def init_db():
-    """Create all tables if they don't exist."""
-    conn = get_db()
-    c = conn.cursor()
-
-    # Users table
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users(
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            name VARCHAR(255),
-            email VARCHAR(255) UNIQUE,
-            password BLOB
-        )
-    """)
-
-    # Profiles table
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS profiles(
-            user_id INT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            college_name VARCHAR(150) NULL,
-            email VARCHAR(100) NOT NULL,
-            phone VARCHAR(20) NULL,
-            degree VARCHAR(100),
-            major VARCHAR(100),
-            cgpa FLOAT,
-            experience INT,
-            skills TEXT,
-            passout_year INT,
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
-    """)
-
-    # Ensure phone column exists for existing DB tables
+    """Create all tables and auto-migrate missing columns if they don't exist."""
     try:
-        c.execute("ALTER TABLE profiles ADD COLUMN phone VARCHAR(20) NULL AFTER email")
-    except Exception:
-        pass
+        conn = get_db()
+        c = conn.cursor()
 
-    # Predictions table
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS predictions(
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            user_id INT,
-            degree VARCHAR(100),
-            major VARCHAR(100),
-            cgpa FLOAT,
-            employed VARCHAR(50),
-            experience INT,
-            skills TEXT,
-            certifications TEXT,
-            industry VARCHAR(100),
-            predicted_role VARCHAR(100),
-            confidence FLOAT NULL,
-            resume_filename VARCHAR(255) NULL,
-            created_at DATETIME,
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
-    """)
+        # Users table
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS users(
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                name VARCHAR(255),
+                email VARCHAR(255) UNIQUE,
+                password BLOB
+            )
+        """)
 
-    # Ensure resume_filename column exists for existing DB tables
-    try:
-        c.execute("ALTER TABLE predictions ADD COLUMN resume_filename VARCHAR(255) NULL AFTER confidence")
-    except Exception:
-        pass
+        # Profiles table
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS profiles(
+                user_id INT PRIMARY KEY,
+                name VARCHAR(100) NULL,
+                college_name VARCHAR(150) NULL,
+                email VARCHAR(100) NULL,
+                phone VARCHAR(20) NULL,
+                degree VARCHAR(100) NULL,
+                major VARCHAR(100) NULL,
+                cgpa FLOAT NULL,
+                experience INT NULL,
+                skills TEXT NULL,
+                passout_year INT NULL,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            )
+        """)
 
-    conn.commit()
-    c.close()
-    conn.close()
+        # Auto-migrate any missing columns for existing TiDB/MySQL profiles tables
+        profile_cols = [
+            ("name", "VARCHAR(100) NULL"),
+            ("email", "VARCHAR(100) NULL"),
+            ("phone", "VARCHAR(20) NULL"),
+            ("college_name", "VARCHAR(150) NULL"),
+            ("degree", "VARCHAR(100) NULL"),
+            ("major", "VARCHAR(100) NULL"),
+            ("cgpa", "FLOAT NULL"),
+            ("experience", "INT NULL"),
+            ("skills", "TEXT NULL"),
+            ("passout_year", "INT NULL"),
+        ]
+        for col_name, col_type in profile_cols:
+            try:
+                c.execute(f"ALTER TABLE profiles ADD COLUMN {col_name} {col_type}")
+            except Exception:
+                pass
+
+        # Predictions table
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS predictions(
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT,
+                degree VARCHAR(100),
+                major VARCHAR(100),
+                cgpa FLOAT,
+                employed VARCHAR(50),
+                experience INT,
+                skills TEXT,
+                certifications TEXT,
+                industry VARCHAR(100),
+                predicted_role VARCHAR(100),
+                confidence FLOAT NULL,
+                resume_filename VARCHAR(255) NULL,
+                created_at DATETIME,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            )
+        """)
+
+        pred_cols = [
+            ("confidence", "FLOAT NULL"),
+            ("resume_filename", "VARCHAR(255) NULL"),
+        ]
+        for col_name, col_type in pred_cols:
+            try:
+                c.execute(f"ALTER TABLE predictions ADD COLUMN {col_name} {col_type}")
+            except Exception:
+                pass
+
+        conn.commit()
+        c.close()
+        conn.close()
+    except Exception as e:
+        print("init_db note:", e)

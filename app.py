@@ -125,44 +125,46 @@ def profile():
     uid = session["user_id"]
 
     if request.method == "GET":
+        profile_data = {
+            "name": session.get("user_name", ""),
+            "email": session.get("user_email", ""),
+            "phone": "",
+            "college_name": "",
+            "degree": "",
+            "major": "",
+            "cgpa": "",
+            "experience": "",
+            "skills": "",
+            "passout_year": ""
+        }
         try:
             conn = get_db()
             cur  = conn.cursor(dictionary=True)
-            cur.execute("""
-                SELECT 
-                    COALESCE(p.name, u.name) AS name,
-                    COALESCE(p.email, u.email) AS email,
-                    p.phone,
-                    p.college_name,
-                    p.degree,
-                    p.major,
-                    p.cgpa,
-                    p.experience,
-                    p.skills,
-                    p.passout_year
-                FROM users u
-                LEFT JOIN profiles p ON u.id = p.user_id
-                WHERE u.id = %s
-            """, (uid,))
-            row = cur.fetchone()
+
+            # Step 1: Always get user's registered name and email
+            cur.execute("SELECT name, email FROM users WHERE id = %s", (uid,))
+            user_row = cur.fetchone()
+            if user_row:
+                if user_row.get("name"): profile_data["name"] = user_row["name"]
+                if user_row.get("email"): profile_data["email"] = user_row["email"]
+
+            # Step 2: Fetch profile details if row exists
+            try:
+                cur.execute("SELECT * FROM profiles WHERE user_id = %s", (uid,))
+                p_row = cur.fetchone()
+                if p_row:
+                    for k, v in p_row.items():
+                        if v is not None and str(v).strip() != "":
+                            profile_data[k] = v
+            except Exception as pe:
+                logger.warning(f"Profiles table select note: {pe}")
+
             cur.close()
             conn.close()
-            if row:
-                if not row.get("name"):
-                    row["name"] = session.get("user_name", "")
-                if not row.get("email"):
-                    row["email"] = session.get("user_email", "")
-                return jsonify(row)
-            return jsonify({
-                "name": session.get("user_name", ""),
-                "email": session.get("user_email", "")
-            })
+            return jsonify(profile_data)
         except Exception as e:
-            logger.warning(f"Profile fetch warning (DB unreachable): {e}")
-            return jsonify({
-                "name": session.get("user_name", ""),
-                "email": session.get("user_email", "")
-            })
+            logger.warning(f"Profile fetch warning: {e}")
+            return jsonify(profile_data)
 
     try:
         conn = get_db()
