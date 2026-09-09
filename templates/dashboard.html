@@ -433,8 +433,8 @@
         <div class="profile-header-new">
           <div class="profile-initials-circle" id="profileInitialsCircle">?</div>
           <div class="ph-info">
-            <div class="ph-name-badges">
-              <h3 id="displayName">—</h3>
+            <h3 id="displayName">—</h3>
+            <div class="ph-badges-row">
               <span class="role-tag">Student / Professional</span>
               <span class="ph-location-badge" id="hdrLocationBadge" onclick="editHeaderLocation()" title="Click to edit location">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -458,20 +458,6 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
               <span>Portfolio</span>
             </a>
-          </div>
-
-          <!-- Creative Profile Bio / About Me Quote Box -->
-          <div class="ph-bio-quote-card" id="phBioCard" onclick="editHeaderBio()" title="Click to edit your bio / career objective">
-            <div class="ph-bio-left-accent">
-              <div class="ph-bio-icon">✨</div>
-            </div>
-            <div class="ph-bio-text-wrap">
-              <div class="ph-bio-label">
-                <span>ABOUT &amp; CAREER OBJECTIVE</span>
-                <span class="ph-bio-edit-hint">✎ Click to Edit</span>
-              </div>
-              <div class="ph-bio-content" id="hdrBioText">“Click here to add your personal summary, career objectives, or brief background...”</div>
-            </div>
           </div>
         </div>
 
@@ -1179,14 +1165,6 @@ function editHeaderLocation() {
   }
 }
 
-function editHeaderBio() {
-  const bioItem = document.getElementById('val_bio')?.closest('.pg-item');
-  if (bioItem) {
-    bioItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    bioItem.click();
-  }
-}
-
 async function loadProfile() {
   const res = await fetch('/api/profile');
   if (!res.ok) return;
@@ -1209,10 +1187,6 @@ async function loadProfile() {
   // Header location badge
   const locEl = document.getElementById('hdrLocationText');
   if (locEl) locEl.textContent = (d.location && String(d.location).trim()) ? d.location : 'Add Location';
-
-  // Header bio card
-  const bioEl = document.getElementById('hdrBioText');
-  if (bioEl) bioEl.textContent = (d.bio && String(d.bio).trim()) ? `“${d.bio}”` : '“Click here to add your personal summary, career objectives, or brief background...”';
 
   // Render values in grid
   const fields = ['name','email','phone','location','college_name','degree','major','cgpa','experience','passout_year','bio','skills','linkedin','github','portfolio'];
@@ -1348,10 +1322,6 @@ function activateInlineEdit(itemEl, fieldKey, type, placeholder) {
       const locVal = pendingEdits.location !== undefined ? pendingEdits.location : (cachedProfile.location || '');
       const locEl = document.getElementById('hdrLocationText');
       if (locEl) locEl.textContent = (locVal && locVal.trim()) ? locVal : 'Add Location';
-    } else if (fieldKey === 'bio') {
-      const bioVal = pendingEdits.bio !== undefined ? pendingEdits.bio : (cachedProfile.bio || '');
-      const bioEl = document.getElementById('hdrBioText');
-      if (bioEl) bioEl.textContent = (bioVal && bioVal.trim()) ? `“${bioVal}”` : '“Click here to add your personal summary, career objectives, or brief background...”';
     }
   };
 

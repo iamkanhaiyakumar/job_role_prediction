@@ -107,11 +107,21 @@ def init_db():
                 pass
             
         # Ensure any legacy columns like location, education, target_role are nullable
-        for leg_col in ["location", "education", "experience", "target_role", "phone", "bio", "linkedin", "github", "portfolio"]:
+        for leg_col in ["location", "education", "target_role", "phone", "linkedin", "github", "portfolio"]:
             try:
                 c.execute(f"ALTER TABLE profiles MODIFY COLUMN {leg_col} VARCHAR(255) NULL")
             except Exception:
                 pass
+
+        # Explicitly ensure bio and skills are TEXT type for long descriptions
+        try:
+            c.execute("ALTER TABLE profiles MODIFY COLUMN bio TEXT NULL")
+        except Exception:
+            pass
+        try:
+            c.execute("ALTER TABLE profiles MODIFY COLUMN skills TEXT NULL")
+        except Exception:
+            pass
 
         # Predictions table
         c.execute("""
