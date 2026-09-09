@@ -57,11 +57,13 @@ init_db()
 # -------------------- AUTH --------------------
 @app.route("/register", methods=["POST"])
 def register():
-    data = request.json
-    name, email, password = data.get("name"), data.get("email"), data.get("password")
+    data = request.json or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
 
     if not (name and email and password):
-        return jsonify({"error": "Missing fields"}), 400
+        return jsonify({"error": "Name, email, and password are required"}), 400
 
     hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
@@ -69,20 +71,54 @@ def register():
         conn = get_db()
         cur  = conn.cursor()
         cur.execute(
-            "INSERT INTO users(name,email,password) VALUES(%s,%s,%s)",
+            "INSERT INTO users(name, email, password) VALUES(%s, %s, %s)",
             (name, email, hashed),
+        )
+        user_id = cur.lastrowid
+
+        # Insert educational/base profile details provided during registration
+        college_name = (data.get("college_name") or data.get("college") or "").strip()
+        degree = (data.get("degree") or "").strip()
+        major = (data.get("major") or "").strip()
+        phone = (data.get("phone") or "").strip()
+        try:
+            cgpa = float(data.get("cgpa") or 0.0)
+        except (ValueError, TypeError):
+            cgpa = 0.0
+        try:
+            passout_year = int(data.get("passout_year") or 0)
+        except (ValueError, TypeError):
+            passout_year = 0
+
+        cur.execute(
+            """
+            INSERT INTO profiles(user_id, name, email, phone, college_name, degree, major, cgpa, passout_year)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                name=VALUES(name),
+                email=VALUES(email),
+                phone=VALUES(phone),
+                college_name=VALUES(college_name),
+                degree=VALUES(degree),
+                major=VALUES(major),
+                cgpa=VALUES(cgpa),
+                passout_year=VALUES(passout_year)
+            """,
+            (user_id, name, email, phone, college_name, degree, major, cgpa, passout_year)
         )
         conn.commit()
         cur.close()
         conn.close()
+
+        session["user_id"] = user_id
         session["user_name"] = name
         session["user_email"] = email
-        return jsonify({"message": "Registered"})
+        return jsonify({"message": "Registered successfully", "user_id": user_id})
     except mysql.connector.errors.IntegrityError:
-        return jsonify({"error": "Email already exists"}), 400
+        return jsonify({"error": "Email already registered. Please sign in instead."}), 400
     except Exception as e:
         logger.error(f"Register error: {e}")
-        return jsonify({"error": "Server error"}), 500
+        return jsonify({"error": "Registration failed: " + str(e)}), 500
 
 
 @app.route("/api/login", methods=["POST"])

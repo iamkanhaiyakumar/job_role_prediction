@@ -473,50 +473,40 @@ if(rem){
   document.getElementById('rememberMe').checked = true;
 }
 
-// Register (sends account + profile data)
+// Register (sends account + profile data atomically)
 registerForm.addEventListener('submit',async e=>{
   e.preventDefault();
   const btn=document.getElementById('regBtn');
   regMsg.style.display='none';
-  btn.classList.add('loading');btn.textContent='Creating account...';
+  btn.classList.add('loading');btn.textContent='Creating account & profile...';
 
-  // Step 1: Register user
-  const{ok,data}=await postJson('/register',{
-    name:document.getElementById('regName').value.trim(),
-    email:document.getElementById('regEmail').value.trim(),
-    password:document.getElementById('regPassword').value
-  });
+  const regPayload = {
+    name: document.getElementById('regName').value.trim(),
+    email: document.getElementById('regEmail').value.trim(),
+    password: document.getElementById('regPassword').value,
+    phone: document.getElementById('regPhone') ? document.getElementById('regPhone').value.trim() : '',
+    college_name: document.getElementById('regCollege').value.trim(),
+    degree: document.getElementById('regDegree').value.trim(),
+    major: document.getElementById('regMajor').value.trim(),
+    cgpa: parseFloat(document.getElementById('regCgpa').value) || 0,
+    passout_year: parseInt(document.getElementById('regPassout').value) || 2026
+  };
 
-  if(!ok){showMsg(regMsg,data.error||'Registration failed','error');btn.classList.remove('loading');btn.textContent='Create Account 🚀';return}
+  const {ok, data} = await postJson('/register', regPayload);
 
-  // Step 2: Auto-login to save profile
-  const loginRes=await postJson('/api/login',{
-    email:document.getElementById('regEmail').value.trim(),
-    password:document.getElementById('regPassword').value
-  });
-
-  if(loginRes.ok){
-    await postJson('/api/profile',{
-      name:document.getElementById('regName').value.trim(),
-      email:document.getElementById('regEmail').value.trim(),
-      phone:document.getElementById('regPhone') ? document.getElementById('regPhone').value.trim() : '',
-      college_name:document.getElementById('regCollege').value.trim(),
-      degree:document.getElementById('regDegree').value.trim(),
-      major:document.getElementById('regMajor').value.trim(),
-      cgpa:document.getElementById('regCgpa').value||0,
-      experience:0,
-      skills:'',
-      passout_year:document.getElementById('regPassout').value||0
-    });
+  if(!ok){
+    showMsg(regMsg, data.error || 'Registration failed', 'error');
+    btn.classList.remove('loading');
+    btn.textContent='Create Account 🚀';
+    return;
   }
 
-  showMsg(regMsg,'✅ Account created successfully! Redirecting...','success');
-  registerForm.reset();document.getElementById('pwBar').style.width='0';
+  showMsg(regMsg,'✅ Account & profile created successfully! Redirecting...','success');
+  registerForm.reset();
+  if(document.getElementById('pwBar')) document.getElementById('pwBar').style.width='0';
   setTimeout(()=>{
-    if(loginRes.ok){window.location.href='/dashboard'}
-    else{registerSection.classList.add('hidden');loginSection.classList.remove('hidden');goToStep(1)}
-  },800);
-  btn.classList.remove('loading');btn.textContent='Create Account 🚀';
+    window.location.href = '/dashboard';
+  }, 600);
 });
 </script>
 </body>

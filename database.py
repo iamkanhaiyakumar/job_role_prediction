@@ -95,6 +95,17 @@ def init_db():
                 c.execute(f"ALTER TABLE profiles ADD COLUMN {col_name} {col_type}")
             except Exception:
                 pass
+            try:
+                c.execute(f"ALTER TABLE profiles MODIFY COLUMN {col_name} {col_type}")
+            except Exception:
+                pass
+            
+        # Ensure any legacy columns like location, education, target_role are nullable
+        for leg_col in ["location", "education", "experience", "target_role", "phone", "bio", "linkedin", "github", "portfolio"]:
+            try:
+                c.execute(f"ALTER TABLE profiles MODIFY COLUMN {leg_col} VARCHAR(255) NULL")
+            except Exception:
+                pass
 
         # Predictions table
         c.execute("""
