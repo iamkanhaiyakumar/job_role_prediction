@@ -391,10 +391,53 @@ button{cursor:pointer;border:none;font-family:inherit;}
   box-shadow:0 0 25px rgba(99,102,241,0.3);flex-shrink:0;
   letter-spacing:-1px;
 }
-.ph-info{flex:1;min-width:200px;}
-.ph-info h3{font-size:1.2rem;font-weight:700;margin-bottom:0.25rem;}
-.role-tag{display:inline-block;padding:0.2rem 0.7rem;border-radius:2rem;background:rgba(168,85,247,0.1);color:var(--purple);font-size:0.73rem;font-weight:600;}
-.ph-email{font-size:0.8rem;color:var(--muted);margin-top:0.3rem;}
+.ph-info{flex:1;min-width:260px;}
+.ph-name-badges{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.25rem;}
+.ph-info h3{font-size:1.25rem;font-weight:700;margin:0;}
+.role-tag{display:inline-block;padding:0.2rem 0.65rem;border-radius:2rem;background:rgba(168,85,247,0.12);color:var(--purple);font-size:0.73rem;font-weight:600;}
+.ph-location-badge{
+  display:inline-flex;align-items:center;gap:0.35rem;padding:0.22rem 0.65rem;border-radius:2rem;
+  background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);color:var(--cyan);
+  font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s ease;
+}
+.ph-location-badge:hover{
+  background:rgba(34,211,238,0.2);border-color:var(--cyan);transform:translateY(-1px);
+  box-shadow:0 3px 12px rgba(34,211,238,0.25);
+}
+.ph-chip-edit-icon{font-size:0.7rem;opacity:0.6;transition:opacity 0.2s;}
+.ph-location-badge:hover .ph-chip-edit-icon{opacity:1;}
+.ph-email{font-size:0.8rem;color:var(--muted);margin-top:0.2rem;}
+
+/* Creative Profile Bio / About Card */
+.ph-bio-quote-card{
+  width:100%;margin-top:1.1rem;padding:0.95rem 1.25rem;border-radius:0.95rem;
+  background:linear-gradient(135deg,rgba(255,255,255,0.035) 0%,rgba(99,102,241,0.06) 100%);
+  border:1px solid rgba(99,102,241,0.25);display:flex;align-items:flex-start;gap:0.9rem;
+  position:relative;overflow:hidden;cursor:pointer;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 4px 16px rgba(0,0,0,0.15);
+}
+.ph-bio-quote-card::before{
+  content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+  background:linear-gradient(to bottom,var(--cyan),var(--blue),var(--purple));border-radius:4px 0 0 4px;
+}
+.ph-bio-quote-card:hover{
+  background:linear-gradient(135deg,rgba(255,255,255,0.05) 0%,rgba(99,102,241,0.1) 100%);
+  border-color:rgba(34,211,238,0.45);transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(99,102,241,0.25);
+}
+.ph-bio-left-accent{
+  width:32px;height:32px;border-radius:0.6rem;background:rgba(99,102,241,0.18);
+  border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;margin-top:0.1rem;
+}
+.ph-bio-text-wrap{flex:1;}
+.ph-bio-label{
+  display:flex;align-items:center;justify-content:space-between;font-size:0.68rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--cyan);margin-bottom:0.35rem;
+}
+.ph-bio-edit-hint{font-size:0.68rem;color:var(--muted);opacity:0.7;transition:opacity 0.2s;}
+.ph-bio-quote-card:hover .ph-bio-edit-hint{opacity:1;color:var(--cyan);}
+.ph-bio-content{font-size:0.88rem;color:#e2e8f0;line-height:1.5;font-style:italic;word-break:break-word;}
 
 /* Header Social / Developer Links */
 .ph-social-links{display:flex;align-items:center;gap:0.55rem;margin-left:auto;flex-wrap:wrap;}
