@@ -435,7 +435,7 @@
           <div class="ph-info">
             <h3 id="displayName">—</h3>
             <div class="ph-badges-row">
-              <span class="role-tag">Student / Professional</span>
+              <span class="role-tag" id="hdrRoleTag">Student</span>
               <span class="ph-location-badge" id="hdrLocationBadge" onclick="editHeaderLocation()" title="Click to edit location">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 <span id="hdrLocationText">Add Location</span>
@@ -1201,6 +1201,13 @@ async function loadProfile() {
   document.getElementById('displayName').textContent  = d.name || '—';
   document.getElementById('displayEmail').textContent = d.email || '—';
   if (d.name) document.getElementById('navUserName').textContent = d.name;
+
+  // Role tag (Student or Professional)
+  const roleTagEl = document.getElementById('hdrRoleTag');
+  if (roleTagEl) {
+    const expNum = parseInt(d.experience) || 0;
+    roleTagEl.textContent = expNum > 0 ? 'Professional' : 'Student';
+  }
 
   // Header location badge
   const locEl = document.getElementById('hdrLocationText');
