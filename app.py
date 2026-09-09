@@ -658,6 +658,20 @@ def history():
         return jsonify([])
 
 
+# -------------------- HISTORY DETAIL INTELLIGENCE --------------------
+@app.route("/api/history/detail", methods=["POST"])
+def history_detail():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json or {}
+    role = (data.get("predicted_role") or data.get("role") or "").strip()
+    skills = (data.get("skills") or "").strip()
+
+    gap_data = analyze_skill_gap(role, skills)
+    return jsonify(gap_data)
+
+
 # -------------------- SYSTEM STATUS & METADATA --------------------
 @app.route("/api/system/status", methods=["GET"])
 def system_status():

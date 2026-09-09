@@ -2057,7 +2057,7 @@ function toggleFaqAccordion(btn) {
 // ===== HISTORY DETAILS MODAL HANDLERS =====
 let activeHistoryRow = null;
 
-function openHistoryDetails(index) {
+async function openHistoryDetails(index) {
   let rows = [...allRows];
   const search = (document.getElementById('historySearch').value || '').trim().toLowerCase();
   if (search) {
@@ -2090,29 +2090,105 @@ function openHistoryDetails(index) {
   document.getElementById('hmdIndustry').textContent = r.industry || 'Information Technology';
   document.getElementById('hmdResume').textContent = r.resume_filename ? ('Resume (' + r.resume_filename + ')') : 'Manual Form Entry';
 
-  // Render Skills Badges (no emojis)
+  // Render Skills Badges
   const skillsArr = (r.skills || '').split(',').map(s => s.trim()).filter(Boolean);
   const skillsContainer = document.getElementById('hmdSkillsList');
   if (skillsArr.length) {
-    skillsContainer.innerHTML = skillsArr.map(s => `<span class="h-chip">${s}</span>`).join('');
+    skillsContainer.innerHTML = skillsArr.map(s => `<span class="h-chip">⚡ ${s}</span>`).join('');
   } else {
     skillsContainer.innerHTML = '<span style="color:var(--muted);font-size:0.85rem">No skills recorded</span>';
   }
 
-  // Render Certifications Badges (no emojis)
+  // Render Certifications Badges
   const certsArr = (r.certifications || '').split(',').map(c => c.trim()).filter(Boolean);
   const certsContainer = document.getElementById('hmdCertsList');
   const certsBlock = document.getElementById('hmdCertsBlock');
   if (certsArr.length) {
     certsBlock.style.display = 'block';
-    certsContainer.innerHTML = certsArr.map(c => `<span class="h-chip h-chip-cert">${c}</span>`).join('');
+    certsContainer.innerHTML = certsArr.map(c => `<span class="h-chip h-chip-cert">📜 ${c}</span>`).join('');
   } else {
     certsBlock.style.display = 'none';
   }
 
+  // Reset / Placeholder states for dynamic sections
+  document.getElementById('hmdReadinessVal').textContent = 'Calculating...';
+  document.getElementById('hmdReadinessFill').style.width = '0%';
+  document.getElementById('hmdMatchedPills').innerHTML = '<span class="sg-empty" style="font-size:0.75rem">Analyzing skills...</span>';
+  document.getElementById('hmdMissingPills').innerHTML = '<span class="sg-empty" style="font-size:0.75rem">Analyzing skills...</span>';
+  document.getElementById('hmdRoadmapTimeline').innerHTML = '<p style="font-size:0.8rem;color:var(--muted)">Loading structured roadmap...</p>';
+  document.getElementById('hmdInterviewAccordion').innerHTML = '<p style="font-size:0.8rem;color:var(--muted)">Loading interview questions...</p>';
+
   const modal = document.getElementById('historyDetailModal');
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
+
+  // Fetch complete Skill Gap, Roadmap & Interview Questions
+  try {
+    const res = await fetch('/api/history/detail', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ predicted_role: r.predicted_role, skills: r.skills })
+    });
+
+    if (res.ok) {
+      const sg = await res.json();
+
+      // Skill Gap Analysis
+      const readiness = sg.readiness_percentage || 75;
+      document.getElementById('hmdReadinessVal').textContent = readiness + '%';
+      setTimeout(() => { document.getElementById('hmdReadinessFill').style.width = readiness + '%'; }, 100);
+      document.getElementById('hmdBoostBadge').textContent = sg.potential_boost || '+30% Match Potential';
+
+      document.getElementById('hmdMatchedPills').innerHTML = (sg.matched_skills || []).map(s => `
+        <span class="sg-pill matched" style="font-size:0.75rem;padding:0.25rem 0.6rem">✅ ${s}</span>
+      `).join('') || '<span class="sg-empty" style="font-size:0.75rem">No direct matches recorded</span>';
+
+      document.getElementById('hmdMissingPills').innerHTML = (sg.missing_skills || []).map(s => `
+        <span class="sg-pill missing" style="font-size:0.75rem;padding:0.25rem 0.6rem">⚡ ${s}</span>
+      `).join('') || '<span class="sg-empty" style="font-size:0.75rem">Great job! All core skills covered!</span>';
+
+      // 3-Phase Step-by-Step Learning Roadmap
+      if (sg.roadmap && sg.roadmap.length > 0) {
+        document.getElementById('hmdRoadmapTimeline').innerHTML = sg.roadmap.map((phase, idx) => `
+          <div class="roadmap-step" style="padding-left:1.5rem;margin-bottom:1.1rem;position:relative">
+            <div class="rs-dot" style="width:18px;height:18px;font-size:0.65rem;left:-9px">${idx + 1}</div>
+            <div class="rs-card" style="padding:0.9rem 1.1rem;border-radius:0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08)">
+              <div class="rs-header" style="margin-bottom:0.4rem;display:flex;justify-content:space-between;align-items:center">
+                <h4 class="rs-phase" style="font-size:0.88rem;margin:0;color:#fff">${phase.phase}</h4>
+                <span class="rs-duration" style="font-size:0.7rem;padding:0.15rem 0.5rem;background:rgba(99,102,241,0.15);border-radius:1rem;color:#a5b4fc">${phase.duration}</span>
+              </div>
+              <p class="rs-topics" style="font-size:0.78rem;color:var(--muted);margin:0 0 0.6rem;line-height:1.4">${phase.topics}</p>
+              <div class="rs-resources" style="display:flex;flex-wrap:wrap;gap:0.4rem">
+                ${(phase.resources || []).map(res => `
+                  <a href="${res.url}" target="_blank" class="rs-res-link" style="font-size:0.72rem;padding:0.2rem 0.6rem;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);border-radius:0.5rem;color:#22d3ee;text-decoration:none">
+                    🔗 ${res.title}
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Top 5 Technical Interview Questions & Answers
+      if (sg.interview_questions && sg.interview_questions.length > 0) {
+        document.getElementById('hmdInterviewAccordion').innerHTML = sg.interview_questions.map((iq, idx) => `
+          <div class="interview-item" style="margin-bottom:0.6rem;border-radius:0.8rem;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);overflow:hidden">
+            <button type="button" class="interview-q-btn" onclick="this.closest('.interview-item').classList.toggle('open')" style="width:100%;text-align:left;background:none;border:none;padding:0.8rem 1rem;color:#fff;font-size:0.82rem;font-weight:600;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+              <span>Q${idx + 1}: ${iq.q}</span>
+              <span class="iq-arrow" style="font-size:0.7rem;color:var(--cyan);transition:transform 0.2s">▼</span>
+            </button>
+            <div class="interview-answer" style="padding:0.85rem 1rem;background:rgba(0,0,0,0.25);border-top:1px solid rgba(255,255,255,0.05);font-size:0.8rem;color:#cbd5e1;line-height:1.5;display:none">
+              <strong style="color:var(--cyan);display:block;margin-bottom:0.3rem">💡 Model Answer:</strong>
+              ${iq.a}
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (err) {
+    console.error('History detail fetch error:', err);
+  }
 }
 
 function closeHistoryDetails() {
@@ -2167,15 +2243,15 @@ loadProfile();
 checkHistoryNotice();
 </script>
 
-<!-- ===== HISTORY DETAIL MODAL POPUP (CLEAN PROFESSIONAL UI) ===== -->
+<!-- ===== HISTORY DETAIL MODAL POPUP (COMPREHENSIVE AI CAREER INTELLIGENCE) ===== -->
 <div class="h-modal-overlay" id="historyDetailModal" onclick="if(event.target===this)closeHistoryDetails()">
   <div class="h-modal-card">
     <div class="h-modal-header">
       <div>
         <div class="h-modal-title" id="hmdRole">Data Scientist</div>
         <div class="h-modal-badges">
-          <span class="tc-cat-badge" id="hmdCategory">Data Science & AI</span>
-          <span class="tc-conf-badge" id="hmdConf">90.8% Match</span>
+          <span class="tc-cat-badge" id="hmdCategory">Data Science &amp; AI</span>
+          <span class="tc-conf-badge" id="hmdConf">90.8% Match Score</span>
           <span style="font-size:0.8rem;color:var(--muted)" id="hmdDate">09 Sept 2026</span>
         </div>
       </div>
@@ -2184,6 +2260,7 @@ checkHistoryNotice();
 
     <div class="h-modal-body">
       <!-- Academic & Professional Stats Grid -->
+      <div class="h-section-title">🎓 Candidate Background &amp; Inputs</div>
       <div class="h-detail-grid">
         <div class="h-detail-item">
           <div class="h-detail-label">Degree</div>
@@ -2217,26 +2294,63 @@ checkHistoryNotice();
 
       <!-- Skills Section -->
       <div class="h-skills-block">
-        <div class="h-block-title">Technical Skills</div>
+        <div class="h-block-title">⚡ Evaluated Technical Skills</div>
         <div class="h-chips-wrap" id="hmdSkillsList">
           <span class="h-chip">Python</span>
-          <span class="h-chip">C</span>
-          <span class="h-chip">Javascript</span>
-          <span class="h-chip">Html</span>
-          <span class="h-chip">CSS</span>
         </div>
       </div>
 
       <!-- Certifications Section -->
       <div class="h-certs-block" id="hmdCertsBlock" style="display:none">
-        <div class="h-block-title">Certifications & Licenses</div>
+        <div class="h-block-title">📜 Certifications &amp; Licenses</div>
         <div class="h-chips-wrap" id="hmdCertsList"></div>
+      </div>
+
+      <!-- AI Skill Gap Analysis Block -->
+      <div class="h-skill-gap-block" id="hmdSkillGapBlock">
+        <div class="h-block-header-flex">
+          <div class="h-block-title" style="margin-bottom:0">🎯 AI Skill Gap &amp; Readiness Analysis</div>
+          <span class="h-boost-badge" id="hmdBoostBadge">+35% Match Potential</span>
+        </div>
+
+        <div class="readiness-meter-wrap" style="margin: 0.8rem 0 1rem;">
+          <div class="rm-label-row">
+            <span class="rm-title" style="font-size:0.75rem">Career Readiness Fit</span>
+            <span class="rm-val" id="hmdReadinessVal" style="font-size:0.85rem">75%</span>
+          </div>
+          <div class="rm-bar-bg"><div class="rm-bar-fill" id="hmdReadinessFill" style="width:75%"></div></div>
+        </div>
+
+        <div class="sg-columns" style="gap:0.8rem">
+          <div class="sg-col matched-col" style="padding:0.9rem;border-radius:0.85rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2)">
+            <div class="sg-col-title" style="font-size:0.78rem;margin-bottom:0.6rem;color:#22c55e">✅ Skills Already Acquired</div>
+            <div class="sg-pills" id="hmdMatchedPills" style="gap:0.4rem"></div>
+          </div>
+          <div class="sg-col missing-col" style="padding:0.9rem;border-radius:0.85rem;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2)">
+            <div class="sg-col-title" style="font-size:0.78rem;margin-bottom:0.6rem;color:#f59e0b">⚠️ Recommended Skills to Learn</div>
+            <div class="sg-pills" id="hmdMissingPills" style="gap:0.4rem"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step-by-Step Learning Roadmap Block -->
+      <div class="h-roadmap-block" id="hmdRoadmapBlock">
+        <div class="h-block-title">🗺️ Step-by-Step Learning Roadmap</div>
+        <p style="font-size:0.78rem;color:var(--muted);margin:-0.3rem 0 0.8rem;">Structured milestone syllabus and free tutorials curated for this role</p>
+        <div class="h-roadmap-timeline" id="hmdRoadmapTimeline"></div>
+      </div>
+
+      <!-- Top 5 Technical Interview Questions Block -->
+      <div class="h-interview-block" id="hmdInterviewBlock">
+        <div class="h-block-title">💡 Top 5 Technical Interview Questions &amp; Answers</div>
+        <p style="font-size:0.78rem;color:var(--muted);margin:-0.3rem 0 0.8rem;">Click any question to reveal high-scoring model interview answers</p>
+        <div class="h-interview-accordion" id="hmdInterviewAccordion"></div>
       </div>
     </div>
 
     <div class="h-modal-footer">
       <button class="h-btn-secondary" onclick="closeHistoryDetails()">Close</button>
-      <button class="h-btn-primary" onclick="repredictFromHistory()">Re-run Prediction</button>
+      <button class="h-btn-primary" onclick="repredictFromHistory()">🔮 Re-run in Predictor</button>
     </div>
   </div>
 </div>
@@ -2314,12 +2428,12 @@ checkHistoryNotice();
   opacity: 1;
 }
 .h-modal-card {
-  background: rgba(18, 18, 42, 0.95);
+  background: rgba(18, 18, 42, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(99, 102, 241, 0.35);
   border-radius: 1.5rem;
   width: 100%;
-  max-width: 620px;
+  max-width: 760px;
   max-height: 90vh;
   overflow-y: auto;
   display: flex;
@@ -2381,10 +2495,16 @@ checkHistoryNotice();
   flex-direction: column;
   gap: 1.2rem;
 }
+.h-section-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
 .h-detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
 }
 .h-detail-item {
   background: rgba(255, 255, 255, 0.04);
@@ -2405,20 +2525,37 @@ checkHistoryNotice();
   font-weight: 600;
   color: #fff;
 }
-.h-skills-block, .h-certs-block {
+.h-skills-block, .h-certs-block, .h-skill-gap-block, .h-roadmap-block, .h-interview-block {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 1rem 1.2rem;
-  border-radius: 1rem;
+  padding: 1.1rem 1.3rem;
+  border-radius: 1.1rem;
 }
 .h-block-title {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   margin-bottom: 0.7rem;
   color: #22d3ee;
   display: flex;
   align-items: center;
   gap: 0.4rem;
+}
+.h-block-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.h-boost-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #22d3ee;
+  background: rgba(34, 211, 238, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
 }
 .h-chips-wrap {
   display: flex;
@@ -2438,6 +2575,12 @@ checkHistoryNotice();
   background: rgba(236, 72, 153, 0.15);
   border-color: rgba(236, 72, 153, 0.35);
   color: #fce7f3;
+}
+.interview-item.open .interview-answer {
+  display: block !important;
+}
+.interview-item.open .iq-arrow {
+  transform: rotate(180deg);
 }
 .h-modal-footer {
   padding: 1.2rem 1.6rem;
