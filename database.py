@@ -16,14 +16,21 @@ load_dotenv()  # NEW: load .env file
 #     "database": "edu2job"
 # }
 
-# NEW: loads from .env — works locally AND on Railway/PythonAnywhere
+# NEW: loads from .env — works locally AND on Render / Railway / TiDB Cloud
+db_port = int(os.getenv("MYSQLPORT", os.getenv("DB_PORT", 3306)))
+db_host = os.getenv("MYSQLHOST", os.getenv("DB_HOST", "localhost"))
+
 DB_CONFIG = {
-    "host":     os.getenv("MYSQLHOST",     os.getenv("DB_HOST",     "localhost")),
+    "host":     db_host,
     "user":     os.getenv("MYSQLUSER",     os.getenv("DB_USER",     "root")),
     "password": os.getenv("MYSQLPASSWORD", os.getenv("DB_PASSWORD", "Iamkk010405")),
     "database": os.getenv("MYSQLDATABASE", os.getenv("DB_NAME",     "edu2job")),
-    "port":     int(os.getenv("MYSQLPORT", os.getenv("DB_PORT",     3306))),
+    "port":     db_port,
 }
+
+# TiDB Cloud and remote TLS databases require ssl configuration
+if db_port == 4000 or "tidbcloud.com" in db_host.lower():
+    DB_CONFIG["ssl_verify_cert"] = False
 
 # ======================== Load Model + Encoders ========================
 model            = joblib.load("jobrole_model.pkl")
