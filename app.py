@@ -165,6 +165,7 @@ def profile():
             "name": session.get("user_name", ""),
             "email": session.get("user_email", ""),
             "phone": "",
+            "location": "",
             "college_name": "",
             "degree": "",
             "major": "",
@@ -212,13 +213,14 @@ def profile():
         data = request.json
         cur.execute(
             """
-            INSERT INTO profiles(user_id, name, email, phone, college_name, degree, major,
+            INSERT INTO profiles(user_id, name, email, phone, location, college_name, degree, major,
                                  cgpa, experience, skills, passout_year, linkedin, github, portfolio, bio)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             ON DUPLICATE KEY UPDATE
                 name=VALUES(name),
                 email=VALUES(email),
                 phone=VALUES(phone),
+                location=VALUES(location),
                 college_name=VALUES(college_name),
                 degree=VALUES(degree),
                 major=VALUES(major),
@@ -236,6 +238,7 @@ def profile():
                 data.get("name", ""),
                 data.get("email", ""),
                 data.get("phone", ""),
+                data.get("location", ""),
                 data.get("college_name", ""),
                 data.get("degree", ""),
                 data.get("major", ""),
