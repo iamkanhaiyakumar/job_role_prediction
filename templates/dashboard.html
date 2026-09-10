@@ -73,20 +73,20 @@
       </div>
 
       <!-- Animated count-up stats -->
-      <div class="stats-row" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="stats-row stats-row-4">
         <div class="stat-card g-card">
           <div class="stat-icon-wrap">🎯</div>
-          <div class="stat-num" data-target="95" data-suffix="%+">0</div>
-          <div class="stat-label">Calibrated Accuracy</div>
+          <div class="stat-num" data-target="95" data-suffix="%">0</div>
+          <div class="stat-label">AI Accuracy</div>
         </div>
         <div class="stat-card g-card">
           <div class="stat-icon-wrap">💼</div>
-          <div class="stat-num" data-target="31" data-suffix=" Roles">0</div>
+          <div class="stat-num" data-target="31" data-suffix="">0</div>
           <div class="stat-label">Canonical Roles</div>
         </div>
         <div class="stat-card g-card">
           <div class="stat-icon-wrap">🌐</div>
-          <div class="stat-num" data-target="20" data-suffix=" Sectors">0</div>
+          <div class="stat-num" data-target="20" data-suffix="">0</div>
           <div class="stat-label">Industry Sectors</div>
         </div>
         <div class="stat-card g-card">
@@ -2914,22 +2914,7 @@ checkHistoryNotice();
   box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
 }
 
-@media (max-width: 640px) {
-  .timeline-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .tc-action-col {
-    margin-left: 0;
-    margin-top: 0.8rem;
-    padding-left: 0;
-    width: 100%;
-  }
-  .tc-details-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
+
 /* Profile Locked Account Fields */
 .pg-item.locked {
   cursor: default !important;
